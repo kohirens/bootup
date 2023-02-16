@@ -158,7 +158,7 @@ func TestParse(tester *testing.T) {
 
 	for _, fxtr := range fixtures {
 		tester.Run(fxtr.name, func(test *testing.T) {
-			err := Parse(fxtr.tplFile, fxtr.appDir, fxtr.vars)
+			err := parse(fxtr.tplFile, fxtr.appDir, fxtr.vars)
 
 			if !fxtr.gotWhatIWant(err) {
 				test.Error(fxtr.failMsg)

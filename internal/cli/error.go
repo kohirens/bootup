@@ -66,7 +66,7 @@ var Errors = struct {
 	CurrentBranch:          "failed to get current for %s",
 	FatalHeader:            "\nfatal error detected: ",
 	FlagOrderErr:           "flag %v MUST come before any non-flag arguments, a fix would be to move this flag to the left of other input arguments",
-	FileTooBig:             "template file too big to Parse, must be less thatn %v bytes",
+	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
 	GettingAnswers:         "problem getting answers; error %q",
 	GettingCommitHash:      "error getting commit hash %v: %s",
 	GitCheckoutFailed:      "git checkout failed: %s",

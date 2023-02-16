@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-	"text/template/parse"
+	txtParse "text/template/parse"
 )
 
 const (
@@ -133,12 +133,12 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, fec *std
 }
 
 // ListTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
-func listNodeFields(node parse.Node, res map[string]string) {
-	if node.Type() == parse.NodeAction {
+func listNodeFields(node txtParse.Node, res map[string]string) {
+	if node.Type() == txtParse.NodeAction {
 		res[strings.Trim(node.String(), "{}.")] = ""
 	}
 
-	if ln, ok := node.(*parse.ListNode); ok {
+	if ln, ok := node.(*txtParse.ListNode); ok {
 		for _, n := range ln.Nodes {
 			listNodeFields(n, res)
 		}

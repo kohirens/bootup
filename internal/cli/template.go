@@ -223,8 +223,8 @@ func Extract(archivePath string) (string, error) {
 	return tmplDir, nil
 }
 
-// Parse a file as a Go template.
-func Parse(tplFile, dstDir string, vars tmplVars) error {
+// parse a file as a Go template.
+func parse(tplFile, dstDir string, vars tmplVars) error {
 	log.Infof("parsing %v", tplFile)
 	funcMap := template.FuncMap{
 		"title":   strings.Title,
@@ -339,7 +339,7 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 			}
 		}
 
-		rErr = Parse(sourcePath, saveDir, vars)
+		rErr = parse(sourcePath, saveDir, vars)
 
 		return
 	})
