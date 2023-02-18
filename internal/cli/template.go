@@ -35,6 +35,7 @@ type Client interface {
 type TmplJson struct {
 	Excludes     []string    `json:"excludes"`
 	Placeholders tmplVars    `json:"placeholders"`
+	Skip         []string    `json:"skip"`
 	Validation   []validator `json:"validation"`
 	Version      string      `json:"version"`
 }
@@ -290,10 +291,13 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 		}
 
 		currFile := filepath.Base(sourcePath)
-		// Skip files by extension.
-		// TODO: Add globbing is added. filepath.Glob(pattern)
-		if currFile != EmptyFile && !fec.IsValid(sourcePath) { // Use an exclusion list, include every file by default.
+		if currFile != EmptyFile && !fec.IsValid(sourcePath) { // Skip files by extension; Use an exclusion list, include every file by default.
 			log.Infof(Messages.UnknownFileType, sourcePath)
+			return
+		}
+
+		if inArray(currFile, tmplJson.Skip) { // Skip files in this list
+			log.Infof(Messages.SkipFile, sourcePath)
 			return
 		}
 
@@ -310,7 +314,7 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 		log.Infof("partial dir: %v", partial)
 		log.Infof("save dir: %v", saveDir)
 
-		// skip certain files/directories
+		// Skip template manifest file and the git config directory.
 		if currFile == TmplManifest || strings.Contains(partial, PS+gitDir+PS) {
 			log.Infof(Messages.SkipFile, partial)
 			return
@@ -386,4 +390,15 @@ func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 	for placeholder, _ := range placeholders.Placeholders {
 		log.Logf(Messages.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
+}
+
+// shouldSkip Returns true if the file is listed in the array.
+func inArray(currFile string, files []string) bool {
+	for _, aFile := range files {
+		if aFile == currFile {
+			return true
+		}
+	}
+
+	return false
 }
