@@ -264,7 +264,7 @@ func parse(tplFile, dstDir string, vars tmplVars) error {
 }
 
 // ParseDir Recursively walk a directory parsing all files along the way as Go templates.
-func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, excludes []string) (err error) {
+func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmplJson *TmplJson) (err error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	normTplDir := strings.ReplaceAll(tplDir, "/", PS)
 	normTplDir = strings.ReplaceAll(normTplDir, "\\", PS)
@@ -322,13 +322,12 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 			return
 		}
 
-		// exclude from parsing, but copy as-is.
-		if excludes != nil {
+		if tmplJson.Excludes != nil { // exclude from parsing, but copy as-is.
 			// TODO: Replace with better method of comparing files.
 			fileToCheck := strings.ReplaceAll(normSourcePath, normTplDir, "")
 			log.Infof("fileToCheck: %q against excludes", fileToCheck)
 			fileToCheck = strings.ReplaceAll(fileToCheck, PS, "")
-			for _, exclude := range excludes {
+			for _, exclude := range tmplJson.Excludes {
 				fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
 				fileToCheckB = strings.ReplaceAll(exclude, "/", "")
 				if fileToCheckB == fileToCheck {

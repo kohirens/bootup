@@ -163,5 +163,5 @@ func main() {
 
 	cli.ShowAllPlaceholderValues(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders)
 
-	mainErr = cli.ParseDir(appConfig.Tmpl, appConfig.OutPath, appConfig.AnswersJson.Placeholders, fec, tmplManifest.Excludes)
+	mainErr = cli.ParseDir(appConfig.Tmpl, appConfig.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
 }
