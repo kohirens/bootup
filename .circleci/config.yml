@@ -76,6 +76,7 @@ jobs:
               chmod +x ./yajsv
               ./yajsv -s answers.schema.json testdata/answers-01.json
               ./yajsv -s template.schema.json testdata/template-01.json
+              ./yajsv -s template.schema.json testdata/template-1.2.json
 
   publish-image:
     docker:

@@ -36,8 +36,14 @@ type TmplJson struct {
 	Excludes     []string    `json:"excludes"`
 	Placeholders tmplVars    `json:"placeholders"`
 	Skip         []string    `json:"skip"`
+	Replace      ReplaceWith `json:"replace"`
 	Validation   []validator `json:"validation"`
 	Version      string      `json:"version"`
+}
+
+type ReplaceWith struct {
+	Directory string   `json:"directory"`
+	Files     []string `json:"files"`
 }
 
 type tmplVars map[string]string
@@ -296,6 +302,8 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 			return
 		}
 
+		currFile = replaceWith(currFile, PS, tmplJson.Replace)
+
 		if inArray(currFile, tmplJson.Skip) { // Skip files in this list
 			log.Infof(Messages.SkipFile, sourcePath)
 			return
@@ -401,4 +409,17 @@ func inArray(currFile string, files []string) bool {
 	}
 
 	return false
+}
+
+// replaceWith Replace the current file with another.
+func replaceWith(currFile, ps string, replace ReplaceWith) string {
+	for _, replaceMap := range replace.Files {
+		output := strings.Split(replaceMap, ":")
+
+		if output[1] == currFile {
+			return replace.Directory + ps + output[0]
+		}
+	}
+
+	return currFile
 }
