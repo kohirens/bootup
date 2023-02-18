@@ -26,7 +26,7 @@ type AnswersJson struct {
 	Placeholders tmplVars `json:"placeholders"`
 }
 
-// Client specify the methods reqruied by an HTTP client
+// Client specify the methods required by an HTTP client
 type Client interface {
 	Get(url string) (*http.Response, error)
 	Head(url string) (*http.Response, error)
