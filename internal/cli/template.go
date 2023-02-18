@@ -387,7 +387,7 @@ func ReadTemplateJson(filePath string) (*TmplJson, error) {
 func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 	tVals := *tmplValues
 	log.Logf("the following values have been provided\n")
-	for placeholder, _ := range placeholders.Placeholders {
+	for placeholder := range placeholders.Placeholders {
 		log.Logf(Messages.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
 }
