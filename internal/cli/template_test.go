@@ -321,3 +321,63 @@ func TestPlaceholderInput(tester *testing.T) {
 		}
 	})
 }
+
+func TestSkipping(tester *testing.T) {
+	repoFixture := "repo-10"
+	outPath := TmpDir + test.PS + "processed" + test.PS + repoFixture
+	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
+	tc := struct {
+		name    string
+		absent  []string
+		present []string
+		answers tmplVars
+		ph      *TmplJson
+	}{
+		"pressTmplWithNoConfig",
+		[]string{
+			"dir-to-include/second-level/skip-me-as-well.md",
+			"dir-to-skip",
+			"skip-me-too.md",
+			"template.json",
+		},
+		[]string{
+			"dir-to-include/README.md",
+			"dir-to-include/second-level/README.md",
+			"README.md",
+		},
+		tmplVars{"appName": "Repo 09"},
+		&TmplJson{
+			Version: "1.2",
+			Placeholders: tmplVars{
+				"appName": "Application name, the formal name with capitalization and spaces",
+			},
+			Skip: []string{
+				"dir-to-skip",
+				"skip-me-too.md",
+				"dir-to-include/second-level/skip-me-as-well.md",
+			},
+		},
+	}
+
+	tmplPath := test.SetupARepository(repoFixture, TmpDir, FixtureDir, test.PS)
+
+	err := ParseDir(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
+
+	if err != nil {
+		tester.Errorf("got an error %q", err)
+	}
+
+	for _, path := range tc.absent {
+		file := outPath + test.PS + path
+		if stdlib.PathExist(file) {
+			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+
+	for _, path := range tc.present {
+		file := outPath + test.PS + path
+		if !stdlib.PathExist(file) {
+			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+}

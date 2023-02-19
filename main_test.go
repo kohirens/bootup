@@ -344,3 +344,60 @@ func TestFirstTimeRun(tester *testing.T) {
 		})
 	}
 }
+
+func TestSkipFeature(tester *testing.T) {
+	repoFixture := "repo-09"
+	outPath := TmpDir + test.PS + "processed" + test.PS + repoFixture
+	tc := struct {
+		name     string
+		wantCode int
+		args     []string
+		absent   []string
+		present  []string
+	}{
+		"pressTmplWithNoConfig",
+		0,
+		[]string{
+			"-answer-path", FixtureDir + test.PS + repoFixture + "-answers.json",
+			"-out-path", outPath,
+			"-tmpl-path", "will be replace below",
+		},
+		[]string{
+			"dir-to-include/second-level/skip-me-as-well.md",
+			"dir-to-skip",
+			"skip-me-too.md",
+			"template.json",
+		},
+		[]string{
+			"dir-to-include/README.md",
+			"dir-to-include/second-level/README.md",
+			"README.md",
+		},
+	}
+
+	tc.args[5] = test.SetupARepository(repoFixture, TmpDir, FixtureDir, test.PS)
+
+	cmd := runMain(tester.Name(), tc.args)
+
+	_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+
+	got := cmd.ProcessState.ExitCode()
+
+	if got != tc.wantCode {
+		tester.Errorf("got %q, but want %q", got, tc.wantCode)
+	}
+
+	for _, path := range tc.absent {
+		file := outPath + test.PS + path
+		if stdlib.PathExist(file) {
+			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+
+	for _, path := range tc.present {
+		file := outPath + test.PS + path
+		if !stdlib.PathExist(file) {
+			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+}

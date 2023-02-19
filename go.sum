@@ -2,3 +2,7 @@ github.com/kohirens/stdlib v0.0.0-20230218231722-5e7ae38b63c6 h1:Y69li7XASsCMl9G
 github.com/kohirens/stdlib v0.0.0-20230218231722-5e7ae38b63c6/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
 github.com/kohirens/stdlib v0.0.0-20230218231902-1665f7166025 h1:a+udVlOOJAy2WQbNh9dFn5UroHTczCQDL6WyB5xXdY0=
 github.com/kohirens/stdlib v0.0.0-20230218231902-1665f7166025/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
+github.com/kohirens/stdlib v0.0.0-20230219045949-58453f26b64d h1:5EUPHRhXrrxDwNdshWRow4wM19Wv9pQeujzZZwjlKcE=
+github.com/kohirens/stdlib v0.0.0-20230219045949-58453f26b64d/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
+github.com/kohirens/stdlib v0.0.0-20230219064943-5fec2e64a5e1 h1:lT94OJ8rdwwbxPgmqYH1ganQa1vFlJr84iiQSpugCGM=
+github.com/kohirens/stdlib v0.0.0-20230219064943-5fec2e64a5e1/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kohirens/stdlib"
-	"github.com/kohirens/stdlib/kstring"
 	"github.com/kohirens/stdlib/log"
 	"io"
 	"io/ioutil"
@@ -305,27 +304,24 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 
 		currFile = replaceWith(currFile, PS, tmplJson.Replace)
 
-		if kstring.InArray(currFile, tmplJson.Skip) { // Skip files in this list
-			log.Infof(Messages.SkipFile, sourcePath)
-			return
-		}
-
 		// Normalize the path separator in these 2 variables before comparing them.
-		normSourcePath := strings.ReplaceAll(sourcePath, "/", PS)
-		normSourcePath = strings.ReplaceAll(normSourcePath, "\\", PS)
-
-		// Get the subdirectory from the template source and append it to the
-		// output directory, so that files are placed in the correct
-		// subdirectories in the output directory.
-		partial := strings.ReplaceAll(normSourcePath, normTplDir, "")
-		//partial = strings.ReplaceAll(partial, PS, "/")
-		saveDir := filepath.Clean(outDir + filepath.Dir(partial))
-		log.Infof("partial dir: %v", partial)
+		normSourcePath := stdlib.NormalizePath(sourcePath)
+		// Get the relative path of the file from root of the template and
+		// append it to the output directory, so that files are placed in the
+		// same subdirectories in the output directory.
+		relativePath := strings.TrimLeft(strings.ReplaceAll(normSourcePath, normTplDir, ""), "\\/")
+		saveDir := filepath.Clean(outDir + PS + filepath.Dir(relativePath))
+		log.Infof("relativePath dir: %v", relativePath)
 		log.Infof("save dir: %v", saveDir)
 
 		// Skip template manifest file and the git config directory.
-		if currFile == TmplManifest || strings.Contains(partial, PS+gitDir+PS) {
-			log.Infof(Messages.SkipFile, partial)
+		if currFile == TmplManifest || strings.Contains(relativePath, gitDir+PS) {
+			log.Infof(Messages.SkipFile, relativePath)
+			return
+		}
+
+		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
+			log.Infof(Messages.SkipFile, sourcePath)
 			return
 		}
 
@@ -399,6 +395,16 @@ func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 	for placeholder := range placeholders.Placeholders {
 		log.Logf(Messages.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
+}
+
+func inSkipArray(p string, skips []string) bool {
+	for _, skip := range skips {
+		skip = stdlib.NormalizePath(skip)
+		if strings.Contains(p, skip) {
+			return true
+		}
+	}
+	return false
 }
 
 // replaceWith Replace the current file with another.
