@@ -270,8 +270,8 @@ func parse(tplFile, dstDir string, vars tmplVars) error {
 	return nil
 }
 
-// ParseDir Recursively walk a directory parsing all files along the way as Go templates.
-func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmplJson *TmplJson) (err error) {
+// Press Recursively walk a directory parsing all files along the way as Go templates.
+func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmplJson *TmplJson) (err error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	normTplDir := strings.ReplaceAll(tplDir, "/", PS)
 	normTplDir = strings.ReplaceAll(normTplDir, "\\", PS)

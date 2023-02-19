@@ -110,7 +110,7 @@ func TestParseDir2(tester *testing.T) {
 	fileChkr, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	for _, fxtr := range fixtures {
 		tester.Run(fxtr.name, func(test *testing.T) {
-			err := ParseDir(fxtr.srcDir, fxtr.dstDir, fxtr.vars, fileChkr, &TmplJson{Excludes: []string{}})
+			err := Press(fxtr.srcDir, fxtr.dstDir, fxtr.vars, fileChkr, &TmplJson{Excludes: []string{}})
 			isAllGood := fxtr.want(err)
 
 			if !isAllGood {
@@ -187,7 +187,7 @@ func TestParseDir(tester *testing.T) {
 	tester.Run(fxtr.name, func(test *testing.T) {
 		fec, _ := stdlib.NewFileExtChecker(nil, &[]string{"md", "yml"})
 
-		err := ParseDir(fxtr.tmplPath, fxtr.outPath, fxtr.tplVars, fec, &TmplJson{})
+		err := Press(fxtr.tmplPath, fxtr.outPath, fxtr.tplVars, fec, &TmplJson{})
 
 		if err != nil {
 			test.Errorf("got an error %q", err.Error())
@@ -361,7 +361,7 @@ func TestSkipping(tester *testing.T) {
 
 	tmplPath := test.SetupARepository(repoFixture, TmpDir, FixtureDir, test.PS)
 
-	err := ParseDir(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
+	err := Press(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
 
 	if err != nil {
 		tester.Errorf("got an error %q", err)
