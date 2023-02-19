@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"io/ioutil"
 	"net/http"
@@ -378,6 +379,73 @@ func TestSkipping(tester *testing.T) {
 		file := outPath + test.PS + path
 		if !stdlib.PathExist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+}
+
+func TestReplaceWith(tester *testing.T) {
+	repoFixture := "repo-11"
+	outPath := TmpDir + test.PS + "processed" + test.PS + repoFixture
+	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
+	tc := struct {
+		name    string
+		files   []string
+		absent  []string
+		content []string
+		answers tmplVars
+		ph      *TmplJson
+	}{
+		"success",
+		[]string{
+			".circleci/config.yml",
+			".chglog/config.yml",
+			"README.md",
+		},
+		[]string{
+			"replace/.circleci/config.yml",
+			"replace/.chglog/config.yml",
+		},
+		[]string{
+			"This is the correct file for Repo 11",
+			"This is the correct file for Repo 11",
+			"# Repo 11",
+		},
+		tmplVars{"appName": "Repo 11"},
+		&TmplJson{
+			Version: "1.2",
+			Placeholders: tmplVars{
+				"appName": "Application name, the formal name with capitalization and spaces",
+			},
+			Replace: ReplaceWith{
+				Directory: "replace",
+				Files: []string{
+					".circleci:.circleci",
+					".chglog/config.yml:.chglog/config.yml",
+				},
+			},
+		},
+	}
+
+	tmplPath := test.SetupARepository(repoFixture, TmpDir, FixtureDir, test.PS)
+
+	err := Press(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
+
+	if err != nil {
+		tester.Errorf("got an error %q", err)
+	}
+
+	for _, path := range tc.absent {
+		file := outPath + test.PS + path
+		if stdlib.PathExist(file) {
+			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
+		}
+	}
+
+	for i, path := range tc.files {
+		file := outPath + test.PS + path
+		got, _ := ioutil.ReadFile(file)
+		if bytes.NewBuffer(got).String() == tc.content[i] {
+			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", got, tc.content[i])
 		}
 	}
 }

@@ -302,8 +302,6 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 			return
 		}
 
-		currFile = replaceWith(currFile, PS, tmplJson.Replace)
-
 		// Normalize the path separator in these 2 variables before comparing them.
 		normSourcePath := stdlib.NormalizePath(sourcePath)
 		// Get the relative path of the file from root of the template and
@@ -321,6 +319,12 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 		}
 
 		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
+			log.Infof(Messages.SkipFile, sourcePath)
+			return
+		}
+
+		// skip the directory with replace files.
+		if strings.Contains(relativePath, tmplJson.Replace.Directory) {
 			log.Infof(Messages.SkipFile, sourcePath)
 			return
 		}
@@ -346,6 +350,8 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 				}
 			}
 		}
+
+		sourcePath = replaceWith(relativePath, PS, sourcePath, normTplDir, tmplJson.Replace)
 
 		rErr = parse(sourcePath, saveDir, vars)
 
@@ -408,14 +414,20 @@ func inSkipArray(p string, skips []string) bool {
 }
 
 // replaceWith Replace the current file with another.
-func replaceWith(currFile, ps string, replace ReplaceWith) string {
-	for _, replaceMap := range replace.Files {
-		output := strings.Split(replaceMap, ":")
+func replaceWith(cf, ps, sp, tmplRoot string, replace ReplaceWith) string {
+	for _, fileMap := range replace.Files {
+		fileMap = stdlib.NormalizePath(fileMap)
+		fileAry := strings.Split(fileMap, ":")
 
-		if output[1] == currFile {
-			return replace.Directory + ps + output[0]
+		if strings.Contains(cf, fileAry[1]) {
+			if cf == fileAry[1] {
+				return tmplRoot + ps + replace.Directory + ps + fileAry[0]
+			}
+			// match by prefix
+
+			return tmplRoot + ps + replace.Directory + ps + fileAry[0] + strings.Replace(cf, fileAry[0], "", 1)
 		}
 	}
 
-	return currFile
+	return sp
 }
