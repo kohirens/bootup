@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kohirens/stdlib"
+	"github.com/kohirens/stdlib/kstring"
 	"github.com/kohirens/stdlib/log"
 	"io"
 	"io/ioutil"
@@ -304,7 +305,7 @@ func ParseDir(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, 
 
 		currFile = replaceWith(currFile, PS, tmplJson.Replace)
 
-		if inArray(currFile, tmplJson.Skip) { // Skip files in this list
+		if kstring.InArray(currFile, tmplJson.Skip) { // Skip files in this list
 			log.Infof(Messages.SkipFile, sourcePath)
 			return
 		}
@@ -398,17 +399,6 @@ func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 	for placeholder := range placeholders.Placeholders {
 		log.Logf(Messages.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
-}
-
-// shouldSkip Returns true if the file is listed in the array.
-func inArray(currFile string, files []string) bool {
-	for _, aFile := range files {
-		if aFile == currFile {
-			return true
-		}
-	}
-
-	return false
 }
 
 // replaceWith Replace the current file with another.
