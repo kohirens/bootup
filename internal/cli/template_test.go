@@ -443,7 +443,7 @@ func TestReplaceWith(tester *testing.T) {
 
 	for i, path := range tc.files {
 		file := outPath + test.PS + path
-		got, _ := ioutil.ReadFile(file)
+		got, _ := os.ReadFile(file)
 		if bytes.NewBuffer(got).String() == tc.content[i] {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", got, tc.content[i])
 		}
