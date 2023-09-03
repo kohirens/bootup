@@ -111,10 +111,10 @@ tool does.
       },
       "excludes": [
          ".gitignore",
-         "*.gif",
-         "*.jpg",
-         "*.png",
-         "*.mov",
+         ".gif",
+         ".jpg",
+         ".png",
+         ".mov",
       ]
    }
    ```
