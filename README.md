@@ -1,3 +1,9 @@
+# TmplToApp
+
+Start an app (or something) from a template.
+
+## Table of Contents
+
 * [TmplToApp](#tmpltoapp)
     * [Description](#description)
     * [Installation](#installation)
@@ -7,9 +13,6 @@
         * [Making a Template](#making-a-template)
         * [Using a Template](#using-a-template)
 
-# TmplToApp
-
-Start an app (or something) from a template.
 
 ## Info
 
@@ -17,17 +20,17 @@ Start an app (or something) from a template.
 
 ## Description
 
-Uses the Go text/template engine to produce output such as an app, project, etc.
-A template is a folder with files (of any extension). Each file processed as a
-Go template. Data for the template is supplied with JSON files. They can be
-simple key/value pairs. However, you are only limited to your knowledge of Go
-templates. Meaning it can be more than just simple string replacement of
-placeholders. Think loops, conditions, and function calls (built into go).
+Build templates using this app which uses the Go text/template library to
+produce output for files formatted for an app, project, etc.
 
-This can be used to process anything you can start from a template. For example
-image you want to send out an email to many clients, then you can process
-a file, in a loop, and supply the data that changes to produce different output
-with each pass of the loop.
+A template starts out as a folder with files (of any extension) containing Go
+template syntax. Each file processed as a Go template. Data for the template is
+supplied with questions answer from the CLI or a JSON file as input. This is
+extremely powerful; you are only limited to your knowledge of Go templates.
+
+**Hint:** Templates are invaluable for quickly setting up apps/projects layouts
+(even a small parts) that you commonly use. This is especially true when using
+the `answer.json` file with automation.
 
 ## Terminology
 

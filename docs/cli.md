@@ -14,13 +14,13 @@ directory.
 
 ## Options
 
-**--tmplPath**, **-t** URL to a zip or a local path to a directory
+**-tmplPath**, **-t** URL to a zip or a local path to a directory
 
-**--answers**, **-a** Path to an answer file.
+**-answers**, **-a** Path to an answer file.
 
-**--help**, **-h** Output this documentation.
+**-help**, **-h** Output this documentation.
 
-**--verbosity** Control the level of information/feedback the program will
+**-verbosity** Control the level of information/feedback the program will
 output to the user.
 
-**--version**, **-v** Output version information.
+**-version**, **-v** Output version information.
