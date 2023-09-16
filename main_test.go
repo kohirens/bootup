@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kohirens/stdlib"
+	stdt "github.com/kohirens/stdlib/test"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/test"
+	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"os"
 	"os/exec"
 	"strings"
@@ -143,7 +145,7 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 		args     []string
 		expected string
 	}{
-		{"noArgs", 1, []string{cli.CmdConfig}, "usage: config"},
+		{"noArgs", 1, []string{cli.CmdConfig}, "invalid number of arguments"},
 		{"keyDoesNotExist", 1, []string{cli.CmdConfig, "set", "key", "value"}, "no \"key\" setting found"},
 	}
 
@@ -153,7 +155,7 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 			cmd := test.GetTestBinCmd(tc.args)
 
 			out, _ := test.VerboseSubCmdOut(cmd.CombinedOutput())
-			// get exit code.
+
 			got := cmd.ProcessState.ExitCode()
 
 			if got != tc.wantCode {
@@ -180,7 +182,7 @@ func TestSubCmdConfigSuccess(tester *testing.T) {
 		args     []string
 		contains string
 	}{
-		{"help", 0, []string{cli.CmdConfig, "-help"}, "usage: config"},
+		{"help", 0, []string{cli.CmdConfig, "-help"}, config.UsageTmpl},
 		{"getCache", 0, []string{cli.CmdConfig, "get", "CacheDir"}, "tmp"},
 	}
 
@@ -239,7 +241,7 @@ func TestSetUserOptions(tester *testing.T) {
 
 			file := TmpDir + cli.PS + ".tmpltoapp" + cli.PS + "config.json"
 
-			gotCfg := &cli.Config{}
+			gotCfg := &cli.AppData{}
 			_ = gotCfg.LoadUserSettings(file)
 			data, err1 := json.Marshal(gotCfg.UsrOpts)
 
@@ -285,7 +287,7 @@ func TestTmplAndOutPathMatch(tester *testing.T) {
 
 			cmd := runMain(tester.Name(), tc.args)
 
-			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			got := cmd.ProcessState.ExitCode()
 

@@ -1,9 +1,12 @@
-package cli
+package manifest
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/kohirens/stdlib"
+	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/tmpltoapp/internal/msg"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -13,13 +16,57 @@ import (
 )
 
 const (
-	TmplManifest = "template.json"
+	TmplManifest = "template.json" //TODO: BREAKING Rename to tmplpress.json
+	ps           = string(os.PathSeparator)
+	EmptyFile    = ".empty"
+	GitConfigDir = ".git"
+	Name         = "manifest"
+	Summary      = "Generate a template.json file for a template."
 )
+
+type Arguments struct {
+	Path string // path to generate a manifest for.
+}
+
+var (
+	Args  Arguments
+	flags *flag.FlagSet
+	help  bool
+)
+
+func Init() *flag.FlagSet {
+	flags = flag.NewFlagSet(Name, flag.ExitOnError)
+
+	flags.BoolVar(&help, "help", false, UsageMessages["help"])
+
+	return flags
+}
+
+func ParseFlags(ca []string) error {
+	if e := flags.Parse(ca); e != nil {
+		return fmt.Errorf(msg.Errors.ParsingConfigArgs, e.Error())
+	}
+
+	if len(ca) < 1 {
+		return fmt.Errorf(msg.Errors.InvalidNoSubCmdArgs, Name, 1)
+	}
+
+	if help {
+		flags.Usage()
+		return nil
+	}
+
+	Args.Path = ca[0]
+
+	log.Dbugf("manifest.Args.Path = %v", Args.Path)
+
+	return nil
+}
 
 // GenerateATemplateManifest Make a JSON file with your templates placeholders.
 func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
 	if !stdlib.PathExist(tmplPath) {
-		return nil, fmt.Errorf(Errors.pathNotExist, tmplPath)
+		return nil, fmt.Errorf(msg.Errors.PathNotExist, tmplPath)
 	}
 
 	// Traverse the path recursively, filtering out files that should be excluded
@@ -36,13 +83,13 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 
 		t, e := template.ParseFiles(tmpl)
 		if e != nil {
-			return nil, fmt.Errorf(Errors.parsingFile, tmpl, e.Error())
+			return nil, fmt.Errorf(msg.Errors.ParsingFile, tmpl, e.Error())
 		}
 
 		ListTemplateFields(t, actions)
 	}
 
-	if e := saveFile(tmplPath+PS+TmplManifest, actions); e != nil {
+	if e := saveFile(tmplPath+ps+TmplManifest, actions); e != nil {
 		return nil, e
 	}
 
@@ -58,8 +105,8 @@ func ListTemplateFields(t *template.Template, res map[string]string) {
 // ManifestParseDir Recursively walk a directory parsing all files along the way as Go templates.
 func ManifestParseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
-	nPath := strings.ReplaceAll(path, "/", PS)
-	nPath = strings.ReplaceAll(nPath, "\\", PS)
+	nPath := strings.ReplaceAll(path, "/", ps)
+	nPath = strings.ReplaceAll(nPath, "\\", ps)
 
 	var files []string
 	i := 0
@@ -68,7 +115,7 @@ func ManifestParseDir(path string, fec *stdlib.FileExtChecker, excludes []string
 		i++
 		//fmt.Printf("%-2d %v\n", i, fPath)
 
-		file, e1 := filterFile(fPath, nPath, info, err, fec, excludes)
+		file, e1 := filterFile(fPath, nPath, info, err, excludes)
 		if err != nil {
 			return e1
 		}
@@ -88,7 +135,7 @@ func ManifestParseDir(path string, fec *stdlib.FileExtChecker, excludes []string
 }
 
 // filterFile
-func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, fec *stdlib.FileExtChecker, excludes []string) (string, error) {
+func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes []string) (string, error) {
 	if wErr != nil {
 		return "", wErr
 	}
@@ -98,7 +145,7 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, fec *std
 	}
 
 	// skip certain .git files/directories
-	if strings.Contains(sourcePath, PS+gitDir+PS) {
+	if strings.Contains(sourcePath, ps+GitConfigDir+ps) {
 		return "", nil
 	}
 
@@ -111,13 +158,13 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, fec *std
 	}
 
 	// Normalize the path separator in these 2 variables before comparing them.
-	normSourcePath := strings.ReplaceAll(sourcePath, "/", PS)
-	normSourcePath = strings.ReplaceAll(normSourcePath, "\\", PS)
+	normSourcePath := strings.ReplaceAll(sourcePath, "/", ps)
+	normSourcePath = strings.ReplaceAll(normSourcePath, "\\", ps)
 
 	// Skip files that are listed in the excludes.
 	if excludes != nil {
 		fileToCheck := strings.ReplaceAll(normSourcePath, nPath, "")
-		fileToCheck = strings.ReplaceAll(fileToCheck, PS, "")
+		fileToCheck = strings.ReplaceAll(fileToCheck, ps, "")
 
 		for _, exclude := range excludes {
 			fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
@@ -154,10 +201,10 @@ func saveFile(jsonFile string, actions map[string]string) error {
 	data, e1 := json.Marshal(actions)
 
 	if e1 != nil {
-		return fmt.Errorf(Errors.encodingJson, jsonFile, e1.Error())
+		return fmt.Errorf(stderr.EncodingJson, jsonFile, e1.Error())
 	}
 
-	tmpl := template.Must(template.New(tmplJsonTmpl).Parse(tmplJsonTmpl))
+	tmpl := template.Must(template.New(TmplManifest).Parse(TmplJsonTmpl))
 
 	f, e2 := os.Create(jsonFile)
 	if e2 != nil {
@@ -166,7 +213,7 @@ func saveFile(jsonFile string, actions map[string]string) error {
 
 	// Write the template.json manifest to disk.
 	if e := tmpl.Execute(f, templateSchema{Placeholders: data}); e != nil {
-		return fmt.Errorf(Errors.savingManifest, jsonFile, e.Error())
+		return fmt.Errorf(stderr.SavingManifest, jsonFile, e.Error())
 	}
 
 	return nil

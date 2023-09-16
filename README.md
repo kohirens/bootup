@@ -20,13 +20,22 @@ Start an app (or something) from a template.
 
 ## Description
 
-Build templates using this app which uses the Go text/template library to
-produce output for files formatted for an app, project, etc.
+A template is a collection of files organized in a folder hierarchy. Any
+extension can be used, but the template must be written in text (only tested
+with UTF-8) containing Go template syntax. This application takes such a folder
+and processes each file in the folder structure to an output folder of your
+choosing.
 
-A template starts out as a folder with files (of any extension) containing Go
-template syntax. Each file processed as a Go template. Data for the template is
-supplied with questions answer from the CLI or a JSON file as input. This is
-extremely powerful; you are only limited to your knowledge of Go templates.
+Data for the template is supplied with questions answer from the CLI or a
+JSON file as input. This is extremely powerful; you are only limited to your
+knowledge of Go templates.
+
+You can make whole project templates or smaller pieces your more likely to use
+on a regular basis. For examole, making a Docker file template or a CI/CD
+configuration you use for many projects. Making a tempalte out of them to fill
+in application details for example.
+
+The idea is to quickly setup things you need on a regular basis.
 
 **Hint:** Templates are invaluable for quickly setting up apps/projects layouts
 (even a small parts) that you commonly use. This is especially true when using
@@ -36,26 +45,27 @@ the `answer.json` file with automation.
 
 * Placeholders - refer to the variables that need to be filled in when a file
   is process as a Go template.
-* Template - is a folder/directory with files (of any extension).
+* Template - refer to top/root folder/directory as a whole, which contains
+  text files (of any extension) containing Go template syntax.
 * Empty directory - a directory with a single file named `.empty`, contents
   are ignored.
-* Templates source - can be a local folder, URL to a zip file, or Git repo.
+* Templates source - the Git repository for the __Template__ repo.
 
 ## Installation
 
 ### Using Go
 
 ```
-go get github.com/kohirens/tmpltoapp
+go install github.com/kohirens/tmpltoapp
 ```
 
 ### Using Docker
 
 ```
-docker pull kohirens/tmpltoapp:latest
+docker pull kohirens/tmpltoapp:x.x.x
 ```
 
-### Using cURL
+### Using cURL on Linux
 
 ```
 cd /tmp
@@ -69,60 +79,37 @@ export PATH="${HOME}/bin:${PATH}"
 
 ### Making a Template
 
-Templates are just directories containing files, which can contain Go template
-syntax that will be processed to fill in placeholders. The output will serve as
-a new project.
+You can quickly make a Template by following these steps.
 
-1. Make a new directory.
-2. Add folders, and if a directory should be empty, then place a file named
-   ".empty" in it. It does need any text in it.
-3. Add your files, the extension does not matter as it will be processed as a Go template. For example imagine "README.md" with the content.
-   1. Files can contain a GoLang template placeholder, so `README.md` can contain:
-      ```gotemplate
-      # {{ .appName }}
+1. Make a new directory with a name of your choosing.
+2. Make a README.md and add `# {{.AppName}}` as the content.
+3. Open a command line to this folder and run `tmpltoapp manifest ./`. This
+   will generate the manifest `template.json` file containing some details about
+   your template. Mainly the placeholder.
+4. You can edit this file by giving the AppName key a value like:
+   "application name". This acts as a label or question when someone uses your
+   template. More on that later.
+5. Run `git inti` and then `git add .`, then commit the changes.
 
-      ## Summary
-      ```
-   Note: the placeholder `{{ .appName }}` will be replaced with the apps name at runtime.
-4. Add a `template.json` file that serves as a manifest of all variables in the template, see [How To Build A Template JSON Manifest](/docs/building-a-template-json.md)
-5. Commit the changes and push up to your repo.
+That is the start of your template. But you can add more folders,
+and if a directory should be empty, then place a file named ".empty" in it.
+The .empty file does need any text in it.
+
+Add more files as needed, the extension does not matter as it will be
+processed as a Go template, unless it is excluded in the template.json manifest.
+See [How To Build A Template JSON Manifest] for other details that can be added.
 
 ### Using a Template
 
-Run this application with 3 parameters:
-1. a path to a template, a URL to a zip or local folder.
-2. a path to where you want to place the project (it should not exist).
-3. a path to an answer (JSON) file containing key/value pairs that will
-   serve as variables. The name is not imp For example, an `{{ .author }}`
-   placeholder would take a file that has:
-   ```
-   {
-      "author": "your name here",
-      "appName": "awesomeAppName"
-   }
-   ```
-NOTICE: Name change pending... "start-from-tmpl" to make it obvious what this
-tool does.
+You'll need to download this tool in order to use a template. See [Installation]
+if you have not done so.
 
-4. make a `template.json` file which acts as a manifest, it needs the following:
-   ```
-   {
-      "version": "1.0.0",
-      "placeholders": {
-        "appName": "name of the app",
-        "repoName": "name of the VCS repository"
-      },
-      "excludes": [
-         ".gitignore",
-         ".gif",
-         ".jpg",
-         ".png",
-         ".mov",
-      ]
-   }
-   ```
 NOTE: There are command line flags should you need to place the arguments
-      out of order. Run the program with `-h` or `--help` for options.
+out of order. Run the program with `-h` or `--help` for options.
+
+Run this application with 3 parameters:
+1. a path to a template, a URL or local folder.
+2. a path to where you want to place the project (it should not exist).
 
 ### Notes About Template Processing
 
@@ -135,3 +122,4 @@ NOTE: There are command line flags should you need to place the arguments
 ---
 
 [Golang text/template]: https://golang.org/pkg/text/template/
+[How To Build A Template JSON Manifest]: /docs/building-a-template-json.md

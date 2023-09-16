@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"github.com/kohirens/tmpltoapp/internal/test"
+	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -195,13 +196,12 @@ func TestParseDir(tester *testing.T) {
 			return
 		}
 
-		got, err := ioutil.ReadFile(tmpDir + "/parse-dir-01/dir1/README.md")
+		got, err := os.ReadFile(tmpDir + "/parse-dir-01/dir1/README.md")
 
 		if err != nil {
 			test.Errorf("got an error %q", err.Error())
 		}
 
-		//TODO: Verify the files in the parsed dir was processed
 		if string(got) != fxtr.want {
 			test.Errorf("got %q, but want %q", string(got), fxtr.want)
 		}
@@ -213,21 +213,17 @@ func TestReadTemplateJson(tester *testing.T) {
 
 	fixtures := []struct {
 		name      string
-		config    *Config
 		shouldErr bool
 	}{
 		{
 			"canBeFound",
-			&Config{
-				TmplPath: fixturePath1,
-			},
 			false,
 		},
 	}
 
 	fxtr := fixtures[0]
 	tester.Run(fxtr.name, func(test *testing.T) {
-		got, err := ReadTemplateJson(fxtr.config.TmplPath + PS + TmplManifest)
+		got, err := ReadTemplateJson(fixturePath1 + PS + manifest.TmplManifest)
 
 		if fxtr.shouldErr && err == nil {
 			test.Errorf("expected an error, but got nil")
@@ -248,12 +244,14 @@ func TestReadTemplateJson(tester *testing.T) {
 
 func TestPlaceholderInput(tester *testing.T) {
 	defer test.Silencer()()
+
 	// Use a temp file to simulate input on the command line.
-	tmpFile, err := ioutil.TempFile(TmpDir, "qi-01")
-	if err != nil {
-		tester.Errorf("failed to make temp file %v", err.Error())
+	tmpFile, err1 := os.CreateTemp(TmpDir, "qi-01")
+	if err1 != nil {
+		tester.Errorf("failed to make temp file %v", err1.Error())
 	}
 
+	// cleanup
 	defer func() {
 		if e := tmpFile.Close(); e != nil {
 			tester.Errorf("failed to close tmp file: %v", e.Error())
@@ -275,12 +273,12 @@ func TestPlaceholderInput(tester *testing.T) {
 
 	fixtures := []struct {
 		name   string
-		config *Config
+		config *AppData
 		want   string
 	}{
 		{
 			"missingAnAnswer",
-			&Config{
+			&AppData{
 				AnswersJson: &AnswersJson{
 					Placeholders: tmplVars{"var1": "", "var2": ""},
 				},
@@ -294,7 +292,7 @@ func TestPlaceholderInput(tester *testing.T) {
 		},
 		{
 			"noMissingAnswers",
-			&Config{
+			&AppData{
 				AnswersJson: &AnswersJson{
 					Placeholders: tmplVars{"var1": "1", "var2": "2", "var3": "3"},
 				},
@@ -311,10 +309,9 @@ func TestPlaceholderInput(tester *testing.T) {
 	fxtr := fixtures[0]
 	tester.Run(fxtr.name, func(test *testing.T) {
 		resetTmpFile()
-		err := GetPlaceholderInput(fxtr.config.TmplJson, &fxtr.config.AnswersJson.Placeholders, tmpFile, " ")
-
-		if err != nil {
-			test.Errorf("got an error %q", err.Error())
+		err2 := GetPlaceholderInput(fxtr.config.TmplJson, &fxtr.config.AnswersJson.Placeholders, tmpFile, " ")
+		if err2 != nil {
+			test.Errorf("got an error %q", err2.Error())
 		}
 
 		if fxtr.config.AnswersJson.Placeholders[fxtr.want] != "1" {

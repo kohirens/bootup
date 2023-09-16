@@ -1,4 +1,4 @@
-package cli
+package msg
 
 // Messages helpful info to std out
 var Messages = struct {

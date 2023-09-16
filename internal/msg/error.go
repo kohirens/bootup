@@ -1,4 +1,4 @@
-package cli
+package msg
 
 var Errors = struct {
 	AnswerFile404          string
@@ -34,6 +34,7 @@ var Errors = struct {
 	LocalOutPath           string
 	MissingTmplJson        string
 	NoGitTagFound          string
+	NoInput                string
 	OutPathCollision       string
 	ParsingConfigArgs      string
 	PathNotAllowed         string
@@ -42,10 +43,8 @@ var Errors = struct {
 	TmplOutput             string
 	TmplPath               string
 	UnhandledHttpErr       string
-	encodingJson           string
-	savingManifest         string
-	parsingFile            string
-	pathNotExist           string
+	ParsingFile            string
+	PathNotExist           string
 }{
 	AnswerFile404:          "could not find the answer file %q, please specify a path to a valid answer file that exist: given %q",
 	AppDataDir:             "the following error occurred trying to get the app data directory: %q",
@@ -74,12 +73,13 @@ var Errors = struct {
 	GetRemoteTags:          "could not get remote tags, please check for a typo, it exist, and is readable: %v",
 	GitExitErrCode:         "git %v returned exit code %q",
 	GitFetchFailed:         "fetch failed on %s and %s; %s",
-	InvalidNoArgs:          "invalid number of arguments passed to config sub-command, please try config -h for usage",
-	InvalidNoSubCmdArgs:    "sub-command %v takes %v number of arguments, try \"%[1]s -h\" for usage",
+	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
+	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
 	InvalidTmplDir:         "invalid template directory %q",
 	LocalOutPath:           "enter a local path to output the app",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
 	NoGitTagFound:          "no tag found in %v",
+	NoInput:                "no input",
 	OutPathCollision:       "-tmpl-path %q and -out-path %q cannot point to the same directory",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
@@ -88,8 +88,6 @@ var Errors = struct {
 	TmplOutput:             "template has NOT been cloned locally",
 	TmplPath:               "please specify a path (or URL) to a template",
 	UnhandledHttpErr:       "template Download aborted; I'm coded to NOT do anything when HTTP status is %q and status code is %d",
-	encodingJson:           "could not marshall actions in file %v, error: %v",
-	savingManifest:         "could not save file %v, error: %v",
-	parsingFile:            "could not parse file %v, error: %v",
-	pathNotExist:           "could not locate the path %q",
+	ParsingFile:            "could not parse file %v, error: %v",
+	PathNotExist:           "could not locate the path %q",
 }

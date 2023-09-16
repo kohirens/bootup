@@ -10,24 +10,24 @@ import (
 func TestGetTmplLocation(runner *testing.T) {
 	fixtures := []struct {
 		name, want string
-		cfg        *Config
+		tmplPath   string
 	}{
-		{"relative", "local", &Config{TmplPath: "./"}},
-		{"relative2", "local", &Config{TmplPath: "."}},
-		{"relativeUp", "local", &Config{TmplPath: ".."}},
-		{"absolute", "local", &Config{TmplPath: "/home/myuser"}},
-		{"windows", "local", &Config{TmplPath: "C:\\Temp"}},
-		{"http", "remote", &Config{TmplPath: "http://example.com/repo1"}},
-		{"https", "remote", &Config{TmplPath: "https://example.com/repo1"}},
-		{"git", "remote", &Config{TmplPath: "git://example.com/repo1"}},
-		{"file", "remote", &Config{TmplPath: "file://example.com/repo1"}},
-		{"hiddenRelative", "local", &Config{TmplPath: ".m/example.com/repo1"}},
-		{"tildeRelative", "local", &Config{TmplPath: "~/repo1.git"}},
+		{"relative", "local", "./"},
+		{"relative2", "local", "."},
+		{"relativeUp", "local", ".."},
+		{"absolute", "local", "/home/myuser"},
+		{"windows", "local", "C:\\Temp"},
+		{"http", "remote", "http://example.com/repo1"},
+		{"https", "remote", "https://example.com/repo1"},
+		{"git", "remote", "git://example.com/repo1"},
+		{"file", "remote", "file://example.com/repo1"},
+		{"hiddenRelative", "local", ".m/example.com/repo1"},
+		{"tildeRelative", "local", "~/repo1.git"},
 	}
 
 	for _, tc := range fixtures {
 		runner.Run(tc.name, func(t *testing.T) {
-			got := tc.cfg.getTmplLocation()
+			got := getTmplLocation(tc.tmplPath)
 
 			if got != tc.want {
 				t.Errorf("got %q, want %q", got, tc.want)
@@ -39,7 +39,7 @@ func TestGetTmplLocation(runner *testing.T) {
 func TestGetSettings(t *testing.T) {
 
 	t.Run("configNotFound", func(t *testing.T) {
-		cfgFixture := &Config{}
+		cfgFixture := &AppData{}
 		gotErr := cfgFixture.LoadUserSettings("does-not-exist")
 
 		if !strings.Contains(gotErr.Error(), "could not open") {
@@ -48,7 +48,7 @@ func TestGetSettings(t *testing.T) {
 	})
 
 	t.Run("canReadConfig", func(t *testing.T) {
-		cfgFixture := &Config{}
+		cfgFixture := &AppData{}
 		err := cfgFixture.LoadUserSettings(FixtureDir + PS + "config-01.json")
 		if err != nil {
 			t.Errorf("got an unexpected error %v", err.Error())
@@ -60,9 +60,9 @@ func TestInitConfigFile(t *testing.T) {
 	var testCases = []struct {
 		name string
 		want error
-		cfg  *Config
+		cfg  *AppData
 	}{
-		{"NotExist", nil, &Config{Path: TmpDir + PS + "config-fix-01.json"}},
+		{"NotExist", nil, &AppData{Path: TmpDir + PS + "config-fix-01.json"}},
 	}
 
 	for _, tc := range testCases {
@@ -109,37 +109,6 @@ func TestLoadAnswers(tester *testing.T) {
 	})
 }
 
-//func xTestSubCmdConfigBadExit(tester *testing.T) {
-//	oldArgs := os.Args
-//	var tests = []struct {
-//		name     string
-//		wantCode int
-//		args     []string
-//		expected string
-//	}{
-//		{"noArgs", 1, []string{oldArgs[0], CmdConfig}, "usage: config"},
-//		{"keyDoesNotExist", 1, []string{oldArgs[0], CmdConfig, "set", "key", "value"}, "no config setting \"keyDoesNotExist\" found"},
-//	}
-//
-//	for _, tc := range tests {
-//		tester.Run(tc.name, func(t *testing.T) {
-//			defer func() {
-//				os.Args = oldArgs
-//			}()
-//
-//			// replace the test flaga and arts with the test fixture flags and args.
-//			os.Args = tc.args
-//
-//			testConf := &Config{}
-//			defineFlags(testConf)
-//			e := parseFlags(testConf)
-//			if e != nil {
-//				t.Error(e)
-//			}
-//		})
-//	}
-//}
-
 func xTestLoadUserSettings(tester *testing.T) {
 	delayedFunc := test.TmpSetParentDataDir(TmpDir)
 	defer delayedFunc()
@@ -147,12 +116,12 @@ func xTestLoadUserSettings(tester *testing.T) {
 	var tests = []struct {
 		name     string
 		filename string
-		want     *Config
+		want     *AppData
 	}{
 		{
 			"goodFile",
 			FixtureDir + PS + "good-config-01.json",
-			&Config{
+			&AppData{
 				UsrOpts: &UserOptions{
 					ExcludeFileExtensions: &[]string{""},
 					CacheDir:              "",
@@ -162,7 +131,7 @@ func xTestLoadUserSettings(tester *testing.T) {
 		{
 			"badFile",
 			FixtureDir + PS + "bad-config-01.json",
-			&Config{
+			&AppData{
 				UsrOpts: &UserOptions{
 					ExcludeFileExtensions: &[]string{""},
 					CacheDir:              "",
@@ -173,7 +142,7 @@ func xTestLoadUserSettings(tester *testing.T) {
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			gotCfg := &Config{}
+			gotCfg := &AppData{}
 			err := gotCfg.LoadUserSettings(tc.filename)
 
 			if err != nil { // test bad values

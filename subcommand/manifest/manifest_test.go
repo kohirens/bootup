@@ -1,10 +1,15 @@
-package cli
+package manifest
 
 import (
 	"github.com/kohirens/stdlib"
-	"github.com/kohirens/tmpltoapp/internal/test"
+	"github.com/kohirens/stdlib/test"
 	"reflect"
 	"testing"
+)
+
+const (
+	fixtureDir = "testdata"
+	tmpDir     = "tmp"
 )
 
 func TestGenerateATemplateJson(runner *testing.T) {
@@ -24,9 +29,9 @@ func TestGenerateATemplateJson(runner *testing.T) {
 
 	for _, tc := range testCases {
 		runner.Run(tc.name, func(t *testing.T) {
-			repoPath := test.SetupARepository(tc.repo, TmpDir, FixtureDir, PS)
+			repoPath := test.SetupARepository(tc.repo, tmpDir, fixtureDir, ps)
 			got, err := GenerateATemplateManifest(repoPath, fec, []string{})
-			f := repoPath + PS + "template.json"
+			f := repoPath + ps + "template.json"
 
 			if err != nil {
 				t.Errorf("want nil, got: %q", err.Error())

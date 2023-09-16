@@ -8,9 +8,12 @@ following format.
 
 At minimum the `template.json` needs to contain
 
-1. A `version` property with a  value of `0.1.0`
-2. A `placeholders` object property with at least 1 template variable name
-2. An optional `excludes` array property with at least 1 item to indicate a file or directory to skip processing and copy as-is.
+1. A `version` property with the desired template.json schema version.
+2. A `placeholders` object property with at least 1 key/value pair;
+   key being the template variable name, and value describes what value it
+   takes.
+3. An optional `excludes` array property with at least 1 item to indicate a
+   file or directory to skip processing and copy as-is.
 
 for example:
 ```JSON

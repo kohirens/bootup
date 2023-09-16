@@ -1,22 +1,57 @@
 package main
 
 var usageTmpl = `
-{{define "option"}}
-{{printf "  -%-11s %v" .option .info}}{{with .dv }} (default = {{.}}){{end}}
-{{end}}
-Usage: {{ .appName }} -[options] <args>
-
-example: {{ .appName }} -answers "answers.json" -out-path "/tmp/new-app" "https://github.com/kohirens/tmpl-go-web"
-
+{{- define "optionHeader"}}
 Options:
+{{end -}}
+
+{{- define "option"}}
+{{printf "  -%-11s %v" .OptionName .OptionInfo}}{{with .DefaultValue }} (default = {{.}}){{end}}
+{{end -}}
+
+{{- define "commandHeader"}}
+Commands
+{{end -}}
+
+{{- define "subcommand"}}
+  {{.Command}} - {{.Summary}}
+
+    usage: {{ .AppName }} [global options] {{ .Command }} [options] <args>
+
+    See {{ .AppName }} {{ .Command }} -help
+{{end}}
+Usage: {{ .AppName }} -[options] <args>
+
+example: {{ .AppName }} -answers "answers.json" -out-path "/tmp/new-app" "https://github.com/kohirens/tmpl-go-web"
+
+{{ with .Options}}Options
+{{end -}}
+
+{{- with .Commands}}Commands
+{{end -}}
 `
 
-var usageManifest = `
-Generate a template.json in the {{.appName}} schema format containing all the specified templates placeholders.
-This is meant for template designers to reduce error in adding placeholders to your file manually.
-Placeholders are also known ad "Actions"--data evaluations-- in Go.
+var usageTmpl2 = `
+{{- define "optionHeader"}}
+Options:
+{{end -}}
 
-Usage: {{.appName}} <path>
+{{- define "option"}}
+{{printf "  -%-11s %v" .OptionName .OptionInfo}}{{with .DefaultValue }} (default = {{.}}){{end}}
+{{end -}}
 
-example: {{.appName}} ./
+{{- define "commandHeader"}}
+Commands
+{{end -}}
+
+{{- define "subcommand"}}
+  {{.Command}} - {{.Summary}}
+
+    usage: {{.AppName}} [global options] {{.Command}} [options] <args>
+
+    See {{.AppName}} {{.Command}} -help
+{{end}}
+Usage: {{.AppName}} -[options] <args>
+
+example: {{.AppName}} [options] <args>
 `
