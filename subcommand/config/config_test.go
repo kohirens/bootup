@@ -36,7 +36,7 @@ func TestFlagsAndArguments(tester *testing.T) {
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
 			Init()
-			e := ParseFlags(tc.ca)
+			e := ParseInput(tc.ca)
 			if !tc.wantErr && e != nil {
 				t.Error(e)
 			}
@@ -68,12 +68,7 @@ func TestSubCmdConfigBadExit(tester *testing.T) {
 		tester.Run(tc.name, func(t *testing.T) {
 			Init()
 
-			e1 := ParseFlags(tc.ca)
-			if e1 != nil {
-				t.Error(e1)
-			}
-
-			e2 := Run(tc.cfg)
+			e2 := Run(tc.ca, tc.cfg)
 			if e2 != nil {
 				t.Error(e2)
 			}

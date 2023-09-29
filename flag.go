@@ -10,8 +10,6 @@ import (
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
-	"github.com/kohirens/tmpltoapp/subcommand/config"
-	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 )
 
 type appFlags struct {
@@ -76,19 +74,6 @@ func parseCli(af *appFlags, cfg *cli.AppData) error {
 
 	if len(ca) == 0 {
 		return fmt.Errorf(msg.Stderr.NoInput)
-	}
-
-	switch flag.Arg(0) {
-	case config.Name:
-		cfg.SubCmd = config.Name
-		if e := config.ParseFlags(ca[1:]); e != nil {
-			return e
-		}
-	case manifest.Name:
-		cfg.SubCmd = manifest.Name
-		if e := manifest.ParseFlags(ca[1:]); e != nil {
-			return e
-		}
 	}
 
 	return nil

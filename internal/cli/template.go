@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"io"
 	"io/ioutil"
@@ -309,7 +310,7 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 		}
 
 		// Normalize the path separator in these 2 variables before comparing them.
-		normSourcePath := stdlib.NormalizePath(sourcePath)
+		normSourcePath := path.Normalize(sourcePath)
 		// Get the relative path of the file from root of the template and
 		// append it to the output directory, so that files are placed in the
 		// same subdirectories in the output directory.
@@ -372,7 +373,7 @@ func ReadTemplateJson(filePath string) (*TmplJson, error) {
 	log.Dbugf("\ntemplate manifest path: %q\n", filePath)
 
 	// Verify the TMPL_MANIFEST file is present.
-	if !stdlib.PathExist(filePath) {
+	if !path.Exist(filePath) {
 		return nil, fmt.Errorf(msg.Stderr.TmplManifest404, TmplManifestFile)
 	}
 
@@ -411,7 +412,7 @@ func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 
 func inSkipArray(p string, skips []string) bool {
 	for _, skip := range skips {
-		skip = stdlib.NormalizePath(skip)
+		skip = path.Normalize(skip)
 		if strings.Contains(p, skip) {
 			return true
 		}
@@ -422,7 +423,7 @@ func inSkipArray(p string, skips []string) bool {
 // replaceWith Replace the current file with another.
 func replaceWith(cf, ps, sp, tmplRoot string, replace ReplaceWith) string {
 	for _, fileMap := range replace.Files {
-		fileMap = stdlib.NormalizePath(fileMap)
+		fileMap = path.Normalize(fileMap)
 		fileAry := strings.Split(fileMap, ":")
 
 		if strings.Contains(cf, fileAry[1]) {

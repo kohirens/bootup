@@ -8,6 +8,7 @@ import (
 	"github.com/kohirens/stdlib"
 	stdc "github.com/kohirens/stdlib/cli"
 	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
@@ -42,15 +43,23 @@ func init() {
 	// Define all flags
 	defineFlags(flags)
 
-	c := config.Init()
-	m := manifest.Init()
-
-	stdc.AddGlobalCommand(AppName, Summary, usageTmpl2, um, nil)
-	stdc.AddCommand(config.Name, config.Summary, config.UsageMessages, c)
-	stdc.AddCommand(manifest.Name, manifest.Summary, manifest.UsageMessages, m)
-
-	stdc.AddTmpl(config.Name, config.UsageTmpl, config.UsageVars)
-	stdc.AddTmpl(manifest.Name, manifest.UsageTmpl, manifest.UsageVars)
+	usg := stdc.NewUsage(AppName, um, nil, Summary, usageTmpl2)
+	usg.Command.AddCommand(
+		config.Init(),
+		config.Name,
+		config.UsageMessages,
+		config.UsageVars,
+		config.Summary,
+		config.UsageTmpl,
+	)
+	usg.Command.AddCommand(
+		manifest.Init(),
+		manifest.Name,
+		manifest.UsageMessages,
+		manifest.UsageVars,
+		manifest.Summary,
+		manifest.UsageTmpl,
+	)
 }
 
 func main() {
@@ -87,18 +96,26 @@ func main() {
 
 	ca := flag.Args()
 
-	switch flag.Arg(0) {
-	case config.Name:
-		// store or get the key and return
-		mainErr = config.Run(appConfig)
-		return
-	case manifest.Name:
-		ma := &manifest.Arguments{}
+	if len(ca) > 0 {
+		switch ca[0] {
+		case config.Name:
+			appConfig.SubCmd = config.Name
+			// store or get the key and return
+			mainErr = config.Run(ca[1:], appConfig)
+			return
+		case manifest.Name:
+			appConfig.SubCmd = manifest.Name
+			if e := manifest.ParseFlags(ca[1:]); e != nil {
+				mainErr = e
+				return
+			}
+			ma := &manifest.Arguments{}
 
-		// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
-		fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
-		_, mainErr = manifest.GenerateATemplateManifest(ma.Path, fec, []string{})
-		return
+			// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
+			fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
+			_, mainErr = manifest.GenerateATemplateManifest(ma.Path, fec, []string{})
+			return
+		}
 	}
 
 	if e := parseMainArgs(flags, ca); e != nil {
@@ -132,8 +149,7 @@ func main() {
 
 		if flags.Branch == "latest" {
 			latestTag, e3 := getLatestTag(flags.TmplPath)
-			// This error is informative, but not worth stopping the program.
-			logf(e3.Error())
+			log.Infof(e3.Error())
 			if latestTag != "" {
 				flags.Branch = latestTag
 			}
@@ -144,7 +160,7 @@ func main() {
 		infof(msg.Stdout.OutRepoDir, repoDir)
 
 		// Do a pull when the repo already exists. This will fail if it downloaded a zip.
-		if stdlib.DirExist(repoDir + cli.PS + gitConfDir) {
+		if path.DirExist(repoDir + cli.PS + gitConfDir) {
 			infof(msg.Stdout.UsingCache, repoDir)
 			repo, commitHash, err2 = gitCheckout(repoDir, flags.Branch)
 		} else {
@@ -160,7 +176,7 @@ func main() {
 		appConfig.Tmpl = repo
 	}
 
-	if !stdlib.DirExist(appConfig.Tmpl) {
+	if !path.DirExist(appConfig.Tmpl) {
 		mainErr = fmt.Errorf(msg.Stderr.InvalidTmplDir, appConfig.Tmpl)
 		return
 	}
@@ -181,7 +197,7 @@ func main() {
 	appConfig.TmplJson = tmplManifest
 	appConfig.AnswersJson = cli.NewAnswerJson()
 
-	if stdlib.PathExist(flags.AnswersPath) {
+	if path.Exist(flags.AnswersPath) {
 		appConfig.AnswersJson, mainErr = cli.LoadAnswers(flags.AnswersPath)
 		if mainErr != nil {
 			return
@@ -198,6 +214,7 @@ func main() {
 	mainErr = cli.Press(appConfig.Tmpl, flags.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
 }
 
+// / TODO: Move this to parseCli
 func parseMainArgs(af *appFlags, pArgs []string) error {
 	// throw an error when a flag comes after any arguments.
 	for i := 0; i < len(pArgs); i++ {
@@ -238,11 +255,11 @@ func validateMainArgs(af *appFlags) error {
 		return fmt.Errorf(errors.OutPathCollision, af.TmplPath, af.OutPath)
 	}
 
-	if stdlib.DirExist(af.OutPath) {
+	if path.DirExist(af.OutPath) {
 		return fmt.Errorf(stdout.OutPathExist, af.OutPath)
 	}
 
-	if af.AnswersPath != "" && !stdlib.PathExist(af.AnswersPath) {
+	if af.AnswersPath != "" && !path.Exist(af.AnswersPath) {
 		return fmt.Errorf(errors.AnswerFile404, af.AnswersPath)
 	}
 

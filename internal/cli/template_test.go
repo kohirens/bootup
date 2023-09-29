@@ -2,8 +2,10 @@ package cli
 
 import (
 	"bytes"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,16 +35,16 @@ func TestDownload(runner *testing.T) {
 	var err error
 	fixtures := HttpMock{
 		&http.Response{
-			Body:       ioutil.NopCloser(strings.NewReader("200 OK")),
+			Body:       io.NopCloser(strings.NewReader("200 OK")),
 			StatusCode: 200,
 		},
 		err,
 	}
 
 	runner.Run("canDownload", func(t *testing.T) {
-		got, err := Download("/fake_dl", TmpDir, &fixtures)
-		if err != nil {
-			t.Errorf("got %q, want nil", err.Error())
+		got, err1 := Download("/fake_dl", TmpDir, &fixtures)
+		if err1 != nil {
+			t.Errorf("got %q, want nil", err1.Error())
 		}
 		_, err = os.Stat(got)
 
@@ -103,7 +105,7 @@ func TestParseDir2(tester *testing.T) {
 			"dir1IsEmpty",
 			FixtureDir + "/template-04",
 			func(e error) bool {
-				return !stdlib.PathExist(TmpDir + PS + "template-04-out" + PS + "dir1" + PS + ".empty")
+				return !path.Exist(TmpDir + PS + "template-04-out" + PS + "dir1" + PS + ".empty")
 			},
 			tmplVars{},
 		},
@@ -365,16 +367,16 @@ func TestSkipping(tester *testing.T) {
 		tester.Errorf("got an error %q", err)
 	}
 
-	for _, path := range tc.absent {
-		file := outPath + test.PS + path
-		if stdlib.PathExist(file) {
+	for _, p := range tc.absent {
+		file := outPath + test.PS + p
+		if path.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
 
-	for _, path := range tc.present {
-		file := outPath + test.PS + path
-		if !stdlib.PathExist(file) {
+	for _, p := range tc.present {
+		file := outPath + test.PS + p
+		if !path.Exist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
@@ -431,15 +433,15 @@ func TestReplaceWith(tester *testing.T) {
 		tester.Errorf("got an error %q", err)
 	}
 
-	for _, path := range tc.absent {
-		file := outPath + test.PS + path
-		if stdlib.PathExist(file) {
+	for _, p := range tc.absent {
+		file := outPath + test.PS + p
+		if path.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
 
-	for i, path := range tc.files {
-		file := outPath + test.PS + path
+	for i, p := range tc.files {
+		file := outPath + test.PS + p
 		got, _ := os.ReadFile(file)
 		if bytes.NewBuffer(got).String() == tc.content[i] {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", got, tc.content[i])

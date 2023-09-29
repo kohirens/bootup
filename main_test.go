@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/kohirens/stdlib"
+	"github.com/kohirens/stdlib/path"
 	stdt "github.com/kohirens/stdlib/test"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/press"
@@ -173,9 +173,11 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 	}
 }
 
-func TestSubCmdConfigSuccess(tester *testing.T) {
-	delayedFunc := test.TmpSetParentDataDir(TmpDir)
-	defer delayedFunc()
+func TestSubCmdConfigHelp(tester *testing.T) {
+	delayedFunc := test.TmpSetParentDataDir(TmpDir + "/TestSubCmdConfigSuccess")
+	defer func() {
+		delayedFunc()
+	}()
 
 	var tests = []struct {
 		name     string
@@ -183,8 +185,43 @@ func TestSubCmdConfigSuccess(tester *testing.T) {
 		args     []string
 		contains string
 	}{
-		{"help", 0, []string{cli.CmdConfig, "-help"}, config.UsageTmpl},
-		{"getCache", 0, []string{cli.CmdConfig, "get", "CacheDir"}, "tmp"},
+		{"help", 0, []string{config.Name, "-help"}, config.UsageTmpl},
+	}
+
+	for _, tc := range tests {
+		tester.Run(tc.name, func(t *testing.T) {
+
+			cmd := test.GetTestBinCmd(tc.args)
+
+			out, _ := test.VerboseSubCmdOut(cmd.CombinedOutput())
+
+			// get exit code.
+			got := cmd.ProcessState.ExitCode()
+
+			if got != tc.wantCode {
+				t.Errorf("got %q, want %q", got, tc.wantCode)
+			}
+
+			if !strings.Contains(bytes.NewBuffer(out).String(), tc.contains) {
+				t.Errorf("did not contain %q", tc.contains)
+			}
+		})
+	}
+}
+
+func TestSubCmdConfigSuccess(tester *testing.T) {
+	delayedFunc := test.TmpSetParentDataDir(TmpDir + "/TestSubCmdConfigSuccess")
+	defer func() {
+		delayedFunc()
+	}()
+
+	var tests = []struct {
+		name     string
+		wantCode int
+		args     []string
+		contains string
+	}{
+		{"getCache", 0, []string{config.Name, "get", "CacheDir"}, "tmp"},
 	}
 
 	for _, tc := range tests {
@@ -341,7 +378,7 @@ func TestFirstTimeRun(tester *testing.T) {
 			}
 
 			gotPressedTmpl := tc.args[5]
-			if !stdlib.DirExist(gotPressedTmpl) {
+			if !path.DirExist(gotPressedTmpl) {
 				t.Errorf("output directory %q was not found", gotPressedTmpl)
 			}
 		})
@@ -390,16 +427,16 @@ func TestSkipFeature(tester *testing.T) {
 		tester.Errorf("got %q, but want %q", got, tc.wantCode)
 	}
 
-	for _, path := range tc.absent {
-		file := outPath + test.PS + path
-		if stdlib.PathExist(file) {
+	for _, p := range tc.absent {
+		file := outPath + test.PS + p
+		if path.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
 
-	for _, path := range tc.present {
-		file := outPath + test.PS + path
-		if !stdlib.PathExist(file) {
+	for _, p := range tc.present {
+		file := outPath + test.PS + p
+		if !path.Exist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}

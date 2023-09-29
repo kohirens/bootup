@@ -2,7 +2,8 @@ package manifest
 
 import (
 	"github.com/kohirens/stdlib"
-	"github.com/kohirens/stdlib/test"
+	"github.com/kohirens/stdlib/git"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"reflect"
 	"testing"
@@ -30,7 +31,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 
 	for _, tc := range testCases {
 		runner.Run(tc.name, func(t *testing.T) {
-			repoPath := test.SetupARepository(tc.repo, tmpDir, fixtureDir, ps)
+			repoPath := git.CloneFromBundle(tc.repo, tmpDir, fixtureDir, ps)
 			got, err := GenerateATemplateManifest(repoPath, fec, []string{})
 			f := repoPath + ps + press.TmplManifestFile
 
@@ -38,7 +39,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 				t.Errorf("want nil, got: %q", err.Error())
 			}
 
-			if !stdlib.PathExist(f) {
+			if !path.Exist(f) {
 				t.Errorf("no template.json found in %v", repoPath)
 			}
 

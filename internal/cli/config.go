@@ -3,8 +3,8 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"os"
 	"path/filepath"
@@ -31,19 +31,26 @@ type UserOptions struct {
 
 // Setup All application configuration.
 func (cfg *AppData) Setup(appName, ps, tmplType, tmplPath string, dirMode os.FileMode) error {
-	osDataDir, err1 := stdlib.AppDataDir() //os.UserHomeDir()
+	osDataDir, err1 := os.UserConfigDir()
 	log.Dbugf("app data dir = %q\n", osDataDir)
 	if err1 != nil {
 		return err1
 	}
 
-	// Make a hidden directory in userspace to store data.
+	// Make a hidden directory in userspace to store config data.
 	cfg.DataDir = osDataDir + ps + "." + appName
 	if e := os.MkdirAll(cfg.DataDir, dirMode); e != nil {
 		return e
 	}
 
-	cfg.UsrOpts.CacheDir = cfg.DataDir + ps + "cache"
+	osCacheDir, err2 := os.UserCacheDir()
+	log.Dbugf("app cache dir = %q\n", osDataDir)
+	if err2 != nil {
+		return err2
+	}
+
+	// Make a hidden directory in userspace to cache data.
+	cfg.UsrOpts.CacheDir = osCacheDir + ps + "cache"
 	if e := os.MkdirAll(cfg.UsrOpts.CacheDir, dirMode); e != nil {
 		return fmt.Errorf(msg.Stderr.CouldNotMakeCacheDir, e.Error())
 	}
@@ -70,7 +77,7 @@ func (cfg *AppData) Setup(appName, ps, tmplType, tmplPath string, dirMode os.Fil
 
 // Initialize a configuration file.
 func (cfg *AppData) initFile() error {
-	if stdlib.PathExist(cfg.Path) {
+	if path.Exist(cfg.Path) {
 		log.Infof(msg.Stdout.ConfigFileExist, cfg.Path)
 		return nil
 	}
@@ -80,6 +87,12 @@ func (cfg *AppData) initFile() error {
 		return fmt.Errorf(msg.Stderr.CouldNotSaveConf, err1.Error())
 	}
 
+	defer func() {
+		if e := f.Close(); e != nil {
+			panic(fmt.Errorf(msg.Stderr.CouldNotCloseFile, cfg.Path, e.Error()))
+		}
+	}()
+
 	data, err2 := json.Marshal(cfg.UsrOpts)
 	if err2 != nil {
 		return fmt.Errorf(msg.Stderr.CouldNotEncodeConfig, err2.Error())
@@ -88,10 +101,6 @@ func (cfg *AppData) initFile() error {
 	b, err3 := f.Write(data)
 	if err3 != nil {
 		return fmt.Errorf(msg.Stderr.CouldNotWriteFile, cfg.Path, err3.Error())
-	}
-
-	if e := f.Close(); e != nil {
-		return fmt.Errorf(msg.Stderr.CouldNotCloseFile, cfg.Path, e.Error())
 	}
 
 	log.Infof(msg.Stdout.MadeNewConfig, b, cfg.Path)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"io/fs"
@@ -65,7 +66,7 @@ func ParseFlags(ca []string) error {
 
 // GenerateATemplateManifest Make a JSON file with your templates placeholders.
 func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
-	if !stdlib.PathExist(tmplPath) {
+	if !path.Exist(tmplPath) {
 		return nil, fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 

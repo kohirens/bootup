@@ -38,13 +38,12 @@ func Init() *flag.FlagSet {
 	return flags
 }
 
-func ParseFlags(ca []string) error {
+func ParseInput(ca []string) error {
 	if e := flags.Parse(ca); e != nil {
 		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
 
 	if help {
-		flags.Usage()
 		return nil
 	}
 
@@ -71,7 +70,16 @@ func ParseFlags(ca []string) error {
 }
 
 // Run Set or get a config setting.
-func Run(cfg *cli.AppData) error {
+func Run(ca []string, cfg *cli.AppData) error {
+	if e := ParseInput(ca); e != nil {
+		return e
+	}
+
+	if help {
+		flags.Usage()
+		return nil
+	}
+
 	log.Dbugf("args.Method = %v\n", args.Method)
 	log.Dbugf("args.Key = %v\n", args.Setting)
 

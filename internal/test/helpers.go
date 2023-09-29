@@ -2,7 +2,7 @@ package test
 
 import (
 	"fmt"
-	"github.com/kohirens/stdlib"
+	path2 "github.com/kohirens/stdlib/path"
 	"log"
 	"os"
 	"os/exec"
@@ -63,7 +63,7 @@ func SetupARepository(bundleName, tmpDir, bundleDir, ps string) string {
 
 	srcRepo := wd + ps + bundleDir + ps + bundleName + ".bundle"
 	// It may not exist.
-	if !stdlib.PathExist(srcRepo) {
+	if !path2.Exist(srcRepo) {
 		panic(fmt.Sprintf("%v bundle not found", srcRepo))
 	}
 
@@ -108,14 +108,20 @@ func TmpSetParentDataDir(d string) func() {
 
 	// Set the app data dir to the local test tmp.
 	if runtime.GOOS == "windows" {
-		oldAppData, _ := os.LookupEnv("LOCALAPPDATA")
+		appDataDir, _ := os.LookupEnv("APPDATA")
+		cacheDataDir, _ := os.LookupEnv("LOCALAPPDATA")
+
+		if e := os.Setenv("APPDATA", dir); e != nil {
+			panic("failed to set LOCALAPPDATA for unit test")
+		}
 
 		if e := os.Setenv("LOCALAPPDATA", dir); e != nil {
 			panic("failed to set LOCALAPPDATA for unit test")
 		}
 
 		return func() {
-			_ = os.Setenv("LOCALAPPDATA", oldAppData)
+			_ = os.Setenv("APPDATA", appDataDir)
+			_ = os.Setenv("LOCALAPPDATA", cacheDataDir)
 		}
 	} else {
 		oldHome, _ := os.LookupEnv("HOME")
