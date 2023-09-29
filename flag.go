@@ -39,7 +39,7 @@ func defineFlags(af *appFlags) {
 	flag.StringVar(&af.OutPath, "out-path", "", um["out-path"])       // TODO: BREAKING remove this will be a required 2nd argument.
 	flag.StringVar(&af.TmplPath, "tmpl-path", "", um["tmpl-path"])    // TODO: BREAKING remove this will be a required 1st argument.
 	flag.StringVar(&af.TmplType, "tmpl-type", "git", um["tmpl-type"]) // TODO: BREAKING Remove, we only use git now.
-	flag.IntVar(&verbosityLevel, "verbosity", 0, um["verbosity"])
+	flag.IntVar(&verbosityLevel, "verbosity", log.VerboseLvlLog, um["verbosity"])
 	flag.BoolVar(&af.Version, "version", false, um["version"])
 }
 
