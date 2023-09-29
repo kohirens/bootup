@@ -9,7 +9,6 @@ import (
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/msg"
-	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -20,9 +19,10 @@ import (
 )
 
 const (
-	MaxTplSize   = 1e+7
-	EmptyFile    = ".empty"
-	GitConfigDir = ".git"
+	MaxTplSize       = 1e+7
+	EmptyFile        = ".empty"
+	GitConfigDir     = ".git"
+	TmplManifestFile = "template.json" // TODO: BREAKING Rename to tmplpress.json
 )
 
 type AnswersJson struct {
@@ -122,6 +122,7 @@ func NewAnswerJson() *AnswersJson {
 }
 
 // Download a template from a URL to a local directory.
+// Deprecated: Will be replace with method that uses git clone.
 func Download(url, dstDir string, client Client) (string, error) {
 	// Save to a unique filename in the cache.
 	dest := strings.ReplaceAll(url, "https://", "")
@@ -163,6 +164,7 @@ func Download(url, dstDir string, client Client) (string, error) {
 	return zipFile, nil
 }
 
+// Deprecated: Do NOT USE, will be removed.
 func Extract(archivePath string) (string, error) {
 	tmplDir := ""
 	zipParentDir := ""
@@ -274,6 +276,7 @@ func parse(tplFile, dstDir string, vars tmplVars) error {
 }
 
 // Press Recursively walk a directory parsing all files along the way as Go templates.
+// Deprecated: See press.FindTemplates
 func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmplJson *TmplJson) (err error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	normTplDir := strings.ReplaceAll(tplDir, "/", PS)

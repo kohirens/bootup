@@ -6,13 +6,10 @@ import (
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/msg"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 )
-
-// TODO: Change to RunTimeSettings to avoid confution with config sub command
 
 // AppData runtime settings shared throughout the application.
 type AppData struct {

@@ -41,6 +41,8 @@ func Silencer() func() {
 	}
 }
 
+// SetupARepository set up a repository.
+// Deprecated see stdlib.git.CloneFromBundle
 func SetupARepository(bundleName, tmpDir, bundleDir, ps string) string {
 	repoPath := tmpDir + ps + bundleName
 

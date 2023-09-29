@@ -7,6 +7,7 @@ import (
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -16,7 +17,6 @@ import (
 )
 
 const (
-	TmplManifest = "template.json" //TODO: BREAKING Rename to tmplpress.json
 	ps           = string(os.PathSeparator)
 	EmptyFile    = ".empty"
 	GitConfigDir = ".git"
@@ -83,13 +83,13 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 
 		t, e := template.ParseFiles(tmpl)
 		if e != nil {
-			return nil, fmt.Errorf(msg.Errors.ParsingFile, tmpl, e.Error())
+			return nil, fmt.Errorf(msg.Stderr.ParsingFile, tmpl, e.Error())
 		}
 
 		ListTemplateFields(t, actions)
 	}
 
-	if e := saveFile(tmplPath+ps+TmplManifest, actions); e != nil {
+	if e := saveFile(tmplPath+ps+press.TmplManifestFile, actions); e != nil {
 		return nil, e
 	}
 
@@ -153,7 +153,7 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes
 
 	// Skip files by extension.
 	// TODO: Add globbing is added. filepath.Glob(pattern)
-	if currFile == EmptyFile || currFile == TmplManifest { // Use an exclusion list, include every file by default.
+	if currFile == EmptyFile || currFile == press.TmplManifestFile { // Use an exclusion list, include every file by default.
 		return "", nil
 	}
 
@@ -204,7 +204,7 @@ func saveFile(jsonFile string, actions map[string]string) error {
 		return fmt.Errorf(stderr.EncodingJson, jsonFile, e1.Error())
 	}
 
-	tmpl := template.Must(template.New(TmplManifest).Parse(TmplJsonTmpl))
+	tmpl := template.Must(template.New(press.TmplManifestFile).Parse(TmplJsonTmpl))
 
 	f, e2 := os.Create(jsonFile)
 	if e2 != nil {

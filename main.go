@@ -10,6 +10,7 @@ import (
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 	"net/http"
@@ -170,7 +171,7 @@ func main() {
 	}
 
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
-	tmplManifestFile := appConfig.Tmpl + cli.PS + manifest.TmplManifest
+	tmplManifestFile := appConfig.Tmpl + cli.PS + press.TmplManifestFile
 	tmplManifest, errX := cli.ReadTemplateJson(tmplManifestFile)
 	if errX != nil {
 		mainErr = fmt.Errorf(msg.Stderr.MissingTmplJson, press.TmplManifestFile, tmplManifestFile, errX.Error())

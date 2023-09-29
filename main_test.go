@@ -7,6 +7,7 @@ import (
 	"github.com/kohirens/stdlib"
 	stdt "github.com/kohirens/stdlib/test"
 	"github.com/kohirens/tmpltoapp/internal/cli"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"os"
@@ -368,7 +369,7 @@ func TestSkipFeature(tester *testing.T) {
 			"dir-to-include/second-level/skip-me-as-well.md",
 			"dir-to-skip",
 			"skip-me-too.md",
-			"template.json",
+			press.TmplManifestFile,
 		},
 		[]string{
 			"dir-to-include/README.md",

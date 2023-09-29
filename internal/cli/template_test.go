@@ -2,8 +2,8 @@ package cli
 
 import (
 	"bytes"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
-	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -223,7 +223,7 @@ func TestReadTemplateJson(tester *testing.T) {
 
 	fxtr := fixtures[0]
 	tester.Run(fxtr.name, func(test *testing.T) {
-		got, err := ReadTemplateJson(fixturePath1 + PS + manifest.TmplManifest)
+		got, err := ReadTemplateJson(fixturePath1 + PS + press.TmplManifestFile)
 
 		if fxtr.shouldErr && err == nil {
 			test.Errorf("expected an error, but got nil")
@@ -336,7 +336,7 @@ func TestSkipping(tester *testing.T) {
 			"dir-to-include/second-level/skip-me-as-well.md",
 			"dir-to-skip",
 			"skip-me-too.md",
-			"template.json",
+			press.TmplManifestFile,
 		},
 		[]string{
 			"dir-to-include/README.md",

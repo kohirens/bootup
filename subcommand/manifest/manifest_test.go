@@ -3,6 +3,7 @@ package manifest
 import (
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/test"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"reflect"
 	"testing"
 )
@@ -31,7 +32,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 		runner.Run(tc.name, func(t *testing.T) {
 			repoPath := test.SetupARepository(tc.repo, tmpDir, fixtureDir, ps)
 			got, err := GenerateATemplateManifest(repoPath, fec, []string{})
-			f := repoPath + ps + "template.json"
+			f := repoPath + ps + press.TmplManifestFile
 
 			if err != nil {
 				t.Errorf("want nil, got: %q", err.Error())
