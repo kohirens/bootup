@@ -86,8 +86,8 @@ func main() {
 	}
 
 	ca := flag.Args()
-	// process sub-commands
-	switch ca[0] {
+
+	switch flag.Arg(0) {
 	case config.Name:
 		// store or get the key and return
 		mainErr = config.Run(appConfig)
