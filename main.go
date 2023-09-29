@@ -57,7 +57,7 @@ func main() {
 
 	defer func() {
 		if mainErr != nil {
-			logf(msg.Errors.FatalHeader)
+			logf(msg.Stderr.FatalHeader)
 			log.Fatf(mainErr.Error())
 		}
 		os.Exit(0)
@@ -76,7 +76,7 @@ func main() {
 	}
 
 	if flags.Version {
-		log.Logf(msg.Messages.CurrentVersion, flags.CurrentVersion, flags.CommitHash)
+		log.Logf(msg.Stdout.CurrentVersion, flags.CurrentVersion, flags.CommitHash)
 		os.Exit(0)
 	}
 	mainErr = appConfig.Setup(AppName, cli.PS, flags.TmplType, flags.TmplPath, cli.DirMode)
@@ -140,18 +140,18 @@ func main() {
 
 		// Determine the cache location
 		repoDir := appConfig.UsrOpts.CacheDir + cli.PS + getRepoDir(flags.TmplPath, flags.Branch)
-		infof(msg.Messages.OutRepoDir, repoDir)
+		infof(msg.Stdout.OutRepoDir, repoDir)
 
 		// Do a pull when the repo already exists. This will fail if it downloaded a zip.
 		if stdlib.DirExist(repoDir + cli.PS + gitConfDir) {
-			infof(msg.Messages.UsingCache, repoDir)
+			infof(msg.Stdout.UsingCache, repoDir)
 			repo, commitHash, err2 = gitCheckout(repoDir, flags.Branch)
 		} else {
-			infof(msg.Messages.CloningToCache, repoDir)
+			infof(msg.Stdout.CloningToCache, repoDir)
 			repo, commitHash, err2 = gitClone(flags.TmplPath, repoDir, flags.Branch)
 		}
 
-		infof(msg.Messages.RepoInfo, repo, commitHash)
+		infof(msg.Stdout.RepoInfo, repo, commitHash)
 		if err2 != nil {
 			mainErr = err2
 			return
@@ -160,20 +160,20 @@ func main() {
 	}
 
 	if !stdlib.DirExist(appConfig.Tmpl) {
-		mainErr = fmt.Errorf(msg.Errors.InvalidTmplDir, appConfig.Tmpl)
+		mainErr = fmt.Errorf(msg.Stderr.InvalidTmplDir, appConfig.Tmpl)
 		return
 	}
 
 	fec, err1 := stdlib.NewFileExtChecker(appConfig.UsrOpts.ExcludeFileExtensions, &[]string{})
 	if err1 != nil {
-		mainErr = fmt.Errorf(msg.Errors.CannotInitFileChecker, err1.Error())
+		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
 	}
 
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
 	tmplManifestFile := appConfig.Tmpl + cli.PS + manifest.TmplManifest
 	tmplManifest, errX := cli.ReadTemplateJson(tmplManifestFile)
 	if errX != nil {
-		mainErr = fmt.Errorf(msg.Errors.MissingTmplJson, manifest.TmplManifest, tmplManifestFile, errX.Error())
+		mainErr = fmt.Errorf(msg.Stderr.MissingTmplJson, press.TmplManifestFile, tmplManifestFile, errX.Error())
 		return
 	}
 
@@ -189,7 +189,7 @@ func main() {
 
 	// Checks for any missing placeholder values waits for their input from the CLI.
 	if e := cli.GetPlaceholderInput(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
-		mainErr = fmt.Errorf(msg.Errors.GettingAnswers, e.Error())
+		mainErr = fmt.Errorf(msg.Stderr.GettingAnswers, e.Error())
 	}
 
 	cli.ShowAllPlaceholderValues(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders)
@@ -202,7 +202,7 @@ func parseMainArgs(af *appFlags, pArgs []string) error {
 	for i := 0; i < len(pArgs); i++ {
 		v := pArgs[i]
 		if v[0] == '-' {
-			return fmt.Errorf(msg.Errors.FlagOrderErr, v)
+			return fmt.Errorf(msg.Stderr.FlagOrderErr, v)
 		}
 	}
 

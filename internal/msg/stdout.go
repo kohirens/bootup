@@ -1,7 +1,7 @@
 package msg
 
-// Messages helpful info to std out
-var Messages = struct {
+// Stdout helpful info to std out
+var Stdout = struct {
 	ActualArgs            string
 	CloningToCache        string
 	ConfigFileExist       string

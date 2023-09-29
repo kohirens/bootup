@@ -48,7 +48,7 @@ func (cfg *AppData) Setup(appName, ps, tmplType, tmplPath string, dirMode os.Fil
 
 	cfg.UsrOpts.CacheDir = cfg.DataDir + ps + "cache"
 	if e := os.MkdirAll(cfg.UsrOpts.CacheDir, dirMode); e != nil {
-		return fmt.Errorf(msg.Errors.CouldNotMakeCacheDir, e.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotMakeCacheDir, e.Error())
 	}
 
 	cfg.Path = cfg.DataDir + ps + "config.json"
@@ -74,30 +74,30 @@ func (cfg *AppData) Setup(appName, ps, tmplType, tmplPath string, dirMode os.Fil
 // Initialize a configuration file.
 func (cfg *AppData) initFile() error {
 	if stdlib.PathExist(cfg.Path) {
-		log.Infof(msg.Messages.ConfigFileExist, cfg.Path)
+		log.Infof(msg.Stdout.ConfigFileExist, cfg.Path)
 		return nil
 	}
 
 	f, err1 := os.Create(cfg.Path)
 	if err1 != nil {
-		return fmt.Errorf(msg.Errors.CouldNotSaveConf, err1.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotSaveConf, err1.Error())
 	}
 
 	data, err2 := json.Marshal(cfg.UsrOpts)
 	if err2 != nil {
-		return fmt.Errorf(msg.Errors.CouldNotEncodeConfig, err2.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotEncodeConfig, err2.Error())
 	}
 
 	b, err3 := f.Write(data)
 	if err3 != nil {
-		return fmt.Errorf(msg.Errors.CouldNotWriteFile, cfg.Path, err3.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotWriteFile, cfg.Path, err3.Error())
 	}
 
 	if e := f.Close(); e != nil {
-		return fmt.Errorf(msg.Errors.CouldNotCloseFile, cfg.Path, e.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotCloseFile, cfg.Path, e.Error())
 	}
 
-	log.Infof(msg.Messages.MadeNewConfig, b, cfg.Path)
+	log.Infof(msg.Stdout.MadeNewConfig, b, cfg.Path)
 
 	return nil
 }
@@ -120,15 +120,15 @@ func getTmplLocation(tmplPath string) string {
 
 // LoadUserSettings from a file, replacing the default built-in settings.
 func (cfg *AppData) LoadUserSettings(filename string) error {
-	log.Infof(msg.Messages.ReadConfig, filename)
-	content, er := ioutil.ReadFile(filename)
+	log.Infof(msg.Stdout.ReadConfig, filename)
+	content, er := os.ReadFile(filename)
 
 	if os.IsNotExist(er) {
-		return fmt.Errorf(msg.Errors.CouldNot, er.Error())
+		return fmt.Errorf(msg.Stderr.CouldNot, er.Error())
 	}
 
 	if e := json.Unmarshal(content, &cfg.UsrOpts); e != nil {
-		return fmt.Errorf(msg.Errors.CouldNotDecode, filename, er.Error())
+		return fmt.Errorf(msg.Stderr.CouldNotDecode, filename, er.Error())
 	}
 
 	return nil
@@ -136,16 +136,16 @@ func (cfg *AppData) LoadUserSettings(filename string) error {
 
 // LoadAnswers Load key/value pairs from a JSON file to fill in placeholders (provides that data for the Go templates).
 func LoadAnswers(filename string) (*AnswersJson, error) {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 
 	if err != nil {
-		return nil, fmt.Errorf(msg.Errors.CannotReadAnswerFile, filename, err.Error())
+		return nil, fmt.Errorf(msg.Stderr.CannotReadAnswerFile, filename, err.Error())
 
 	}
 
 	var aj *AnswersJson
 	if e := json.Unmarshal(content, &aj); e != nil {
-		return nil, fmt.Errorf(msg.Errors.CannotDecodeAnswerFile, filename, e.Error())
+		return nil, fmt.Errorf(msg.Stderr.CannotDecodeAnswerFile, filename, e.Error())
 	}
 
 	return aj, nil

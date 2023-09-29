@@ -40,7 +40,7 @@ func Init() *flag.FlagSet {
 
 func ParseFlags(ca []string) error {
 	if e := flags.Parse(ca); e != nil {
-		return fmt.Errorf(msg.Errors.ParsingConfigArgs, e.Error())
+		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
 
 	if help {
@@ -49,7 +49,7 @@ func ParseFlags(ca []string) error {
 	}
 
 	if len(ca) < 2 {
-		return fmt.Errorf(msg.Errors.InvalidNoArgs)
+		return fmt.Errorf(msg.Stderr.InvalidNoArgs)
 	}
 
 	args.Method = ca[0]

@@ -1,6 +1,6 @@
 package msg
 
-var Errors = struct {
+var Stderr = struct {
 	AnswerFile404          string
 	AppDataDir             string
 	BadExcludeFileExt      string

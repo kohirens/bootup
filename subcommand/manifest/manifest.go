@@ -44,11 +44,11 @@ func Init() *flag.FlagSet {
 
 func ParseFlags(ca []string) error {
 	if e := flags.Parse(ca); e != nil {
-		return fmt.Errorf(msg.Errors.ParsingConfigArgs, e.Error())
+		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
 
 	if len(ca) < 1 {
-		return fmt.Errorf(msg.Errors.InvalidNoSubCmdArgs, Name, 1)
+		return fmt.Errorf(msg.Stderr.InvalidNoSubCmdArgs, Name, 1)
 	}
 
 	if help {
@@ -66,7 +66,7 @@ func ParseFlags(ca []string) error {
 // GenerateATemplateManifest Make a JSON file with your templates placeholders.
 func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
 	if !stdlib.PathExist(tmplPath) {
-		return nil, fmt.Errorf(msg.Errors.PathNotExist, tmplPath)
+		return nil, fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 
 	// Traverse the path recursively, filtering out files that should be excluded

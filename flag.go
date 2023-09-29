@@ -51,18 +51,18 @@ func parseCli(af *appFlags, cfg *cli.AppData) error {
 	// and then arguments; it may also require less code to debug and document for not very much gain.
 	flag.Parse()
 
-	log.Infof(msg.Messages.VerboseLevelInfo, verbosityLevel)
+	log.Infof(msg.Stdout.VerboseLevelInfo, verbosityLevel)
 
 	ca := flag.Args()
 
-	log.Dbugf(msg.Messages.NumNonFlagArgs, len(ca))
-	log.Dbugf(msg.Messages.ActualArgs, ca)
-	log.Dbugf(msg.Messages.NumParsedFlags, flag.NFlag())
+	log.Dbugf(msg.Stdout.NumNonFlagArgs, len(ca))
+	log.Dbugf(msg.Stdout.ActualArgs, ca)
+	log.Dbugf(msg.Stdout.NumParsedFlags, flag.NFlag())
 
 	if verbosityLevel == verboseLvlDbug {
-		fmt.Println(msg.Messages.PrintAllFlags)
+		fmt.Println(msg.Stdout.PrintAllFlags)
 		flag.Visit(func(f *flag.Flag) {
-			fmt.Printf(msg.Messages.PrintFlag, f.Name, f.Value, f.DefValue)
+			fmt.Printf(msg.Stdout.PrintFlag, f.Name, f.Value, f.DefValue)
 		})
 	}
 
@@ -75,7 +75,7 @@ func parseCli(af *appFlags, cfg *cli.AppData) error {
 	}
 
 	if len(ca) == 0 {
-		return fmt.Errorf(msg.Errors.NoInput)
+		return fmt.Errorf(msg.Stderr.NoInput)
 	}
 
 	switch flag.Arg(0) {

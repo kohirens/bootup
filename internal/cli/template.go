@@ -56,13 +56,13 @@ func GetPlaceholderInput(placeholders *TmplJson, tmplValues *tmplVars, r *os.Fil
 	numPlaceholder := len(placeholders.Placeholders)
 	numValues := len(*tmplValues)
 
-	//log.Logf(msg.Messages.PlaceholderAnswerStat, numPlaceholder)
+	//log.Logf(msg.Stdout.PlaceholderAnswerStat, numPlaceholder)
 
 	if numPlaceholder == numValues {
 		return nil
 	}
 
-	//log.Logf(msg.Messages.ProvideValues)
+	//log.Logf(msg.Stdout.ProvideValues)
 
 	tVals := *tmplValues
 	nPut := bufio.NewScanner(r)
@@ -71,7 +71,7 @@ func GetPlaceholderInput(placeholders *TmplJson, tmplValues *tmplVars, r *os.Fil
 		a, answered := tVals[placeholder]
 		// skip placeholder that have been supplied with an answer from an answer file.
 		if answered {
-			log.Infof(msg.Messages.PlaceholderHasAnswer, desc, a)
+			log.Infof(msg.Stdout.PlaceholderHasAnswer, desc, a)
 			continue
 		}
 
@@ -86,7 +86,7 @@ func GetPlaceholderInput(placeholders *TmplJson, tmplValues *tmplVars, r *os.Fil
 		fmt.Printf("\n%v - %v: ", placeholder, desc)
 		nPut.Scan()
 		tVals[placeholder] = nPut.Text()
-		log.Infof(msg.Messages.PlaceholderAnswer, desc, tVals[placeholder])
+		log.Infof(msg.Stdout.PlaceholderAnswer, desc, tVals[placeholder])
 		log.Infof("%v = %q\n", placeholder, tVals[placeholder])
 	}
 
@@ -134,7 +134,7 @@ func Download(url, dstDir string, client Client) (string, error) {
 	}
 
 	if resp.StatusCode > 300 || resp.StatusCode < 200 {
-		return "", fmt.Errorf(msg.Errors.TmplPath, resp.Status, resp.StatusCode)
+		return "", fmt.Errorf(msg.Stderr.TmplPath, resp.Status, resp.StatusCode)
 	}
 
 	zipFile := dstDir + PS + dest
@@ -295,13 +295,13 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 
 		// Stop processing files if a template file is too big.
 		if fi.Size() > MaxTplSize {
-			rErr = fmt.Errorf(msg.Errors.FileTooBig, MaxTplSize)
+			rErr = fmt.Errorf(msg.Stderr.FileTooBig, MaxTplSize)
 			return
 		}
 
 		currFile := filepath.Base(sourcePath)
 		if currFile != EmptyFile && !fec.IsValid(sourcePath) { // Skip files by extension; Use an exclusion list, include every file by default.
-			log.Infof(msg.Messages.UnknownFileType, sourcePath)
+			log.Infof(msg.Stdout.UnknownFileType, sourcePath)
 			return
 		}
 
@@ -316,19 +316,19 @@ func Press(tplDir, outDir string, vars tmplVars, fec *stdlib.FileExtChecker, tmp
 		log.Infof("save dir: %v", saveDir)
 
 		// Skip template manifest file and the git config directory.
-		if currFile == manifest.TmplManifest || strings.Contains(relativePath, GitConfigDir+PS) {
-			log.Infof(msg.Messages.SkipFile, relativePath)
+		if currFile == TmplManifestFile || strings.Contains(relativePath, GitConfigDir+PS) {
+			log.Infof(msg.Stdout.SkipFile, relativePath)
 			return
 		}
 
 		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
-			log.Infof(msg.Messages.SkipFile, sourcePath)
+			log.Infof(msg.Stdout.SkipFile, sourcePath)
 			return
 		}
 
 		// skip the directory with replace files.
 		if tmplJson.Replace.Directory != "" && strings.Contains(relativePath, tmplJson.Replace.Directory) {
-			log.Infof(msg.Messages.SkipFile, sourcePath)
+			log.Infof(msg.Stdout.SkipFile, sourcePath)
 			return
 		}
 
@@ -370,7 +370,7 @@ func ReadTemplateJson(filePath string) (*TmplJson, error) {
 
 	// Verify the TMPL_MANIFEST file is present.
 	if !stdlib.PathExist(filePath) {
-		return nil, fmt.Errorf(msg.Errors.TmplManifest404, manifest.TmplManifest)
+		return nil, fmt.Errorf(msg.Stderr.TmplManifest404, TmplManifestFile)
 	}
 
 	content, err1 := ioutil.ReadFile(filePath)
@@ -402,7 +402,7 @@ func ShowAllPlaceholderValues(placeholders *TmplJson, tmplValues *tmplVars) {
 	tVals := *tmplValues
 	log.Logf("the following values have been provided\n")
 	for placeholder := range placeholders.Placeholders {
-		log.Logf(msg.Messages.PlaceholderAnswer, placeholder, tVals[placeholder])
+		log.Logf(msg.Stdout.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
 }
 
