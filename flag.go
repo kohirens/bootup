@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 )
 
@@ -42,7 +41,7 @@ func defineFlags(af *appFlags) {
 }
 
 // Parse and validate all global flags.
-func parseCli(af *appFlags, cfg *cli.AppData) error {
+func parseCli(af *appFlags) error {
 	// Remember that flag parsing stops just before the first argument that does not have a "-" and is also NOT the
 	// value of a flag or comes after the terminator "--".
 	// It was planed to allow for flags/arguments in any order, but it may be less confusing to only support flag first

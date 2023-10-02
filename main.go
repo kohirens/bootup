@@ -29,11 +29,10 @@ const (
 
 var (
 	// appConfig Runtime settings used throughout the application.
-	appConfig = &cli.AppData{
-		UsrOpts: &cli.UserOptions{
-			ExcludeFileExtensions: &[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"},
-		},
-	}
+	appConfig = &cli.AppData{}
+
+	appData *press.AppData
+
 	flags = &appFlags{
 		subcommands: map[string]*flag.FlagSet{},
 	}
@@ -73,7 +72,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	mainErr = parseCli(flags, appConfig)
+	mainErr = parseCli(flags)
 	if mainErr != nil {
 		return
 	}
@@ -89,7 +88,27 @@ func main() {
 		log.Logf(msg.Stdout.CurrentVersion, flags.CurrentVersion, flags.CommitHash)
 		os.Exit(0)
 	}
-	mainErr = appConfig.Setup(AppName, cli.PS, flags.TmplType, flags.TmplPath, cli.DirMode)
+
+	ap, err1 := press.BuildAppDataPath(AppName)
+	if err1 != nil {
+		mainErr = err1
+		return
+	}
+
+	cf := ap + cli.PS + press.ConfigFileName
+	var sc *press.ConfigSaveData
+
+	if path.Exist(cf) {
+		sc, mainErr = press.LoadConfig(cf)
+	} else {
+		// Make a configuration file when there is none.
+		sc, mainErr = press.InitConfig(cf)
+	}
+	if mainErr != nil {
+		return
+	}
+
+	appData, mainErr = press.NewAppData(sc)
 	if mainErr != nil {
 		return
 	}
@@ -99,12 +118,10 @@ func main() {
 	if len(ca) > 0 {
 		switch ca[0] {
 		case config.Name:
-			appConfig.SubCmd = config.Name
 			// store or get the key and return
-			mainErr = config.Run(ca[1:], appConfig)
+			mainErr = config.Run(ca[1:], AppName)
 			return
 		case manifest.Name:
-			appConfig.SubCmd = manifest.Name
 			if e := manifest.ParseFlags(ca[1:]); e != nil {
 				mainErr = e
 				return
@@ -123,20 +140,22 @@ func main() {
 		return
 	}
 
+	var tmplToPress string
+
 	if flags.TmplType == "zip" { //TODO: Remove zip processing
 		var zipFile string
 		var iErr error
 		zipFile = flags.TmplPath
 		if appConfig.TmplLocation == "remote" {
 			client := http.Client{}
-			zipFile, iErr = cli.Download(flags.TmplPath, appConfig.UsrOpts.CacheDir, &client)
+			zipFile, iErr = cli.Download(flags.TmplPath, appData.CacheDir, &client)
 			if iErr != nil {
 				mainErr = iErr
 				return
 			}
 		}
 
-		appConfig.Tmpl, iErr = cli.Extract(zipFile)
+		tmplToPress, iErr = cli.Extract(zipFile)
 		if iErr != nil {
 			mainErr = iErr
 			return
@@ -156,7 +175,7 @@ func main() {
 		}
 
 		// Determine the cache location
-		repoDir := appConfig.UsrOpts.CacheDir + cli.PS + getRepoDir(flags.TmplPath, flags.Branch)
+		repoDir := appData.CacheDir + cli.PS + getRepoDir(flags.TmplPath, flags.Branch)
 		infof(msg.Stdout.OutRepoDir, repoDir)
 
 		// Do a pull when the repo already exists. This will fail if it downloaded a zip.
@@ -173,21 +192,21 @@ func main() {
 			mainErr = err2
 			return
 		}
-		appConfig.Tmpl = repo
+		tmplToPress = repo
 	}
 
-	if !path.DirExist(appConfig.Tmpl) {
-		mainErr = fmt.Errorf(msg.Stderr.InvalidTmplDir, appConfig.Tmpl)
+	if !path.DirExist(tmplToPress) {
+		mainErr = fmt.Errorf(msg.Stderr.InvalidTmplDir, tmplToPress)
 		return
 	}
 
-	fec, err1 := stdlib.NewFileExtChecker(appConfig.UsrOpts.ExcludeFileExtensions, &[]string{})
+	fec, err1 := stdlib.NewFileExtChecker(appData.ExcludeFileExtensions, &[]string{})
 	if err1 != nil {
 		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
 	}
 
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
-	tmplManifestFile := appConfig.Tmpl + cli.PS + press.TmplManifestFile
+	tmplManifestFile := tmplToPress + cli.PS + press.TmplManifestFile
 	tmplManifest, errX := cli.ReadTemplateJson(tmplManifestFile)
 	if errX != nil {
 		mainErr = fmt.Errorf(msg.Stderr.MissingTmplJson, press.TmplManifestFile, tmplManifestFile, errX.Error())
@@ -198,7 +217,7 @@ func main() {
 	appConfig.AnswersJson = cli.NewAnswerJson()
 
 	if path.Exist(flags.AnswersPath) {
-		appConfig.AnswersJson, mainErr = cli.LoadAnswers(flags.AnswersPath)
+		appConfig.AnswersJson, mainErr = press.LoadAnswers(flags.AnswersPath)
 		if mainErr != nil {
 			return
 		}
@@ -211,7 +230,7 @@ func main() {
 
 	cli.ShowAllPlaceholderValues(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders)
 
-	mainErr = cli.Press(appConfig.Tmpl, flags.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
+	mainErr = cli.Press(tmplToPress, flags.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
 }
 
 // / TODO: Move this to parseCli

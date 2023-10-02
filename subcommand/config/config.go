@@ -1,13 +1,13 @@
 package config
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/kohirens/stdlib/log"
+	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
-	"os"
+	"github.com/kohirens/tmpltoapp/internal/press"
 	"regexp"
 	"strings"
 )
@@ -19,7 +19,6 @@ type Arguments struct {
 }
 
 const (
-	dirMode = 0774
 	Summary = "Update or retrieve a configuration value"
 	Name    = "config"
 )
@@ -70,7 +69,7 @@ func ParseInput(ca []string) error {
 }
 
 // Run Set or get a config setting.
-func Run(ca []string, cfg *cli.AppData) error {
+func Run(ca []string, appName string) error {
 	if e := ParseInput(ca); e != nil {
 		return e
 	}
@@ -83,87 +82,82 @@ func Run(ca []string, cfg *cli.AppData) error {
 	log.Dbugf("args.Method = %v\n", args.Method)
 	log.Dbugf("args.Key = %v\n", args.Setting)
 
+	appDataDir, err1 := press.BuildAppDataPath(appName)
+	if err1 != nil {
+		return err1
+	}
+
+	cp := appDataDir + cli.PS + press.ConfigFileName
+
 	switch args.Method {
 	case "set":
 		log.Dbugf("args.Value = %v\n", args.Value)
-		fmt.Printf("\n\n%v\n\n", args.Value)
-		if e := set(args.Setting, args.Value, cfg); e != nil {
-			return e
-		}
-
-		return save(cfg, dirMode)
+		return set(args.Setting, args.Value, cp)
 
 	case "get":
-		v, e := get(args.Setting, cfg)
-
-		if e != nil {
-			return e
-		}
-
-		log.Logf("%v", v)
+		return get(args.Setting, cp)
 
 	default:
 		return fmt.Errorf(Stderr.InvalidConfigMethod, args.Method)
 	}
-
-	return nil
 }
 
 // get the value of a user setting.
-func get(key string, cfg *cli.AppData) (interface{}, error) {
+func get(key string, cp string) error {
 	var val interface{}
+
+	sc, err1 := press.LoadConfig(cp)
+	if err1 != nil {
+		return err1
+	}
 
 	switch key {
 	case "CacheDir":
-		val = cfg.UsrOpts.CacheDir
+		val = sc.CacheDir
+		log.Logf("%v", val)
 		break
+
 	case "ExcludeFileExtensions":
 		v2 := fmt.Sprintf("%v", val)
 		ok, _ := regexp.Match("^[a-zA-Z0-9-.]+(?:,[a-zA-Z0-9-.]+)*", []byte(v2))
 		if !ok {
-			return nil, fmt.Errorf(Stderr.BadExcludeFileExt, val)
+			return fmt.Errorf(Stderr.BadExcludeFileExt, val)
 		}
-		val = strings.Join(*cfg.UsrOpts.ExcludeFileExtensions, ",")
+		val = strings.Join(*sc.ExcludeFileExtensions, ",")
+		log.Logf("%v", val)
 		break
+
 	default:
-		return "", fmt.Errorf("no setting %v found", key)
-	}
-
-	return val, nil
-}
-
-// save configuration file.
-func save(cfg *cli.AppData, mode os.FileMode) error {
-	data, err1 := json.Marshal(cfg.UsrOpts)
-
-	log.Dbugf(Stdout.SaveData, data)
-
-	if err1 != nil {
-		return fmt.Errorf(Stderr.CouldNotEncodeConfig, err1.Error())
-	}
-
-	if e := os.WriteFile(cfg.Path, data, mode); e != nil {
-		return e
+		return fmt.Errorf("no setting %v found", key)
 	}
 
 	return nil
 }
 
 // set the value of a user setting
-func set(key, val string, cfg *cli.AppData) error {
+func set(key, val string, cp string) error {
+	sc := &press.ConfigSaveData{}
+
 	switch key {
 	case "CacheDir":
+		sc.CacheDir = val
 		log.Dbugf("setting CacheDir = %q", val)
-		cfg.UsrOpts.CacheDir = val
 		break
+
 	case "ExcludeFileExtensions":
-		log.Dbugf("adding exclusions %q to config", val)
 		tmp := strings.Split(val, ",")
-		cfg.UsrOpts.ExcludeFileExtensions = &tmp
+		sc.ExcludeFileExtensions = &tmp
+		log.Dbugf("adding exclusions %q to config", val)
 		break
+
 	default:
 		return fmt.Errorf("no %q setting found", key)
 	}
 
-	return nil
+	if !path.Exist(cp) {
+		_, e := press.InitConfig(cp)
+		return e
+	}
+
+	return press.SaveConfig(cp, sc)
 }

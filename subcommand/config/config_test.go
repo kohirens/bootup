@@ -50,17 +50,12 @@ func TestSubCmdConfigBadExit(tester *testing.T) {
 		wantCode int
 		ca       []string
 		expected string
-		cfg      *cli.AppData
 	}{
 		{
 			"set-exclude-file-extensions",
 			1,
 			[]string{"set", "ExcludeFileExtensions", "jpg,gif"},
 			"no config setting \"keyDoesNotExist\" found",
-			&cli.AppData{
-				Path:    tmpDir + "/config-set-exclude-file-extensions.json",
-				UsrOpts: &cli.UserOptions{&[]string{}, ""},
-			},
 		},
 	}
 
@@ -68,7 +63,7 @@ func TestSubCmdConfigBadExit(tester *testing.T) {
 		tester.Run(tc.name, func(t *testing.T) {
 			Init()
 
-			e2 := Run(tc.ca, tc.cfg)
+			e2 := Run(tc.ca, "TestBonanza")
 			if e2 != nil {
 				t.Error(e2)
 			}

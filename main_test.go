@@ -246,7 +246,7 @@ func TestSubCmdConfigSuccess(tester *testing.T) {
 }
 
 func TestSetUserOptions(tester *testing.T) {
-	delayedFunc := test.TmpSetParentDataDir(TmpDir)
+	delayedFunc := test.TmpSetParentDataDir(TmpDir + "/TestSetUserOptions")
 	defer delayedFunc()
 
 	var tests = []struct {
@@ -267,7 +267,7 @@ func TestSetUserOptions(tester *testing.T) {
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
 
-			cmd := test.GetTestBinCmd(tc.args)
+			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
 
 			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
 
@@ -277,11 +277,8 @@ func TestSetUserOptions(tester *testing.T) {
 				t.Errorf("got %q, want %q", gotExit, tc.wantCode)
 			}
 
-			file := TmpDir + cli.PS + ".tmpltoapp" + cli.PS + "config.json"
-
-			gotCfg := &cli.AppData{}
-			_ = gotCfg.LoadUserSettings(file)
-			data, err1 := json.Marshal(gotCfg.UsrOpts)
+			gotCfg, _ := press.LoadConfig(TmpDir + "/TestSetUserOptions/tmpltoapp/config.json")
+			data, err1 := json.Marshal(gotCfg)
 
 			if err1 != nil {
 				t.Errorf("could not find config file %q", err1.Error())
