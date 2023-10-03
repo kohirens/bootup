@@ -5,12 +5,10 @@ import (
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/kohirens/stdlib"
@@ -27,44 +25,6 @@ func (h HttpMock) Get(url string) (*http.Response, error) {
 
 func (h HttpMock) Head(url string) (*http.Response, error) {
 	return h.Resp, h.Err
-}
-
-func TestDownload(runner *testing.T) {
-	defer test.Silencer()()
-
-	var err error
-	fixtures := HttpMock{
-		&http.Response{
-			Body:       io.NopCloser(strings.NewReader("200 OK")),
-			StatusCode: 200,
-		},
-		err,
-	}
-
-	runner.Run("canDownload", func(t *testing.T) {
-		got, err1 := Download("/fake_dl", TmpDir, &fixtures)
-		if err1 != nil {
-			t.Errorf("got %q, want nil", err1.Error())
-		}
-		_, err = os.Stat(got)
-
-		if os.IsNotExist(err) {
-			t.Errorf("got %q, want nil", got)
-		}
-	})
-}
-
-func ExampleDownload() {
-	client := http.Client{}
-	_, err := Download(
-		"https://github.com/kohirens/tmpltoapp-test-tpl/archive/main.zip",
-		TmpDir,
-		&client,
-	)
-
-	if err != nil {
-		return
-	}
 }
 
 func TestExtract(runner *testing.T) {

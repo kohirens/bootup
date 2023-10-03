@@ -122,49 +122,6 @@ func NewAnswerJson() *AnswersJson {
 	}
 }
 
-// Download a template from a URL to a local directory.
-// Deprecated: Will be replace with method that uses git clone.
-func Download(url, dstDir string, client Client) (string, error) {
-	// Save to a unique filename in the cache.
-	dest := strings.ReplaceAll(url, "https://", "")
-	dest = strings.ReplaceAll(dest, "/", "-")
-
-	// Make the HTTP request
-	resp, err1 := client.Get(url)
-	if err1 != nil {
-		return "", err1
-	}
-
-	if resp.StatusCode > 300 || resp.StatusCode < 200 {
-		return "", fmt.Errorf(msg.Stderr.TmplPath, resp.Status, resp.StatusCode)
-	}
-
-	zipFile := dstDir + PS + dest
-	// make handle to the file.
-	out, err2 := os.Create(zipFile)
-	if err2 != nil {
-		return "", err2
-	}
-
-	// Write the body to a file
-	_, err3 := io.Copy(out, resp.Body)
-	if err3 != nil {
-		return "", err3
-	}
-
-	if e := out.Close(); e != nil {
-		return "", e
-	}
-
-	if e := resp.Body.Close(); e != nil {
-		return "", e
-	}
-
-	log.Infof("downloading %v to %v\n", url, dest)
-
-	return zipFile, nil
-}
-
 // Deprecated: Do NOT USE, will be removed.
 func Extract(archivePath string) (string, error) {
 	tmplDir := ""

@@ -75,16 +75,6 @@ func TestCallingMain(tester *testing.T) {
 			},
 		},
 		{
-			"downloadZipTemplate",
-			0,
-			[]string{
-				"-tmpl-path", "https://github.com/kohirens/tmpl-go-web/archive/refs/tags/0.3.0.zip",
-				"-out-path", TmpDir + cli.PS + "tmpl-go-web-02",
-				"-answer-path", FixtureDir + cli.PS + "answers-tmpl-go-web.json",
-				"-tmpl-type", "zip",
-			},
-		},
-		{
 			"remoteGitTemplate",
 			0,
 			[]string{

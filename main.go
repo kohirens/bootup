@@ -14,7 +14,6 @@ import (
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"github.com/kohirens/tmpltoapp/subcommand/manifest"
-	"net/http"
 	"os"
 	"regexp"
 )
@@ -141,26 +140,6 @@ func main() {
 	}
 
 	var tmplToPress string
-
-	if flags.TmplType == "zip" { //TODO: Remove zip processing
-		var zipFile string
-		var iErr error
-		zipFile = flags.TmplPath
-		if appConfig.TmplLocation == "remote" {
-			client := http.Client{}
-			zipFile, iErr = cli.Download(flags.TmplPath, appData.CacheDir, &client)
-			if iErr != nil {
-				mainErr = iErr
-				return
-			}
-		}
-
-		tmplToPress, iErr = cli.Extract(zipFile)
-		if iErr != nil {
-			mainErr = iErr
-			return
-		}
-	}
 
 	if flags.TmplType == "git" {
 		var repo, commitHash string
