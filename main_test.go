@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
 	stdt "github.com/kohirens/stdlib/test"
 	"github.com/kohirens/tmpltoapp/internal/cli"
@@ -19,17 +20,13 @@ import (
 const (
 	FixtureDir = "testdata"
 	TmpDir     = "tmp"
+	ps         = string(os.PathSeparator)
 )
 
 func TestMain(m *testing.M) {
-	// Only runs when this environment variable is set.
-	if _, ok := os.LookupEnv(test.SubCmdFlags); ok {
-		runAppMain()
-	}
-	// call flag.Parse() here if TestMain uses flags
-	_ = os.RemoveAll(TmpDir)
-	// Set up a temporary dir for generate files
-	_ = os.Mkdir(TmpDir, cli.DirMode) // set up a temporary dir for generate files
+	stdt.RunMain(test.SubCmdFlags, main)
+
+	stdt.ResetDir(TmpDir, 0774)
 	// Run all tests
 	exitCode := m.Run()
 	// Clean up
@@ -65,22 +62,12 @@ func TestCallingMain(tester *testing.T) {
 		{"versionFlag", 0, []string{"-version"}},
 		{"helpFlag", 0, []string{"-help"}},
 		{
-			"localTemplate",
-			0,
-			[]string{
-				"-answer-path", FixtureDir + cli.PS + "answers-parse-dir-02.json",
-				"-tmpl-path", FixtureDir + cli.PS + "parse-dir-02",
-				"-out-path", TmpDir + cli.PS + "app-parse-dir-02",
-				"-tmpl-type", "dir",
-			},
-		},
-		{
 			"remoteGitTemplate",
 			0,
 			[]string{
 				"-tmpl-path", "https://github.com/kohirens/tmpl-go-web.git",
-				"-out-path", TmpDir + cli.PS + "tmpl-go-web-03",
-				"-answer-path", FixtureDir + cli.PS + "answers-tmpl-go-web.json",
+				"-out-path", TmpDir + ps + "tmpl-go-web-03",
+				"-answer-path", FixtureDir + ps + "answers-tmpl-go-web.json",
 				"-tmpl-type", "git",
 				"-branch", "refs/tags/0.3.0",
 			},
@@ -99,23 +86,10 @@ func TestCallingMain(tester *testing.T) {
 			got := cmd.ProcessState.ExitCode()
 
 			if got != tc.wantCode {
-				t.Errorf("got %q, want %q", got, tc.wantCode)
+				t.Errorf("got %v, want %v", got, tc.wantCode)
 			}
 		})
 	}
-}
-
-// runAppMain run main passing only the fixture flags
-func runAppMain() {
-	// Get fixture flags set in the unit test.
-	args := strings.Split(os.Getenv(test.SubCmdFlags), " ")
-	// replace the test flaga and arts with the test fixture flags and args.
-	os.Args = append([]string{os.Args[0]}, args...)
-
-	// Debug stmt
-	//fmt.Printf("\nsub os.Args = %v\n", os.Args)
-
-	main()
 }
 
 // runMain execute main in a sub process
@@ -283,7 +257,7 @@ func TestSetUserOptions(tester *testing.T) {
 // Check input repo directory matches the output directory.
 func TestTmplAndOutPathMatch(tester *testing.T) {
 	fixture := "repo-08"
-	fixtureDir := TmpDir + test.PS + "remotes" + test.PS + fixture
+	fixtureDir := TmpDir + ps + "remotes" + ps + fixture
 	// Must be cleaned on every test run to ensure no existing config.
 	if e := os.RemoveAll(TmpDir); e != nil {
 		panic("could not clean tmp directory for test run")
@@ -308,7 +282,7 @@ func TestTmplAndOutPathMatch(tester *testing.T) {
 
 	for _, tc := range testCases {
 		tester.Run(tc.name, func(t *testing.T) {
-			test.SetupARepository(fixture, TmpDir+test.PS+"remotes", FixtureDir, test.PS)
+			test.SetupARepository(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
 
 			cmd := runMain(tester.Name(), tc.args)
 
@@ -343,16 +317,16 @@ func TestFirstTimeRun(tester *testing.T) {
 			"pressTmplWithNoConfig",
 			0,
 			[]string{
-				"-answer-path", FixtureDir + test.PS + fixture + "-answers.json",
+				"-answer-path", FixtureDir + ps + fixture + "-answers.json",
 				"-tmpl-path", "will be replace below",
-				"-out-path", TmpDir + test.PS + "processed" + test.PS + fixture,
+				"-out-path", TmpDir + ps + "processed" + ps + fixture,
 			},
 		},
 	}
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			tc.args[3] = test.SetupARepository(fixture, TmpDir+test.PS+"remotes", FixtureDir, test.PS)
+			tc.args[3] = test.SetupARepository(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
 
 			cmd := runMain(tester.Name(), tc.args)
 
@@ -374,7 +348,7 @@ func TestFirstTimeRun(tester *testing.T) {
 
 func TestSkipFeature(tester *testing.T) {
 	repoFixture := "repo-09"
-	outPath := TmpDir + test.PS + "processed" + test.PS + repoFixture
+	outPath := TmpDir + ps + "processed" + ps + repoFixture
 	tc := struct {
 		name     string
 		wantCode int
@@ -385,7 +359,7 @@ func TestSkipFeature(tester *testing.T) {
 		"pressTmplWithNoConfig",
 		0,
 		[]string{
-			"-answer-path", FixtureDir + test.PS + repoFixture + "-answers.json",
+			"-answer-path", FixtureDir + ps + repoFixture + "-answers.json",
 			"-out-path", outPath,
 			"-tmpl-path", "will be replace below",
 		},
@@ -402,7 +376,7 @@ func TestSkipFeature(tester *testing.T) {
 		},
 	}
 
-	tc.args[5] = test.SetupARepository(repoFixture, TmpDir, FixtureDir, test.PS)
+	tc.args[5] = test.SetupARepository(repoFixture, TmpDir, FixtureDir, ps)
 
 	cmd := runMain(tester.Name(), tc.args)
 
@@ -415,16 +389,52 @@ func TestSkipFeature(tester *testing.T) {
 	}
 
 	for _, p := range tc.absent {
-		file := outPath + test.PS + p
+		file := outPath + ps + p
 		if path.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
 
 	for _, p := range tc.present {
-		file := outPath + test.PS + p
+		file := outPath + ps + p
 		if !path.Exist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
 		}
+	}
+}
+
+func TestTmplPress(tester *testing.T) {
+	var tests = []struct {
+		name     string
+		wantCode int
+		args     []string
+	}{
+		{
+			"local",
+			0,
+			[]string{
+				"-answer-path", FixtureDir + ps + "answers-parse-dir-02.json",
+				"-tmpl-path", FixtureDir + ps + "parse-dir-02",
+				"-out-path", TmpDir + ps + "app-parse-dir-02",
+				"-tmpl-type", "git",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tester.Run(tc.name, func(t *testing.T) {
+			rd := git.CloneFromBundle("parse-dir-02", TmpDir, FixtureDir, ps)
+			fmt.Printf("rd = %v\n", rd)
+			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
+
+			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+
+			// get exit code.
+			got := cmd.ProcessState.ExitCode()
+
+			if got != tc.wantCode {
+				t.Errorf("got %v, want %v", got, tc.wantCode)
+			}
+		})
 	}
 }

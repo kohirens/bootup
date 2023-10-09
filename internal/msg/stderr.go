@@ -8,8 +8,6 @@ var Stderr = struct {
 	CannotDecodeAnswerFile string
 	CannotInitFileChecker  string
 	CannotReadAnswerFile   string
-	Checkout               string
-	Cloning                string
 	CouldNot               string
 	CouldNotCloseFile      string
 	CouldNotDecode         string
@@ -17,15 +15,11 @@ var Stderr = struct {
 	CouldNotMakeCacheDir   string
 	CouldNotSaveConf       string
 	CouldNotWriteFile      string
-	CurrentBranch          string
 	FatalHeader            string
 	FlagOrderErr           string
 	FileTooBig             string
 	GettingAnswers         string
-	GettingCommitHash      string
-	GitCheckoutFailed      string
 	GitFetchFailed         string
-	GitExitErrCode         string
 	GetLatestTag           string
 	GetRemoteTags          string
 	InvalidNoArgs          string
@@ -53,8 +47,6 @@ var Stderr = struct {
 	CannotDecodeAnswerFile: "could not decode JSON in answer file %q, because of: %s",
 	CannotInitFileChecker:  "cannot instantiate file extension checker: %v",
 	CannotReadAnswerFile:   "there was an error reading the answer file %q: %s",
-	Checkout:               "checkout failed for branch %q",
-	Cloning:                "error cloning %v: %s",
 	CouldNot:               "could not %s",
 	CouldNotCloseFile:      "could not close file %v, %v",
 	CouldNotDecode:         "could not decode %q, error: %s",
@@ -62,17 +54,11 @@ var Stderr = struct {
 	CouldNotMakeCacheDir:   "could not make cache directory, error: %s",
 	CouldNotSaveConf:       "could not save a config file, reason: %v",
 	CouldNotWriteFile:      "could not write file %v, reason: %v",
-	CurrentBranch:          "failed to get current for %s",
 	FatalHeader:            "\nfatal error detected: ",
 	FlagOrderErr:           "flag %v MUST come before any non-flag arguments, a fix would be to move this flag to the left of other input arguments",
 	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
 	GettingAnswers:         "problem getting answers; error %q",
-	GettingCommitHash:      "error getting commit hash %v: %s",
-	GitCheckoutFailed:      "git checkout failed: %s",
 	GetLatestTag:           "failed to get latest tag from %v: %v",
-	GetRemoteTags:          "could not get remote tags, please check for a typo, it exist, and is readable: %v",
-	GitExitErrCode:         "git %v returned exit code %q",
-	GitFetchFailed:         "fetch failed on %s and %s; %s",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
 	InvalidTmplDir:         "invalid template directory %q",
@@ -83,7 +69,6 @@ var Stderr = struct {
 	OutPathCollision:       "-tmpl-path %q and -out-path %q cannot point to the same directory",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
-	RunGitFailed:           "error running git %v: %v\n%s",
 	TmplManifest404:        "the required manifest %q file was not found",
 	TmplOutput:             "template has NOT been cloned locally",
 	TmplPath:               "please specify a path (or URL) to a template",

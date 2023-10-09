@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/kohirens/stdlib"
 	stdc "github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/cli"
@@ -146,7 +147,7 @@ func main() {
 		var err2 error
 
 		if flags.Branch == "latest" {
-			latestTag, e3 := getLatestTag(flags.TmplPath)
+			latestTag, e3 := git.LatestTag(flags.TmplPath)
 			log.Infof(e3.Error())
 			if latestTag != "" {
 				flags.Branch = latestTag
@@ -155,15 +156,15 @@ func main() {
 
 		// Determine the cache location
 		repoDir := appData.CacheDir + cli.PS + getRepoDir(flags.TmplPath, flags.Branch)
-		infof(msg.Stdout.OutRepoDir, repoDir)
+		log.Infof(msg.Stdout.RepoDir, repoDir)
 
-		// Do a pull when the repo already exists. This will fail if it downloaded a zip.
+		// Do a pull when the repo already exists.
 		if path.DirExist(repoDir + cli.PS + gitConfDir) {
 			infof(msg.Stdout.UsingCache, repoDir)
-			repo, commitHash, err2 = gitCheckout(repoDir, flags.Branch)
+			repo, commitHash, err2 = git.Checkout(repoDir, flags.Branch)
 		} else {
-			infof(msg.Stdout.CloningToCache, repoDir)
-			repo, commitHash, err2 = gitClone(flags.TmplPath, repoDir, flags.Branch)
+			infof(msg.Stdout.CloningToCache, repoDir, flags.TmplPath)
+			repo, commitHash, err2 = git.Clone(flags.TmplPath, repoDir, flags.Branch)
 		}
 
 		infof(msg.Stdout.RepoInfo, repo, commitHash)

@@ -7,12 +7,10 @@ var Stdout = struct {
 	ConfigFileExist       string
 	CurrentVersion        string
 	CurrentVersionInfo    string
-	GitCheckout           string
 	MadeNewConfig         string
 	NumNonFlagArgs        string
 	NumParsedFlags        string
 	OutPathExist          string
-	OutRepoDir            string
 	ProvideValues         string
 	PrintAllFlags         string
 	PrintFlag             string
@@ -38,11 +36,9 @@ var Stdout = struct {
 	ConfigFileExist:       "config file %q exist",
 	CurrentVersion:        "%v, %v",
 	CurrentVersionInfo:    "version: %v, %v",
-	GitCheckout:           "git checkout %s",
 	MadeNewConfig:         "saved %d bytes to a new config %q",
 	NumNonFlagArgs:        "number of non-flag arguments passed in: %d",
 	NumParsedFlags:        "number of parsed flags = %v",
-	OutRepoDir:            "repoDir = %v",
 	OutPathExist:          "out-path already exits %q",
 	ProvideValues:         "note: entering no value will render the placeholder with an empty string",
 	PrintAllFlags:         "printing all flags set:",
@@ -50,17 +46,14 @@ var Stdout = struct {
 	PlaceholderAnswer:     "%v = %q",
 	PlaceholderAnswerStat: "please provide values for %v placeholders",
 	PlaceholderHasAnswer:  "placeholder %v has a value of %q, so skipping",
-	RefInfo:               "ref = %v ",
-	RemoteTagDbug1:        "remote tag: %v",
 	ReadConfig:            "reading config file %v",
 	RepoDir:               "repoDir = %q",
 	RepoInfo:              "repo = %q; %q",
-	RunningCommand:        "running command %s",
 	SaveData:              "%save data: s",
 	SkipFile:              "skipping: %v",
-	SubCommands:           "sub-commands:\n",
-	UsageHeader:           "Usage: %v -[options] [args]\n",
-	UsingCache:            "using cache %v",
+	SubCommands:           "sub-commands:",
+	UsageHeader:           "Usage: %v -[options] [args]",
+	UsingCache:            "using cache located at %v",
 	UnknownFileType:       "will skip and not process through template engine; could not detect file type for %v",
 	VerboseLevelInfo:      "verbose level: %v",
 }
