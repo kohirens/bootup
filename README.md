@@ -5,14 +5,16 @@ Start an app (or something) from a template.
 ## Table of Contents
 
 * [TmplToApp](#tmpltoapp)
+    * [Info](#info)
     * [Description](#description)
     * [Installation](#installation)
         * [Using Go](#using-go)
         * [Using Docker](#using-docker)
-    * [Get Started](#get-started)
-        * [Making a Template](#making-a-template)
-        * [Using a Template](#using-a-template)
-
+        * [Using cURL & tar](#using-curl--tar)
+    * [Using a Template](#using-a-template)
+    * [Making a Template](/docs/template-designing.md#making-a-template)
+    * [FYI](#fyi)
+    * [Teminology](/docs/terminology.md)
 
 ## Info
 
@@ -21,10 +23,9 @@ Start an app (or something) from a template.
 ## Description
 
 A template is a collection of files organized in a folder hierarchy. Any
-extension can be used, but the template must be written in text (only tested
-with UTF-8) containing Go template syntax. This application takes such a folder
-and processes each file in the folder structure to an output folder of your
-choosing.
+extension can be used as long as it is text (only tested with UTF-8) containing
+Go template syntax. This application takes such a folder and processes each
+file in the folder structure to an output folder of your choosing.
 
 Data for the template is supplied with questions answer from the CLI or a
 JSON file as input. This is extremely powerful; you are only limited to your
@@ -41,16 +42,6 @@ The idea is to quickly setup things you need on a regular basis.
 (even a small parts) that you commonly use. This is especially true when using
 the `answer.json` file with automation.
 
-## Terminology
-
-* Placeholders - refer to the variables that need to be filled in when a file
-  is process as a Go template.
-* Template - refer to top/root folder/directory as a whole, which contains
-  text files (of any extension) containing Go template syntax.
-* Empty directory - a directory with a single file named `.empty`, contents
-  are ignored.
-* Templates source - the Git repository for the __Template__ repo.
-
 ## Installation
 
 ### Using Go
@@ -65,7 +56,7 @@ go install github.com/kohirens/tmpltoapp
 docker pull kohirens/tmpltoapp:x.x.x
 ```
 
-### Using cURL on Linux
+### Using cURL & tar
 
 ```
 cd /tmp
@@ -74,30 +65,6 @@ curl -L -o tmpltoapp.tar.gz https://github.com/kohirens/tmpltoapp/releases/downl
 tar -xzvf tmpltoapp.tar.gz  ${HOME}/bin
 export PATH="${HOME}/bin:${PATH}"
 ```
-
-## Get Started
-
-### Making a Template
-
-You can quickly make a Template by following these steps.
-
-1. Make a new directory with a name of your choosing.
-2. Make a README.md and add `# {{.AppName}}` as the content.
-3. Open a command line to this folder and run `tmpltoapp manifest ./`. This
-   will generate the manifest `template.json` file containing some details about
-   your template. Mainly the placeholder.
-4. You can edit this file by giving the AppName key a value like:
-   "application name". This acts as a label or question when someone uses your
-   template. More on that later.
-5. Run `git inti` and then `git add .`, then commit the changes.
-
-That is the start of your template. But you can add more folders,
-and if a directory should be empty, then place a file named ".empty" in it.
-The .empty file does need any text in it.
-
-Add more files as needed, the extension does not matter as it will be
-processed as a Go template, unless it is excluded in the template.json manifest.
-See [How To Build A Template JSON Manifest] for other details that can be added.
 
 ### Using a Template
 
@@ -119,7 +86,20 @@ Run this application with 3 parameters:
 * Files listed in the `excludes` list are output to the final app directory without template processing.
 * Template are processed with the Go lib [Golang text/template].
 
+## FYI
+
+1. Why is it called "TmplPress"?
+    * The name is a play on newspress. Old machines used to print newspapers.
+      Like a newspaper the TmplPress (Template Press) produces copies from
+      templates.
+2. What is up with the name "printer.go" in the press package"
+    * Going along with the them of newspress, the machine as a whole acts as a
+      printer. Originally the name was lever, for what a person would pull to
+      print 1 side of a newpaper, but since the press package is meant to
+      contain all the parts build to produce the paper, it made more since to
+      call the file that contains the main function to produce a tempalte be
+      name printer.
+
 ---
 
 [Golang text/template]: https://golang.org/pkg/text/template/
-[How To Build A Template JSON Manifest]: /docs/building-a-template-json.md
