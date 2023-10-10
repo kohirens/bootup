@@ -1,3 +1,5 @@
 {
-    "appName": "Parse Dir 2"
+    "placeholders": {
+        "AppName": "Parse Dir 2"
+    }
 }

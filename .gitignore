@@ -4,6 +4,7 @@
 /internal/cli/testdata/001/
 /internal/cli/testdata/repo-*/
 /internal/cli/tmp/
+/testdata/parse-dir-02/
 /testdata/repo-*/
 /out/
 /vendor/

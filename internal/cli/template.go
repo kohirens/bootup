@@ -53,24 +53,25 @@ type ReplaceWith struct {
 type tmplVars map[string]string
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
-func GetPlaceholderInput(placeholders *TmplJson, tmplValues *tmplVars, r *os.File, defaultVal string) error {
+func GetPlaceholderInput(placeholders *TmplJson, tmplValues tmplVars, r *os.File, defaultVal string) error {
 	numPlaceholder := len(placeholders.Placeholders)
-	numValues := len(*tmplValues)
+	numValues := len(tmplValues)
 
-	//log.Logf(msg.Stdout.PlaceholderAnswerStat, numPlaceholder)
+	log.Infof(msg.Stdout.PlaceholderAnswerStat, numPlaceholder)
 
 	if numPlaceholder == numValues {
 		return nil
 	}
 
-	//log.Logf(msg.Stdout.ProvideValues)
+	log.Logf(msg.Stdout.ProvideValues)
 
-	tVals := *tmplValues
+	tVals := tmplValues
 	nPut := bufio.NewScanner(r)
 
 	for placeholder, desc := range placeholders.Placeholders {
 		a, answered := tVals[placeholder]
 		// skip placeholder that have been supplied with an answer from an answer file.
+
 		if answered {
 			log.Infof(msg.Stdout.PlaceholderHasAnswer, desc, a)
 			continue

@@ -160,14 +160,14 @@ func main() {
 
 		// Do a pull when the repo already exists.
 		if path.DirExist(repoDir + cli.PS + gitConfDir) {
-			infof(msg.Stdout.UsingCache, repoDir)
+			log.Infof(msg.Stdout.UsingCache, repoDir)
 			repo, commitHash, err2 = git.Checkout(repoDir, flags.Branch)
 		} else {
-			infof(msg.Stdout.CloningToCache, repoDir, flags.TmplPath)
+			log.Infof(msg.Stdout.CloningToCache, flags.TmplPath, repoDir)
 			repo, commitHash, err2 = git.Clone(flags.TmplPath, repoDir, flags.Branch)
 		}
 
-		infof(msg.Stdout.RepoInfo, repo, commitHash)
+		log.Infof(msg.Stdout.RepoInfo, repo, commitHash)
 		if err2 != nil {
 			mainErr = err2
 			return
@@ -204,7 +204,7 @@ func main() {
 	}
 
 	// Checks for any missing placeholder values waits for their input from the CLI.
-	if e := cli.GetPlaceholderInput(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
+	if e := cli.GetPlaceholderInput(appConfig.TmplJson, appConfig.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
 		mainErr = fmt.Errorf(msg.Stderr.GettingAnswers, e.Error())
 	}
 

@@ -13,6 +13,7 @@ import (
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -404,27 +405,33 @@ func TestSkipFeature(tester *testing.T) {
 }
 
 func TestTmplPress(tester *testing.T) {
+	op := TmpDir + ps + "out" + ps + "app-parse-dir-02"
+	cd := TmpDir + ps + tester.Name()
+
 	var tests = []struct {
 		name     string
 		wantCode int
 		args     []string
+		want     bool
 	}{
 		{
 			"local",
 			0,
 			[]string{
 				"-answer-path", FixtureDir + ps + "answers-parse-dir-02.json",
-				"-tmpl-path", FixtureDir + ps + "parse-dir-02",
-				"-out-path", TmpDir + ps + "app-parse-dir-02",
+				"-out-path", op,
 				"-tmpl-type", "git",
 			},
+			true,
 		},
 	}
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			rd := git.CloneFromBundle("parse-dir-02", TmpDir, FixtureDir, ps)
-			fmt.Printf("rd = %v\n", rd)
+			rd := git.CloneFromBundle("parse-dir-02", cd, FixtureDir, ps)
+
+			test.TmpSetParentDataDir(filepath.Dir(rd))
+			tc.args = append(tc.args, "-tmpl-path", rd)
 			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
 
 			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
@@ -434,6 +441,10 @@ func TestTmplPress(tester *testing.T) {
 
 			if got != tc.wantCode {
 				t.Errorf("got %v, want %v", got, tc.wantCode)
+			}
+
+			if path.Exist(op) != tc.want {
+				t.Errorf("got %v, want %v", path.Exist(op), tc.want)
 			}
 		})
 	}

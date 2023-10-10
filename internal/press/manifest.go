@@ -16,8 +16,9 @@ const (
 // LoadAnswers Load key/value pairs from a JSON file to fill in placeholders (provides that data for the Go templates).
 func LoadAnswers(filename string) (*cli.AnswersJson, error) {
 	if !path.Exist(filename) {
-
+		return nil, fmt.Errorf(msg.Stderr.AnswerFile404, filename)
 	}
+
 	content, err := os.ReadFile(filename)
 
 	if err != nil {

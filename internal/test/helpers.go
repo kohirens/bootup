@@ -107,7 +107,8 @@ func TmpSetParentDataDir(d string) func() {
 	}
 
 	// Set the app data dir to the local test tmp.
-	if runtime.GOOS == "windows" {
+	switch runtime.GOOS {
+	case "windows":
 		appDataDir, _ := os.LookupEnv("APPDATA")
 		cacheDataDir, _ := os.LookupEnv("LOCALAPPDATA")
 
@@ -123,7 +124,7 @@ func TmpSetParentDataDir(d string) func() {
 			_ = os.Setenv("APPDATA", appDataDir)
 			_ = os.Setenv("LOCALAPPDATA", cacheDataDir)
 		}
-	} else {
+	default:
 		oldHome, _ := os.LookupEnv("HOME")
 		_ = os.Setenv("HOME", dir)
 		return func() {

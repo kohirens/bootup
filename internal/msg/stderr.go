@@ -40,7 +40,7 @@ var Stderr = struct {
 	ParsingFile            string
 	PathNotExist           string
 }{
-	AnswerFile404:          "could not find the answer file %q, please specify a path to a valid answer file that exist: given %q",
+	AnswerFile404:          "could not find the answer file, please specify a path to a valid answer file that exist: given %q",
 	AppDataDir:             "the following error occurred trying to get the app data directory: %q",
 	BadExcludeFileExt:      "invalid ExcludeFileExtensions, check format, for example: item1,item2,item3",
 	BadTmplType:            "%q is an invalid value for flag tmplType, or it was not set, must be zip|git",
