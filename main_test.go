@@ -7,7 +7,6 @@ import (
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
 	stdt "github.com/kohirens/stdlib/test"
-	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
@@ -112,8 +111,8 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 		args     []string
 		expected string
 	}{
-		{"noArgs", 1, []string{cli.CmdConfig}, "invalid number of arguments"},
-		{"keyDoesNotExist", 1, []string{cli.CmdConfig, "set", "key", "value"}, "no \"key\" setting found"},
+		{"noArgs", 1, []string{config.Name}, "invalid number of arguments"},
+		{"keyDoesNotExist", 1, []string{config.Name, "set", "key", "value"}, "no \"key\" setting found"},
 	}
 
 	for _, tc := range tests {
@@ -222,11 +221,11 @@ func TestSetUserOptions(tester *testing.T) {
 		args     []string
 		want     string
 	}{
-		{"setCache", 0, []string{"-verbosity", "6", cli.CmdConfig, "set", "CacheDir", "ABC123"}, "ABC123"},
+		{"setCache", 0, []string{"-verbosity", "6", config.Name, "set", "CacheDir", "ABC123"}, "ABC123"},
 		{
 			"setExcludeFileExtensions",
 			0,
-			[]string{cli.CmdConfig, "set", "ExcludeFileExtensions", "md,txt"},
+			[]string{config.Name, "set", "ExcludeFileExtensions", "md,txt"},
 			`"ExcludeFileExtensions":["md","txt"]`,
 		},
 	}
