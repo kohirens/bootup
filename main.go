@@ -72,7 +72,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	mainErr = parseCli(flags)
+	mainErr = parseFlags(flags)
 	if mainErr != nil {
 		return
 	}
@@ -216,7 +216,6 @@ func main() {
 	mainErr = cli.Press(tmplToPress, flags.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
 }
 
-// / TODO: Move this to parseCli
 func parseMainArgs(af *appFlags, pArgs []string) error {
 	// throw an error when a flag comes after any arguments.
 	for i := 0; i < len(pArgs); i++ {
