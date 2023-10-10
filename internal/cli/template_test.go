@@ -5,26 +5,12 @@ import (
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/kohirens/stdlib"
 )
-
-type HttpMock struct {
-	Resp *http.Response
-	Err  error
-}
-
-func (h HttpMock) Get(url string) (*http.Response, error) {
-	return h.Resp, h.Err
-}
-
-func (h HttpMock) Head(url string) (*http.Response, error) {
-	return h.Resp, h.Err
-}
 
 func TestExtract(runner *testing.T) {
 	runner.Run("canExtractDownload", func(t *testing.T) {
@@ -270,7 +256,7 @@ func TestPlaceholderInput(tester *testing.T) {
 	fxtr := fixtures[0]
 	tester.Run(fxtr.name, func(test *testing.T) {
 		resetTmpFile()
-		err2 := GetPlaceholderInput(fxtr.config.TmplJson, &fxtr.config.AnswersJson.Placeholders, tmpFile, " ")
+		err2 := GetPlaceholderInput(fxtr.config.TmplJson, fxtr.config.AnswersJson.Placeholders, tmpFile, " ")
 		if err2 != nil {
 			test.Errorf("got an error %q", err2.Error())
 		}

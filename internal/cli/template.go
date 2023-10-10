@@ -54,17 +54,6 @@ type tmplVars map[string]string
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
 func GetPlaceholderInput(placeholders *TmplJson, tmplValues tmplVars, r *os.File, defaultVal string) error {
-	numPlaceholder := len(placeholders.Placeholders)
-	numValues := len(tmplValues)
-
-	log.Infof(msg.Stdout.PlaceholderAnswerStat, numPlaceholder)
-
-	if numPlaceholder == numValues {
-		return nil
-	}
-
-	log.Logf(msg.Stdout.ProvideValues)
-
 	tVals := tmplValues
 	nPut := bufio.NewScanner(r)
 

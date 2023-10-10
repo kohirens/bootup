@@ -211,8 +211,9 @@ func TestSubCmdConfigSuccess(tester *testing.T) {
 }
 
 func TestSetUserOptions(tester *testing.T) {
-	delayedFunc := test.TmpSetParentDataDir(TmpDir + "/TestSetUserOptions")
-	defer delayedFunc()
+	dd := TmpDir + "/TestSetUserOptions"
+	_ = os.MkdirAll(dd, 0744)
+	defer test.TmpSetParentDataDir(dd)()
 
 	var tests = []struct {
 		name     string
@@ -242,7 +243,7 @@ func TestSetUserOptions(tester *testing.T) {
 				t.Errorf("got %q, want %q", gotExit, tc.wantCode)
 			}
 
-			gotCfg, _ := press.LoadConfig(TmpDir + "/TestSetUserOptions/tmpltoapp/config.json")
+			gotCfg, _ := press.LoadConfig(dd + "/tmpltoapp/config.json")
 			data, err1 := json.Marshal(gotCfg)
 
 			if err1 != nil {
@@ -430,7 +431,7 @@ func TestTmplPress(tester *testing.T) {
 		tester.Run(tc.name, func(t *testing.T) {
 			rd := git.CloneFromBundle("parse-dir-02", cd, FixtureDir, ps)
 
-			test.TmpSetParentDataDir(filepath.Dir(rd))
+			defer test.TmpSetParentDataDir(filepath.Dir(rd))()
 			tc.args = append(tc.args, "-tmpl-path", rd)
 			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
 
