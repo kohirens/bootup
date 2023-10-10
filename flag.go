@@ -21,7 +21,8 @@ type appFlags struct {
 	TmplPath       string // The URL or local template path to a template.
 	TmplType       string // Indicate the type of package for a template, such as a zip to Extract or a repository to Download.
 	OutPath        string // The location to save the processed template output.
-	Version        bool   // The current version
+	Verbosity      int
+	Version        bool // The current version
 	subcommands    map[string]*flag.FlagSet
 }
 
@@ -36,7 +37,7 @@ func defineFlags(af *appFlags) {
 	flag.StringVar(&af.OutPath, "out-path", "", um["out-path"])       // TODO: BREAKING remove this will be a required 2nd argument.
 	flag.StringVar(&af.TmplPath, "tmpl-path", "", um["tmpl-path"])    // TODO: BREAKING remove this will be a required 1st argument.
 	flag.StringVar(&af.TmplType, "tmpl-type", "git", um["tmpl-type"]) // TODO: BREAKING Remove, we only use git now.
-	flag.IntVar(&verbosityLevel, "verbosity", log.VerboseLvlLog, um["verbosity"])
+	flag.IntVar(&af.Verbosity, "verbosity", log.VerboseLvlLog, um["verbosity"])
 	flag.BoolVar(&af.Version, "version", false, um["version"])
 }
 
@@ -48,7 +49,7 @@ func parseCli(af *appFlags) error {
 	// and then arguments; it may also require less code to debug and document for not very much gain.
 	flag.Parse()
 
-	log.Infof(msg.Stdout.VerboseLevelInfo, verbosityLevel)
+	log.Infof(msg.Stdout.VerboseLevelInfo, af.Verbosity)
 
 	ca := flag.Args()
 
@@ -56,7 +57,7 @@ func parseCli(af *appFlags) error {
 	log.Dbugf(msg.Stdout.ActualArgs, ca)
 	log.Dbugf(msg.Stdout.NumParsedFlags, flag.NFlag())
 
-	if verbosityLevel == verboseLvlDbug {
+	if af.Verbosity >= verboseLvlDbug {
 		fmt.Println(msg.Stdout.PrintAllFlags)
 		flag.Visit(func(f *flag.Flag) {
 			fmt.Printf(msg.Stdout.PrintFlag, f.Name, f.Value, f.DefValue)

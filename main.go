@@ -77,6 +77,9 @@ func main() {
 		return
 	}
 
+	log.VerbosityLevel = flags.Verbosity
+	verbosityLevel = flags.Verbosity
+
 	// Exit if we are just printing help usage
 	if flags.Help {
 		flag.Usage()

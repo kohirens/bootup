@@ -221,7 +221,7 @@ func TestSetUserOptions(tester *testing.T) {
 		args     []string
 		want     string
 	}{
-		{"setCache", 0, []string{cli.CmdConfig, "set", "CacheDir", "ABC123"}, "ABC123"},
+		{"setCache", 0, []string{"-verbosity", "6", cli.CmdConfig, "set", "CacheDir", "ABC123"}, "ABC123"},
 		{
 			"setExcludeFileExtensions",
 			0,
