@@ -102,7 +102,7 @@ func main() {
 		sc, mainErr = press.LoadConfig(cf)
 	} else {
 		// Make a configuration file when there is none.
-		sc, mainErr = press.InitConfig(cf)
+		sc, mainErr = press.InitConfig(cf, AppName)
 	}
 	if mainErr != nil {
 		return

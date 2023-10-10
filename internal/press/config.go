@@ -6,6 +6,7 @@ import (
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"os"
+	"runtime"
 )
 
 const (
@@ -42,8 +43,8 @@ func NewAppData(sc *ConfigSaveData) (*AppData, error) {
 }
 
 // InitConfig Save configuration file when it does not exist.
-func InitConfig(filepath string) (*ConfigSaveData, error) {
-	cd, err1 := buildCacheDirPath()
+func InitConfig(filepath, appName string) (*ConfigSaveData, error) {
+	cd, err1 := buildCacheDirPath(appName)
 	if err1 != nil {
 		return nil, fmt.Errorf(msg.Stderr.CouldNotMakeCacheDir, err1.Error())
 	}
@@ -130,14 +131,22 @@ func BuildAppDataPath(appName string) (string, error) {
 	return appDataDir, nil
 }
 
-func buildCacheDirPath() (string, error) {
+func buildCacheDirPath(appName string) (string, error) {
 	osCacheDir, err1 := os.UserCacheDir()
 	if err1 != nil {
 		return "", err1
 	}
 
+	appCacheDir := osCacheDir
+
+	switch runtime.GOOS {
+	case "windows":
+		appCacheDir += PS + appName + PS + "cache"
+	default:
+		appCacheDir += PS + appName
+	}
+
 	// Make a directory in user cache space to download templates.
-	appCacheDir := osCacheDir + PS + "cache"
 	if e := os.MkdirAll(appCacheDir, dirMode); e != nil {
 		return "", fmt.Errorf(msg.Stderr.CouldNotMakeCacheDir, e.Error())
 	}

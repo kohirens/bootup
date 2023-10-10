@@ -92,7 +92,7 @@ func Run(ca []string, appName string) error {
 	switch args.Method {
 	case "set":
 		log.Dbugf("args.Value = %v\n", args.Value)
-		return set(args.Setting, args.Value, cp)
+		return set(args.Setting, args.Value, cp, appName)
 
 	case "get":
 		return get(args.Setting, cp)
@@ -135,7 +135,7 @@ func get(key string, cp string) error {
 }
 
 // set the value of a user setting
-func set(key, val string, cp string) error {
+func set(key, val string, cp, appName string) error {
 	sc := &press.ConfigSaveData{}
 
 	switch key {
@@ -155,7 +155,7 @@ func set(key, val string, cp string) error {
 	}
 
 	if !path.Exist(cp) {
-		_, e := press.InitConfig(cp)
+		_, e := press.InitConfig(cp, appName)
 		return e
 	}
 

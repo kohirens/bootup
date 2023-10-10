@@ -24,7 +24,7 @@ func TestInitConfig(tr *testing.T) {
 	for _, tc := range testCases {
 		tr.Run(tc.name, func(t *testing.T) {
 			_ = os.MkdirAll(filepath.Dir(tc.filepath), dirMode)
-			_, err := InitConfig(tc.filepath)
+			_, err := InitConfig(tc.filepath, "test1")
 			if (err != nil) != tc.wantErr {
 				t.Errorf("InitConfig() error = %v, wantErr %v", err, tc.wantErr)
 			}
