@@ -61,9 +61,9 @@ func ParseInput(ca []string) error {
 		return fmt.Errorf(Stderr.ConfigValueNotSet)
 	}
 
-	log.Dbugf("args.Method = %v\n", args.Method)
-	log.Dbugf("args.Setting = %v\n", args.Setting)
-	log.Dbugf("args.Value = %v\n", args.Value)
+	log.Dbugf("args.Method = %v", args.Method)
+	log.Dbugf("args.Setting = %v", args.Setting)
+	log.Dbugf("args.Value = %v", args.Value)
 
 	return nil
 }
@@ -79,9 +79,6 @@ func Run(ca []string, appName string) error {
 		return nil
 	}
 
-	log.Dbugf("args.Method = %v\n", args.Method)
-	log.Dbugf("args.Key = %v\n", args.Setting)
-
 	appDataDir, err1 := press.BuildAppDataPath(appName)
 	if err1 != nil {
 		return err1
@@ -91,7 +88,6 @@ func Run(ca []string, appName string) error {
 
 	switch args.Method {
 	case "set":
-		log.Dbugf("args.Value = %v\n", args.Value)
 		return set(args.Setting, args.Value, cp, appName)
 
 	case "get":
@@ -141,7 +137,6 @@ func set(key, val string, cp, appName string) error {
 	switch key {
 	case "CacheDir":
 		sc.CacheDir = val
-		log.Dbugf("setting CacheDir = %q", val)
 		break
 
 	case "ExcludeFileExtensions":

@@ -60,7 +60,7 @@ func parseFlags(af *appFlags) error {
 	if af.Verbosity >= verboseLvlDbug {
 		fmt.Println(msg.Stdout.PrintAllFlags)
 		flag.Visit(func(f *flag.Flag) {
-			fmt.Printf(msg.Stdout.PrintFlag, f.Name, f.Value, f.DefValue)
+			log.Logf(msg.Stdout.PrintFlag, f.Name, f.Value, f.DefValue)
 		})
 	}
 

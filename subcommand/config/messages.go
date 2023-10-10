@@ -23,12 +23,6 @@ Command
     get Returns a configuration value.
 `
 
-var Stdout = struct {
-	SaveData string
-}{
-	SaveData: "%save data: s",
-}
-
 var Stderr = struct {
 	BadExcludeFileExt    string
 	CouldNotEncodeConfig string
