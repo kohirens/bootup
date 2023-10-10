@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -243,7 +244,18 @@ func TestSetUserOptions(tester *testing.T) {
 				t.Errorf("got %q, want %q", gotExit, tc.wantCode)
 			}
 
-			gotCfg, _ := press.LoadConfig(dd + "/tmpltoapp/config.json")
+			var confDir string
+
+			switch runtime.GOOS {
+			case "linux":
+				confDir = dd + ps + ".config" + ps + AppName + ps + "config.json"
+			default:
+				confDir = dd + ps + AppName + ps + "config.json"
+			}
+
+			fmt.Printf("confDir = %v\n", confDir)
+
+			gotCfg, _ := press.LoadConfig(confDir)
 			data, err1 := json.Marshal(gotCfg)
 
 			if err1 != nil {

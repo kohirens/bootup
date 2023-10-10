@@ -123,12 +123,14 @@ func TmpSetParentDataDir(d string) func() {
 		return func() {
 			_ = os.Setenv("APPDATA", appDataDir)
 			_ = os.Setenv("LOCALAPPDATA", cacheDataDir)
+			fmt.Println("executed now")
 		}
 	default:
 		oldHome, _ := os.LookupEnv("HOME")
 		_ = os.Setenv("HOME", dir)
 		return func() {
 			_ = os.Setenv("HOME", oldHome)
+			fmt.Println("executed now")
 		}
 	}
 }
