@@ -1,4 +1,4 @@
-package cli
+package press
 
 import (
 	"testing"
@@ -89,7 +89,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := Validate(tc.ui, tc.ph, tc.v)
+			got, _ := validate(tc.ui, tc.ph, tc.v)
 			if got != tc.want {
 				t.Errorf("got %v want %v", got, tc.want)
 			}
@@ -134,7 +134,7 @@ func TestValidateRegExp(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := Validate(tc.ui, tc.ph, tc.v)
+			got, _ := validate(tc.ui, tc.ph, tc.v)
 			if got != tc.want {
 				t.Errorf("got %v want %v", got, tc.want)
 			}
@@ -164,7 +164,7 @@ func TestValidateRegExpCompileError(t *testing.T) {
 		false,
 	}
 
-	got, e := Validate(tc.ui, tc.ph, tc.v)
+	got, e := validate(tc.ui, tc.ph, tc.v)
 	if got != tc.want {
 		t.Errorf("got %v want %v", got, tc.want)
 	}

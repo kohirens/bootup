@@ -1,19 +1,19 @@
 package config
 
 import (
-	"github.com/kohirens/tmpltoapp/internal/cli"
 	"os"
 	"testing"
 )
 
 const (
-	tmpDir = "tmp"
+	dirMode = 0774
+	tmpDir  = "tmp"
 )
 
 func TestMain(m *testing.M) {
 	// Set up a temporary dir for generate files
 	_ = os.RemoveAll(tmpDir)
-	_ = os.Mkdir(tmpDir, cli.DirMode) // set up a temporary dir for generate files
+	_ = os.Mkdir(tmpDir, dirMode) // set up a temporary dir for generate files
 
 	// Run all tests
 	exitCode := m.Run()

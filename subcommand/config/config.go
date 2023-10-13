@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/stdlib/path"
-	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"regexp"
@@ -84,7 +83,7 @@ func Run(ca []string, appName string) error {
 		return err1
 	}
 
-	cp := appDataDir + cli.PS + press.ConfigFileName
+	cp := appDataDir + path.PS + press.ConfigFileName
 
 	switch args.Method {
 	case "set":

@@ -1,4 +1,4 @@
-package cli
+package press
 
 import (
 	"regexp"
@@ -29,8 +29,8 @@ func findValidator(placeholder string, validators []validator) (validator, bool)
 	return val, found
 }
 
-// Validate user input for placeholders
-func Validate(userInput, placeholder string, validators []validator) (bool, error) {
+// validate user input for placeholders
+func validate(userInput, placeholder string, validators []validator) (bool, error) {
 	val, found := findValidator(placeholder, validators)
 
 	if found { // perform validation

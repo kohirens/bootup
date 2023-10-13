@@ -10,7 +10,6 @@ import (
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/stdlib/path"
-	"github.com/kohirens/tmpltoapp/internal/cli"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
@@ -25,12 +24,10 @@ const (
 	AppName    = "tmpltoapp"
 	gitConfDir = ".git"
 	Summary    = "Generate an application from a template."
+	ps         = string(os.PathSeparator)
 )
 
 var (
-	// appConfig Runtime settings used throughout the application.
-	appConfig = &cli.AppData{}
-
 	appData *press.AppData
 
 	flags = &appFlags{
@@ -98,7 +95,7 @@ func main() {
 		return
 	}
 
-	cf := ap + cli.PS + press.ConfigFileName
+	cf := ap + ps + press.ConfigFileName
 	var sc *press.ConfigSaveData
 
 	if path.Exist(cf) {
@@ -158,11 +155,11 @@ func main() {
 		}
 
 		// Determine the cache location
-		repoDir := appData.CacheDir + cli.PS + getRepoDir(flags.TmplPath, flags.Branch)
+		repoDir := appData.CacheDir + ps + getRepoDir(flags.TmplPath, flags.Branch)
 		log.Infof(msg.Stdout.RepoDir, repoDir)
 
 		// Do a pull when the repo already exists.
-		if path.DirExist(repoDir + cli.PS + gitConfDir) {
+		if path.DirExist(repoDir + ps + gitConfDir) {
 			log.Infof(msg.Stdout.UsingCache, repoDir)
 			repo, commitHash, err2 = git.Checkout(repoDir, flags.Branch)
 		} else {
@@ -189,31 +186,33 @@ func main() {
 	}
 
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
-	tmplManifestFile := tmplToPress + cli.PS + press.TmplManifestFile
-	tmplManifest, errX := cli.ReadTemplateJson(tmplManifestFile)
+	tmplManifestFile := tmplToPress + ps + press.TmplManifestFile
+	tmplManifest, errX := press.ReadTemplateJson(tmplManifestFile)
 	if errX != nil {
 		mainErr = fmt.Errorf(msg.Stderr.MissingTmplJson, press.TmplManifestFile, tmplManifestFile, errX.Error())
 		return
 	}
 
-	appConfig.TmplJson = tmplManifest
-	appConfig.AnswersJson = cli.NewAnswerJson()
+	tmplJson := tmplManifest
+	appData.AnswersJson = &press.AnswersJson{
+		Placeholders: make(stdc.StringMap),
+	}
 
 	if path.Exist(flags.AnswersPath) {
-		appConfig.AnswersJson, mainErr = press.LoadAnswers(flags.AnswersPath)
+		appData.AnswersJson, mainErr = press.LoadAnswers(flags.AnswersPath)
 		if mainErr != nil {
 			return
 		}
 	}
 
 	// Checks for any missing placeholder values waits for their input from the CLI.
-	if e := cli.GetPlaceholderInput(appConfig.TmplJson, appConfig.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
+	if e := press.GetPlaceholderInput(tmplJson, appData.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
 		mainErr = fmt.Errorf(msg.Stderr.GettingAnswers, e.Error())
 	}
 
-	cli.ShowAllPlaceholderValues(appConfig.TmplJson, &appConfig.AnswersJson.Placeholders)
+	press.ShowAllPlaceholderValues(tmplJson, &appData.AnswersJson.Placeholders)
 
-	mainErr = cli.Press(tmplToPress, flags.OutPath, appConfig.AnswersJson.Placeholders, fec, appConfig.TmplJson)
+	mainErr = press.Print(tmplToPress, flags.OutPath, appData.AnswersJson.Placeholders, fec, tmplJson)
 }
 
 func parseMainArgs(af *appFlags, pArgs []string) error {

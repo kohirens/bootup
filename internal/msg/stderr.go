@@ -7,6 +7,7 @@ var Stderr = struct {
 	BadTmplType            string
 	CannotDecodeAnswerFile string
 	CannotInitFileChecker  string
+	CannotReadFile         string
 	CannotReadAnswerFile   string
 	CouldNot               string
 	CouldNotCloseFile      string
@@ -27,6 +28,7 @@ var Stderr = struct {
 	InvalidTmplDir         string
 	LocalOutPath           string
 	MissingTmplJson        string
+	MissingTmplJsonVersion string
 	NoGitTagFound          string
 	NoInput                string
 	OutPathCollision       string
@@ -44,6 +46,7 @@ var Stderr = struct {
 	AppDataDir:             "the following error occurred trying to get the app data directory: %q",
 	BadExcludeFileExt:      "invalid ExcludeFileExtensions, check format, for example: item1,item2,item3",
 	BadTmplType:            "%q is an invalid value for flag tmplType, or it was not set, must be zip|git",
+	CannotReadFile:         "could not read file %v: %v",
 	CannotDecodeAnswerFile: "could not decode JSON in answer file %q, because of: %s",
 	CannotInitFileChecker:  "cannot instantiate file extension checker: %v",
 	CannotReadAnswerFile:   "there was an error reading the answer file %q: %s",
@@ -64,6 +67,7 @@ var Stderr = struct {
 	InvalidTmplDir:         "invalid template directory %q",
 	LocalOutPath:           "enter a local path to output the app",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
+	MissingTmplJsonVersion: "missing the Version propery in template.json",
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
 	OutPathCollision:       "-tmpl-path %q and -out-path %q cannot point to the same directory",
