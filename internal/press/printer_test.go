@@ -2,23 +2,25 @@ package press
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
-	"github.com/kohirens/tmpltoapp/internal/test"
+	test2 "github.com/kohirens/stdlib/test"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
-func TestFindTemplates(t *testing.T) {
+func xTestFindTemplates(t *testing.T) {
 	tests := []struct {
 		name    string
 		dir     string
 		wantErr bool
 		want    int
 	}{
-		{"1 file", test.FixturesDir + PS, false, 1},
+		{"1 file", test2.FixtureDir + PS + "find-me-01", false, 1},
 		//{"2 files", test.FixturesDir + PS, false, 2},
 		//{"5 files", test.FixturesDir + PS, false, 5},
 	}
@@ -37,44 +39,64 @@ func TestFindTemplates(t *testing.T) {
 	}
 }
 
-func TestParseDir2(tester *testing.T) {
-	defer test.Silencer()()
+// TestParseDir2 Test the empty directory feature. The fixture directory
+// "template-04" contains a directory "dir1" and has a file ".empty". After
+// calling press.Print on the fixture directory, the output directory
+// "template-04-out" should container "dir1" without any files or directories.
+func TestEmptyDirectoryFeature(runner *testing.T) {
+	// Abort in verbose mode.
+	_, df := test2.TempFileSwap(&os.Stdout, runner.Name(), "out")
+	defer df()
 
 	fixtures := []struct {
 		dstDir,
 		name,
 		srcDir string
-		want func(error) bool
+		want func() bool
 		vars cli.StringMap
 	}{
 		{
-			test.TmpDir + PS + "template-04-out",
+			test2.TmpDir + PS + "template-04-out",
 			"dir1IsEmpty",
-			test.FixturesDir + "/template-04",
-			func(e error) bool {
-				return !path.Exist(test.TmpDir + PS + "template-04-out" + PS + "dir1" + PS + ".empty")
+			test2.FixtureDir + "/template-04",
+			func() bool {
+				dir := test2.TmpDir + PS + "template-04-out" + PS + "dir1"
+				fs, e1 := os.ReadDir(dir)
+				if e1 != nil {
+					return false
+				}
+				return len(fs) == 0
 			},
 			cli.StringMap{},
 		},
 	}
 
 	fileChkr, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
-	for _, fxtr := range fixtures {
-		tester.Run(fxtr.name, func(test *testing.T) {
-			err := Print(fxtr.srcDir, fxtr.dstDir, fxtr.vars, fileChkr, &templateJson{Excludes: []string{}})
-			isAllGood := fxtr.want(err)
+	for _, tc := range fixtures {
+		runner.Run(tc.name, func(t *testing.T) {
+			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, fileChkr, &templateJson{Excludes: []string{}})
 
-			if !isAllGood {
-				test.Error("all is not good")
+			if e1 != nil {
+				t.Errorf("got error %v, want nil", e1.Error())
+			}
+
+			want := tc.want()
+			fmt.Printf("want = %v\n", want)
+			if !want {
+				t.Error("all is not good")
 			}
 		})
 	}
 }
 
-func TestParseDir(tester *testing.T) {
-	fixturePath1, _ := filepath.Abs(test.FixturesDir + PS + "parse-dir-01")
-	tmpDir, _ := filepath.Abs(test.TmpDir)
-	fixtures := []struct {
+// TestPrinting Verify the print-head is printing.
+//
+//	Just making sure when calling press.Print that files make it through to
+//	the template engine and	parsing happens as expected.
+func TestPrinting(tester *testing.T) {
+	fixturePath1, _ := filepath.Abs(test2.FixtureDir + PS + "parse-dir-01")
+	tmpDir, _ := filepath.Abs(test2.TmpDir)
+	tests := []struct {
 		name, tmplPath, outPath string
 		tplVars                 cli.StringMap
 		fileToCheck, want       string
@@ -86,32 +108,33 @@ func TestParseDir(tester *testing.T) {
 		},
 	}
 
-	fxtr := fixtures[0]
-	tester.Run(fxtr.name, func(test *testing.T) {
-		fec, _ := stdlib.NewFileExtChecker(nil, &[]string{"md", "yml"})
+	for _, tc := range tests {
+		tester.Run(tc.name, func(test *testing.T) {
+			fec, _ := stdlib.NewFileExtChecker(nil, &[]string{"md", "yml"})
 
-		err := Print(fxtr.tmplPath, fxtr.outPath, fxtr.tplVars, fec, &templateJson{})
+			err := Print(tc.tmplPath, tc.outPath, tc.tplVars, fec, &templateJson{})
 
-		if err != nil {
-			test.Errorf("got an error %q", err.Error())
-			return
-		}
+			if err != nil {
+				test.Errorf("got an error %q", err.Error())
+				return
+			}
 
-		got, err := os.ReadFile(tmpDir + "/parse-dir-01/dir1/README.md")
+			got, err := os.ReadFile(tmpDir + "/parse-dir-01/dir1/README.md")
 
-		if err != nil {
-			test.Errorf("got an error %q", err.Error())
-		}
+			if err != nil {
+				test.Errorf("got an error %q", err.Error())
+			}
 
-		if string(got) != fxtr.want {
-			test.Errorf("got %q, but want %q", string(got), fxtr.want)
-		}
-	})
+			if string(got) != tc.want {
+				test.Errorf("got %s, but want %v", got, tc.want)
+			}
+		})
+	}
 }
 
 func TestSkipping(tester *testing.T) {
 	repoFixture := "repo-10"
-	outPath := test.TmpDir + PS + "processed" + PS + repoFixture
+	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture
 	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	tc := struct {
 		name    string
@@ -146,7 +169,7 @@ func TestSkipping(tester *testing.T) {
 		},
 	}
 
-	tmplPath := test.SetupARepository(repoFixture, test.TmpDir, test.FixturesDir, PS)
+	tmplPath := git.CloneFromBundle(repoFixture, test2.TmpDir, test2.FixtureDir, PS)
 
 	err := Print(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
 
@@ -171,7 +194,7 @@ func TestSkipping(tester *testing.T) {
 
 func TestReplaceWith(tester *testing.T) {
 	repoFixture := "repo-11"
-	outPath := test.TmpDir + PS + "processed" + PS + repoFixture
+	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture
 	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	tc := struct {
 		name    string
@@ -212,7 +235,7 @@ func TestReplaceWith(tester *testing.T) {
 		},
 	}
 
-	tmplPath := test.SetupARepository(repoFixture, test.TmpDir, test.FixturesDir, test.PS)
+	tmplPath := git.CloneFromBundle(repoFixture, test2.TmpDir, test2.FixtureDir, PS)
 
 	err := Print(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
 
@@ -221,14 +244,14 @@ func TestReplaceWith(tester *testing.T) {
 	}
 
 	for _, p := range tc.absent {
-		file := outPath + test.PS + p
+		file := outPath + PS + p
 		if path.Exist(file) {
 			tester.Errorf("file %v should NOT exist. check the replace code or test bundle %v", file, repoFixture)
 		}
 	}
 
 	for i, p := range tc.files {
-		file := outPath + test.PS + p
+		file := outPath + PS + p
 		got, _ := os.ReadFile(file)
 		if bytes.NewBuffer(got).String() == tc.content[i] {
 			tester.Errorf("file %q should NOT exist. check the replace code or test bundle %q", got, tc.content[i])

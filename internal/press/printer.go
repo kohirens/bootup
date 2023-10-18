@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 )
@@ -31,20 +32,22 @@ func FindTemplates(dir string) ([]string, error) {
 	files := []string{}
 
 	// Recursively walk the template directory.
-	e1 := filepath.Walk(normTplDir, func(sourcePath string, fi os.FileInfo, wErr error) (rErr error) {
+	e1 := filepath.Walk(normTplDir, func(tmpl string, fi os.FileInfo, wErr error) error {
 		if wErr != nil {
-			rErr = wErr
-			return
+			return wErr
 		}
-
-		log.Infof("adding %v", sourcePath)
 
 		// Skip directories.
 		if fi.IsDir() {
-			return
+			log.Dbugf("skipping directory %v", tmpl)
+			return nil
 		}
 
-		return
+		log.Infof("adding file %v", tmpl)
+
+		files = append(files, tmpl)
+
+		return nil
 	})
 
 	if e1 != nil {
@@ -55,94 +58,109 @@ func FindTemplates(dir string) ([]string, error) {
 }
 
 // Print templates to the output directory.
-func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker, tmplJson *templateJson) (err error) {
-	// Normalize the path separator in these 2 variables before comparing them.
-	normTplDir := strings.ReplaceAll(tplDir, "/", PS)
-	normTplDir = strings.ReplaceAll(normTplDir, "\\", PS)
+func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker, tmplJson *templateJson) error {
+	if !path.Exist(tplDir) {
+		return fmt.Errorf(msg.Stderr.PathNotExist, tplDir)
+	}
+
+	// Normalize the path separator in these 2 variables.
+	normTplDir := path.Normalize(tplDir)
+	normOutDir := path.Normalize(outDir)
+	log.Infof("%v -> %v", tplDir, normTplDir)
+	log.Infof("%v -> %v", outDir, normOutDir)
 
 	// Recursively walk the template directory.
-	err = filepath.Walk(normTplDir, func(sourcePath string, fi os.FileInfo, wErr error) (rErr error) {
+	return filepath.Walk(normTplDir, func(sourcePath string, fi os.FileInfo, wErr error) error {
 		if wErr != nil {
-			rErr = wErr
-			return
+			return wErr
 		}
 
-		log.Infof("\nprocessing: %q", sourcePath)
+		log.Infof("processing: %v", sourcePath)
 
 		// Do not parse directories.
 		if fi.IsDir() {
-			return
+			return nil
 		}
 
-		// Stop processing files if a template file is too big.
+		// Skip processing files if a template file is too big.
 		if fi.Size() > maxTmplSize {
-			rErr = fmt.Errorf(msg.Stderr.FileTooBig, maxTmplSize)
-			return
+			return fmt.Errorf(msg.Stderr.FileTooBig, maxTmplSize)
+
 		}
 
 		currFile := filepath.Base(sourcePath)
-		if currFile != emptyFile && !fec.IsValid(sourcePath) { // Skip files by extension; Use an exclusion list, include every file by default.
+
+		// Skip when the extension matches a file extension ignore list.
+		// these files are included in the output but skipped by the template
+		// processor.
+		if !fec.IsValid(sourcePath) { // Skip files by extension; Use an exclusion list, include every file by default.
 			log.Infof(msg.Stdout.UnknownFileType, sourcePath)
-			return
+			return nil
 		}
 
 		// Normalize the path separator in these 2 variables before comparing them.
 		normSourcePath := path.Normalize(sourcePath)
+
 		// Get the relative path of the file from root of the template and
 		// append it to the output directory, so that files are placed in the
 		// same subdirectories in the output directory.
 		relativePath := strings.TrimLeft(strings.ReplaceAll(normSourcePath, normTplDir, ""), "\\/")
-		saveDir := filepath.Clean(outDir + PS + filepath.Dir(relativePath))
 		log.Infof("relativePath dir: %v", relativePath)
+
+		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
 		log.Infof("save dir: %v", saveDir)
 
 		// Skip template manifest file and the git config directory.
 		if currFile == TmplManifestFile || strings.Contains(relativePath, gitConfigDir+PS) {
 			log.Infof(msg.Stdout.SkipFile, relativePath)
-			return
+			return nil
 		}
 
 		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
 			log.Infof(msg.Stdout.SkipFile, sourcePath)
-			return
+			return nil
 		}
 
 		// skip the directory with replace files.
 		if tmplJson.Replace != nil && tmplJson.Replace.Directory != "" && strings.Contains(relativePath, tmplJson.Replace.Directory) {
 			log.Infof(msg.Stdout.SkipFile, sourcePath)
-			return
+			return nil
 		}
 
 		// Make the subdirectories in the new savePath.
-		err = os.MkdirAll(saveDir, dirMode)
-		if err != nil || currFile == emptyFile {
-			return
+		if e := os.MkdirAll(saveDir, dirMode); e != nil {
+			return e
 		}
 
+		// we skip the designated empty file here so that the directory is made.
+		if currFile == emptyFile {
+			return nil
+		}
+
+		// TODO: Replace with better method of comparing files.
 		if tmplJson.Excludes != nil { // exclude from parsing, but copy as-is.
-			// TODO: Replace with better method of comparing files.
 			fileToCheck := strings.ReplaceAll(normSourcePath, normTplDir, "")
-			log.Infof("fileToCheck: %q against excludes", fileToCheck)
 			fileToCheck = strings.ReplaceAll(fileToCheck, PS, "")
+
 			for _, exclude := range tmplJson.Excludes {
+				// we want to see if the paths are the same, so we remove
 				fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
 				fileToCheckB = strings.ReplaceAll(exclude, "/", "")
 				if fileToCheckB == fileToCheck {
-					log.Infof("will copy as-is: %q", sourcePath)
+					log.Infof("file %v will be copied as-is", sourcePath)
 					_, errC := copyToDir(sourcePath, saveDir, PS)
 					return errC
 				}
 			}
 		}
 
-		sourcePath = replaceWith(relativePath, PS, sourcePath, normTplDir, tmplJson.Replace)
+		// replace the template with another if there is an entry in the replacements array.
+		if rp := replaceWith(relativePath, PS, sourcePath, normTplDir, tmplJson.Replace); rp != "" {
+			sourcePath = rp
+		}
 
-		rErr = parse(sourcePath, saveDir, vars)
-
-		return
+		return parse(sourcePath, saveDir, vars)
 	})
-
-	return
 }
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
