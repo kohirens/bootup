@@ -43,7 +43,7 @@ type tmplManifest struct {
 }
 
 type templateJson struct {
-	Excludes     []string      `json:"excludes"`
+	Excludes     []string      `json:"excludes"` // TODO: Rename to "copy" for copy-as-is
 	Placeholders cli.StringMap `json:"placeholders"`
 	Skip         []string      `json:"skip"`
 	Replace      *replacements `json:"replace"`
