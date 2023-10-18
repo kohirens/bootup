@@ -21,11 +21,10 @@ import (
 const (
 	FixtureDir = "testdata"
 	TmpDir     = "tmp"
-	ps         = string(os.PathSeparator)
 )
 
 func TestMain(m *testing.M) {
-	stdt.RunMain(test.SubCmdFlags, main)
+	stdt.RunMain(stdt.SubCmdFlags, main)
 
 	stdt.ResetDir(TmpDir, 0774)
 	// Run all tests
@@ -39,11 +38,11 @@ func TestCallingMain(tester *testing.T) {
 	// This is called recursively, because we will have this test call itself
 	// in a sub-command with the environment variable `GO_CHILD_FLAG` set.
 	// Note that a call to `main()` MUST exit or you'll spin out of control.
-	if os.Getenv(test.SubCmdFlags) != "" {
+	if os.Getenv(stdt.SubCmdFlags) != "" {
 		// We're in the test binary, so test flags are set, lets reset it
 		// so that only the program is set
 		// and whatever flags we want.
-		args := strings.Split(os.Getenv(test.SubCmdFlags), " ")
+		args := strings.Split(os.Getenv(stdt.SubCmdFlags), " ")
 		os.Args = append([]string{os.Args[0]}, args...)
 
 		// Anything you print here will be passed back to the cmd.Stderr and
@@ -81,7 +80,7 @@ func TestCallingMain(tester *testing.T) {
 		tester.Run(tc.name, func(t *testing.T) {
 			cmd := runMain(tester.Name(), tc.args)
 
-			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			// get exit code.
 			got := cmd.ProcessState.ExitCode()
@@ -98,7 +97,7 @@ func runMain(testFunc string, args []string) *exec.Cmd {
 	// Run the test binary and tell it to run just this test with environment set.
 	cmd := exec.Command(os.Args[0], "-test.run", testFunc)
 
-	subEnvVar := test.SubCmdFlags + "=" + strings.Join(args, " ")
+	subEnvVar := stdt.SubCmdFlags + "=" + strings.Join(args, " ")
 	cmd.Env = append(os.Environ(), subEnvVar)
 
 	return cmd
@@ -117,10 +116,9 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			cmd := test.GetTestBinCmd(tc.args)
-
-			out, _ := test.VerboseSubCmdOut(cmd.CombinedOutput())
+			out, _ := stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			got := cmd.ProcessState.ExitCode()
 
@@ -156,9 +154,9 @@ func TestSubCmdConfigHelp(tester *testing.T) {
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
 
-			cmd := test.GetTestBinCmd(tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			out, _ := test.VerboseSubCmdOut(cmd.CombinedOutput())
+			out, _ := stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			// get exit code.
 			got := cmd.ProcessState.ExitCode()
@@ -192,9 +190,9 @@ func TestSubCmdConfigSuccess(tester *testing.T) {
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
 
-			cmd := test.GetTestBinCmd(tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			out, _ := test.VerboseSubCmdOut(cmd.CombinedOutput())
+			out, _ := stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			// get exit code.
 			got := cmd.ProcessState.ExitCode()
@@ -233,9 +231,9 @@ func TestSetUserOptions(tester *testing.T) {
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
 
-			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			gotExit := cmd.ProcessState.ExitCode()
 
@@ -251,8 +249,6 @@ func TestSetUserOptions(tester *testing.T) {
 			default:
 				confDir = dd + ps + AppName + ps + "config.json"
 			}
-
-			fmt.Printf("confDir = %v\n", confDir)
 
 			gotCfg, _ := press.LoadConfig(confDir)
 			data, err1 := json.Marshal(gotCfg)
@@ -295,7 +291,7 @@ func TestTmplAndOutPathMatch(tester *testing.T) {
 
 	for _, tc := range testCases {
 		tester.Run(tc.name, func(t *testing.T) {
-			test.SetupARepository(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
+			git.CloneFromBundle(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
 
 			cmd := runMain(tester.Name(), tc.args)
 
@@ -339,11 +335,11 @@ func TestFirstTimeRun(tester *testing.T) {
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			tc.args[3] = test.SetupARepository(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
+			tc.args[3] = git.CloneFromBundle(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
 
 			cmd := runMain(tester.Name(), tc.args)
 
-			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			got := cmd.ProcessState.ExitCode()
 
@@ -389,11 +385,11 @@ func TestSkipFeature(tester *testing.T) {
 		},
 	}
 
-	tc.args[5] = test.SetupARepository(repoFixture, TmpDir, FixtureDir, ps)
+	tc.args[5] = git.CloneFromBundle(repoFixture, TmpDir, FixtureDir, ps)
 
 	cmd := runMain(tester.Name(), tc.args)
 
-	_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+	_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 	got := cmd.ProcessState.ExitCode()
 
@@ -444,9 +440,9 @@ func TestTmplPress(tester *testing.T) {
 
 			defer test.TmpSetParentDataDir(filepath.Dir(rd))()
 			tc.args = append(tc.args, "-tmpl-path", rd)
-			cmd := stdt.GetTestBinCmd(test.SubCmdFlags, tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			_, _ = test.VerboseSubCmdOut(cmd.CombinedOutput())
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
 			// get exit code.
 			got := cmd.ProcessState.ExitCode()
