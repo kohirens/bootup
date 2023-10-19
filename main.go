@@ -15,6 +15,7 @@ import (
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"github.com/kohirens/tmpltoapp/subcommand/manifest"
 	"os"
+	"path/filepath"
 	"regexp"
 )
 
@@ -247,9 +248,21 @@ func validateMainArgs(af *appFlags) error {
 		return fmt.Errorf(errors.TmplPath)
 	}
 
+	tp, e1 := filepath.Abs(af.TmplPath)
+	if e1 != nil {
+		return fmt.Errorf(errors.Path404, tp, e1.Error())
+	}
+	af.TmplPath = tp
+
 	if af.OutPath == "" {
 		return fmt.Errorf(errors.LocalOutPath)
 	}
+
+	op, e2 := filepath.Abs(af.OutPath)
+	if e2 != nil {
+		return fmt.Errorf(errors.Path404, op, e2.Error())
+	}
+	af.OutPath = op
 
 	if af.TmplPath == af.OutPath {
 		return fmt.Errorf(errors.OutPathCollision, af.TmplPath, af.OutPath)

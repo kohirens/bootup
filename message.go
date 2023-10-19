@@ -5,12 +5,22 @@ var errors = struct {
 	BadTmplType      string
 	LocalOutPath     string
 	OutPathCollision string
+	Path404          string
 	TmplPath         string
-}{}
+}{
+	AnswerFile404:    "could not find the answer file, please specify a path to a valid answer file that exist: given %q",
+	BadTmplType:      "%q is an invalid value for flag tmplType, or it was not set, must be zip|git",
+	LocalOutPath:     "enter a local path to output the app",
+	OutPathCollision: "invalid input; the template path and out path point to the same directory:\ntmpl path = %v\n out path = %v",
+	Path404:          "problem with the path %v, please check the path exist and is readable: %v",
+	TmplPath:         "please specify a path (or URL) to a template",
+}
 
 var stdout = struct {
 	OutPathExist string
-}{}
+}{
+	OutPathExist: "out-path already exits %q",
+}
 
 var um = map[string]string{
 	"answer-path": "Path to a JSON file containing the values for placeholders (which are the keys) defined by a template.",

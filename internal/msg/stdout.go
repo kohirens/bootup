@@ -10,7 +10,6 @@ var Stdout = struct {
 	MadeNewConfig         string
 	NumNonFlagArgs        string
 	NumParsedFlags        string
-	OutPathExist          string
 	ProvideValues         string
 	PrintAllFlags         string
 	PrintFlag             string
@@ -39,7 +38,6 @@ var Stdout = struct {
 	MadeNewConfig:         "saved %d bytes to a new config %v",
 	NumNonFlagArgs:        "number of non-flag arguments passed in: %d",
 	NumParsedFlags:        "number of parsed flags = %v",
-	OutPathExist:          "out-path already exits %q",
 	ProvideValues:         "note that entering no value will render the placeholder with an empty string",
 	PrintAllFlags:         "printing all flags set:",
 	PrintFlag:             "\t%s = %v (default= %v)",

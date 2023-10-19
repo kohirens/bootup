@@ -78,7 +78,7 @@ func TestCallingMain(tester *testing.T) {
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			cmd := runMain(tester.Name(), tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
 			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
@@ -263,21 +263,21 @@ func TestSetUserOptions(tester *testing.T) {
 	}
 }
 
-// Check input repo directory matches the output directory.
+// Verify that same path error is thrown when the template path and the output
+// are the same.
 func TestTmplAndOutPathMatch(tester *testing.T) {
+	dd := TmpDir + ps + tester.Name()
+	_ = os.MkdirAll(dd, 0744)
+	defer test.TmpSetParentDataDir(dd)()
+
 	fixture := "repo-08"
-	fixtureDir := TmpDir + ps + "remotes" + ps + fixture
-	// Must be cleaned on every test run to ensure no existing config.
-	if e := os.RemoveAll(TmpDir); e != nil {
-		panic("could not clean tmp directory for test run")
-	}
-	// Set the tmp directory as the place to download/clone templates.
-	test.TmpSetParentDataDir(TmpDir)
+	fixtureDir := dd + ps + "remotes" + ps + fixture
 
 	var testCases = []struct {
-		name string
-		want int
-		args []string
+		name     string
+		wantCode int
+		args     []string
+		want     string
 	}{
 		{
 			"inputOutputCollision",
@@ -286,21 +286,28 @@ func TestTmplAndOutPathMatch(tester *testing.T) {
 				"-tmpl-path", fixtureDir,
 				"-out-path", fixtureDir,
 			},
+			"template path and output path point to the same directory",
 		},
 	}
 
 	for _, tc := range testCases {
 		tester.Run(tc.name, func(t *testing.T) {
-			git.CloneFromBundle(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
+			tc.args[1] = git.CloneFromBundle(fixture, dd+ps+"remotes", FixtureDir, ps)
 
-			cmd := runMain(tester.Name(), tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
-			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
+			sout, _ := stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
-			got := cmd.ProcessState.ExitCode()
+			gotCode := cmd.ProcessState.ExitCode()
 
-			if got != tc.want {
-				t.Errorf("got %q, want %q", got, tc.want)
+			if gotCode != tc.wantCode {
+				t.Errorf("got %q, want %q", gotCode, tc.wantCode)
+			}
+
+			fmt.Println(string(sout))
+
+			if strings.Contains(string(sout), tc.want) {
+				t.Errorf("got %q, want %q", gotCode, tc.wantCode)
 			}
 		})
 	}
@@ -309,13 +316,11 @@ func TestTmplAndOutPathMatch(tester *testing.T) {
 // Check for the bug that occurs when there is no config file, and you
 // want to process a template. This occurs most the first time you use the CLI.
 func TestFirstTimeRun(tester *testing.T) {
+	dd := TmpDir + ps + tester.Name()
+	_ = os.MkdirAll(dd, 0744)
+	defer test.TmpSetParentDataDir(dd)()
+
 	fixture := "repo-07"
-	// Must be cleaned on every test run to ensure no existing config.
-	if e := os.RemoveAll(TmpDir); e != nil {
-		panic("could not clean tmp directory for test run")
-	}
-	// Set the tmp directory as the place to download/clone templates.
-	test.TmpSetParentDataDir(TmpDir)
 
 	var tests = []struct {
 		name     string
@@ -328,14 +333,14 @@ func TestFirstTimeRun(tester *testing.T) {
 			[]string{
 				"-answer-path", FixtureDir + ps + fixture + "-answers.json",
 				"-tmpl-path", "will be replace below",
-				"-out-path", TmpDir + ps + "processed" + ps + fixture,
+				"-out-path", dd + ps + "processed" + ps + fixture,
 			},
 		},
 	}
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(t *testing.T) {
-			tc.args[3] = git.CloneFromBundle(fixture, TmpDir+ps+"remotes", FixtureDir, ps)
+			tc.args[3] = git.CloneFromBundle(fixture, dd+ps+"remotes", FixtureDir, ps)
 
 			cmd := runMain(tester.Name(), tc.args)
 
@@ -356,8 +361,12 @@ func TestFirstTimeRun(tester *testing.T) {
 }
 
 func TestSkipFeature(tester *testing.T) {
-	repoFixture := "repo-09"
-	outPath := TmpDir + ps + "processed" + ps + repoFixture
+	dd := TmpDir + ps + tester.Name()
+	_ = os.MkdirAll(dd, 0744)
+	defer test.TmpSetParentDataDir(dd)()
+
+	fixture := "repo-09"
+	outPath := TmpDir + ps + "processed" + ps + fixture
 	tc := struct {
 		name     string
 		wantCode int
@@ -368,7 +377,7 @@ func TestSkipFeature(tester *testing.T) {
 		"pressTmplWithNoConfig",
 		0,
 		[]string{
-			"-answer-path", FixtureDir + ps + repoFixture + "-answers.json",
+			"-answer-path", FixtureDir + ps + fixture + "-answers.json",
 			"-out-path", outPath,
 			"-tmpl-path", "will be replace below",
 		},
@@ -385,9 +394,9 @@ func TestSkipFeature(tester *testing.T) {
 		},
 	}
 
-	tc.args[5] = git.CloneFromBundle(repoFixture, TmpDir, FixtureDir, ps)
+	tc.args[5] = git.CloneFromBundle(fixture, dd+ps+"remotes", FixtureDir, ps)
 
-	cmd := runMain(tester.Name(), tc.args)
+	cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
 	_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
@@ -400,14 +409,14 @@ func TestSkipFeature(tester *testing.T) {
 	for _, p := range tc.absent {
 		file := outPath + ps + p
 		if path.Exist(file) {
-			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
+			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, fixture)
 		}
 	}
 
 	for _, p := range tc.present {
 		file := outPath + ps + p
 		if !path.Exist(file) {
-			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
+			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, fixture)
 		}
 	}
 }
