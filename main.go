@@ -248,11 +248,13 @@ func validateMainArgs(af *appFlags) error {
 		return fmt.Errorf(errors.TmplPath)
 	}
 
-	tp, e1 := filepath.Abs(af.TmplPath)
-	if e1 != nil {
-		return fmt.Errorf(errors.Path404, tp, e1.Error())
+	if !git.IsRemoteRepo(af.TmplPath) {
+		tp, e1 := filepath.Abs(af.TmplPath)
+		if e1 != nil {
+			return fmt.Errorf(errors.Path404, tp, e1.Error())
+		}
+		af.TmplPath = tp
 	}
-	af.TmplPath = tp
 
 	if af.OutPath == "" {
 		return fmt.Errorf(errors.LocalOutPath)

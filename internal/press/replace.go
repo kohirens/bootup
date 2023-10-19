@@ -11,6 +11,7 @@ type replacements struct {
 }
 
 // replaceWith Replace the current file with another.
+// Deprecated Will be replaced be press.substitute()
 func replaceWith(cf, ps, sp, tmplRoot string, replace *replacements) string {
 	if replace == nil {
 		return sp

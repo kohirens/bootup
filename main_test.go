@@ -34,25 +34,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestCallingMain(tester *testing.T) {
-	// This was adapted from https://golang.org/src/flag/flag_test.go; line 596-657 at the time.
-	// This is called recursively, because we will have this test call itself
-	// in a sub-command with the environment variable `GO_CHILD_FLAG` set.
-	// Note that a call to `main()` MUST exit or you'll spin out of control.
-	if os.Getenv(stdt.SubCmdFlags) != "" {
-		// We're in the test binary, so test flags are set, lets reset it
-		// so that only the program is set
-		// and whatever flags we want.
-		args := strings.Split(os.Getenv(stdt.SubCmdFlags), " ")
-		os.Args = append([]string{os.Args[0]}, args...)
-
-		// Anything you print here will be passed back to the cmd.Stderr and
-		// cmd.Stdout below, for example:
-		fmt.Printf("os args = %v\n", os.Args)
-
-		// Strange, I was expecting a need to manually call the code in
-		// `init()`,but that seem to happen automatically. So yet more I have learn.
-		main()
-	}
+	dd := TmpDir + ps + tester.Name()
+	_ = os.MkdirAll(dd, 0744)
+	defer test.TmpSetParentDataDir(dd)()
 
 	var tests = []struct {
 		name     string
@@ -342,7 +326,7 @@ func TestFirstTimeRun(tester *testing.T) {
 		tester.Run(tc.name, func(t *testing.T) {
 			tc.args[3] = git.CloneFromBundle(fixture, dd+ps+"remotes", FixtureDir, ps)
 
-			cmd := runMain(tester.Name(), tc.args)
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
 
 			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
 
