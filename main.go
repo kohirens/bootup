@@ -181,6 +181,7 @@ func main() {
 		return
 	}
 
+	// TODO: Remove FileExtension list of using the copy (as-is) feature
 	fec, err1 := stdlib.NewFileExtChecker(appData.ExcludeFileExtensions, &[]string{})
 	if err1 != nil {
 		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
@@ -188,13 +189,17 @@ func main() {
 
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
 	tmplManifestFile := tmplToPress + ps + press.TmplManifestFile
-	tmplManifest, errX := press.ReadTemplateJson(tmplManifestFile)
+	tmplJson, errX := press.ReadTemplateJson(tmplManifestFile)
 	if errX != nil {
 		mainErr = fmt.Errorf(msg.Stderr.MissingTmplJson, press.TmplManifestFile, tmplManifestFile, errX.Error())
 		return
 	}
 
-	tmplJson := tmplManifest
+	if e := press.Substitute(tmplJson.Substitute, tmplToPress); e != nil {
+		mainErr = e
+		return
+	}
+
 	appData.AnswersJson = &press.AnswersJson{
 		Placeholders: make(stdc.StringMap),
 	}

@@ -4,10 +4,12 @@ var Stderr = struct {
 	AnswerFile404          string
 	AppDataDir             string
 	BadExcludeFileExt      string
+	CannotCopyDirToDir     string
 	CannotDecodeAnswerFile string
 	CannotInitFileChecker  string
 	CannotReadFile         string
 	CannotReadAnswerFile   string
+	CannotRemoveDir        string
 	CouldNot               string
 	CouldNotCloseFile      string
 	CouldNotDecode         string
@@ -41,10 +43,12 @@ var Stderr = struct {
 	AnswerFile404:          "could not find the answer file, please specify a path to a valid answer file that exist: given %q",
 	AppDataDir:             "the following error occurred trying to get the app data directory: %q",
 	BadExcludeFileExt:      "invalid ExcludeFileExtensions, check format, for example: item1,item2,item3",
-	CannotReadFile:         "could not read file %v: %v",
+	CannotCopyDirToDir:     "could not copy %v to %v: %v",
 	CannotDecodeAnswerFile: "could not decode JSON in answer file %q, because of: %s",
 	CannotInitFileChecker:  "cannot instantiate file extension checker: %v",
 	CannotReadAnswerFile:   "there was an error reading the answer file %q: %s",
+	CannotReadFile:         "could not read file %v: %v",
+	CannotRemoveDir:        "could not remove dir %v: %v",
 	CouldNot:               "could not %s",
 	CouldNotCloseFile:      "could not close file %v, %v",
 	CouldNotDecode:         "could not decode %q, error: %s",
@@ -70,5 +74,5 @@ var Stderr = struct {
 	TmplOutput:             "template has NOT been cloned locally",
 	UnhandledHttpErr:       "template Download aborted; I'm coded to NOT do anything when HTTP status is %q and status code is %d",
 	ParsingFile:            "could not parse file %v, error: %v",
-	PathNotExist:           "could not locate the path %q",
+	PathNotExist:           "could not locate the path %v",
 }

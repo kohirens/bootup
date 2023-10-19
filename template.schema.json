@@ -4,7 +4,7 @@
     "$id": "https://github.com/kohirens/tmpltoapp/blob/main/template.schema.json",
     "title": "Template Placeholder Manifest",
     "description": "Provide list a placeholder variables names for a template",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "type": "object",
     "required": [ "version", "placeholders" ],
     "properties": {
@@ -44,35 +44,8 @@
                 "$ref": "#/$defs/validator"
             }
         },
-        "replace": {
-            "description": "This is being deprecated, please see \"substitute\" and \"substituteDir\". An object containing a directory name and a list of files to replace other files",
-            "deprecated": true,
-            "type": "object",
-            "required": ["directory", "files"],
-            "properties": {
-                "directory": {
-                    "type": "string"
-                },
-                "files": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[^:]+:[^:]+$"
-                    }
-                }
-            }
-        },
         "substitute": {
-            "description": "The files in the substitute directory must mirror the files they need to replace from the project root.\n",
-            "type": "array",
-            "minItems": 1,
-            "items": {
-                "type": "string"
-            }
-        },
-        "substituteDir": {
-            "description": "Specify the name of the substitute directory.",
+            "description": "Specify the name of the substitute directory. Files in this directory are copied to the root of the template right before pressing output.",
             "type": "string"
         }
     },

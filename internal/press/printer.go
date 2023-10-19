@@ -125,7 +125,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 		}
 
 		// skip the directory with replace files.
-		if tmplJson.Replace != nil && tmplJson.Replace.Directory != "" && strings.Contains(relativePath, tmplJson.Replace.Directory) {
+		if tmplJson.Substitute != "" {
 			log.Infof(msg.Stdout.SkipFile, sourcePath)
 			return nil
 		}
@@ -155,11 +155,6 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 					return errC
 				}
 			}
-		}
-
-		// replace the template with another if there is an entry in the replacements array.
-		if rp := replaceWith(relativePath, PS, sourcePath, normTplDir, tmplJson.Replace); rp != "" {
-			sourcePath = rp
 		}
 
 		return parse(sourcePath, saveDir, vars)

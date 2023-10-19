@@ -30,9 +30,10 @@ type tmplManifest struct {
 	// to the final output.
 	Skip []string `json:"skip"`
 
-	// A list of paths to be to overwrite other files/directories in the final
-	// output. Note that an empty directory can replace a directory with files.
-	Replace *replacements `json:"replace"`
+	// A path to a directory to overwrite other files/directories in the
+	// template, before processing output.
+	// Note that an empty directory can replace a directory with files.
+	Substitute string `json:"substitute"`
 
 	// Optional validation to use when entering placeholder values from the CLI.
 	Validation []validator `json:"validation"`
@@ -47,6 +48,7 @@ type templateJson struct {
 	Placeholders cli.StringMap `json:"placeholders"`
 	Skip         []string      `json:"skip"`
 	Replace      *replacements `json:"replace"`
+	Substitute   string        `json:"Substitute"`
 	Validation   []validator   `json:"validation"`
 	Version      string        `json:"version"`
 }

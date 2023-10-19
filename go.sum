@@ -1,6 +1,2 @@
-github.com/kohirens/stdlib v0.0.0-20231017023215-8cf253b11c3f h1:CANc+bsJt2c5brNdLw/Fmnpl2GZ1kAznSZz+Euc8m/E=
-github.com/kohirens/stdlib v0.0.0-20231017023215-8cf253b11c3f/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
-github.com/kohirens/stdlib v0.0.0-20231017023655-185a24717676 h1:FoGBPzcdl2MVChUcCckHjDFy0fVW6/iopiwpNO7qNx8=
-github.com/kohirens/stdlib v0.0.0-20231017023655-185a24717676/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
-github.com/kohirens/stdlib v0.0.0-20231019135512-85f06b3a7342 h1:RXYMYmwksXyeSsKjII0OyI1qu+4bC6haZZ8fppHQYFI=
-github.com/kohirens/stdlib v0.0.0-20231019135512-85f06b3a7342/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=
+github.com/kohirens/stdlib v0.0.0-20231026083551-9af3a536270a h1:9tafRufev6L31ECFBcN/SHL0Bi+GO5D3lIHDE48CnQw=
+github.com/kohirens/stdlib v0.0.0-20231026083551-9af3a536270a/go.mod h1:Hse6Wv2QlXDGu5DQ/WchCAieavz1zH46DoUNPuMvjHU=

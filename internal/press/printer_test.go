@@ -192,7 +192,10 @@ func TestSkipping(tester *testing.T) {
 	}
 }
 
-func TestReplaceWith(tester *testing.T) {
+// TestSubstitute Using the template printing press, make sure that the
+// files from the substitute directory overwrite files in the output, but then
+// but that the substitute directory itself is removed.
+func TestSubstitute(tester *testing.T) {
 	repoFixture := "repo-11"
 	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture
 	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
@@ -225,13 +228,7 @@ func TestReplaceWith(tester *testing.T) {
 			Placeholders: cli.StringMap{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
-			Replace: &replacements{
-				Directory: "replace",
-				Files: []string{
-					".circleci:.circleci",
-					".chglog/config.yml:.chglog/config.yml",
-				},
-			},
+			Substitute: "replace",
 		},
 	}
 
