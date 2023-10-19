@@ -1,3 +1,6 @@
+// Package press serves as the print head to press the template into a working
+// output of the intended purpose of the designer. So if the designer design a
+// template for an application the output will produce just that.
 package press
 
 import (
@@ -201,6 +204,38 @@ func ShowAllPlaceholderValues(placeholders *templateJson, tmplValues *cli.String
 	for placeholder := range placeholders.Placeholders {
 		log.Logf(msg.Stdout.PlaceholderAnswer, placeholder, tVals[placeholder])
 	}
+}
+
+func copyAsIs(tmplRoot, file, out string, excludedFiles []string) (rVal bool) {
+	rVal = false
+
+	if excludedFiles == nil {
+		return
+	}
+
+	// Using the relative path should always remove the drive letter on windows
+	// and make it uniform across all OS.
+	rp := strings.Replace(file, tmplRoot, "", 1)
+
+	if runtime.GOOS == "windows" { // I dislike the fact that Windows is case-insensitive.
+		rp = strings.ToLower(rp)
+	}
+
+	log.Logf("fileToCheck: %q against excludes", rp)
+
+	for _, ef := range excludedFiles {
+		ef = path.Normalize(ef)
+		if runtime.GOOS == "windows" { // I dislike the fact that Windows is case-insensitive.
+			ef = strings.ToLower(ef)
+		}
+
+		if ef == rp {
+			rVal = true
+			break
+		}
+	}
+
+	return
 }
 
 // copyToDir Copy a file to a directory.
