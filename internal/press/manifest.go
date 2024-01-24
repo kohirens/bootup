@@ -43,16 +43,6 @@ type tmplManifest struct {
 	Version string `json:"version"`
 }
 
-type templateJson struct {
-	Excludes     []string      `json:"excludes"` // TODO: Rename to "copy" for copy-as-is
-	Placeholders cli.StringMap `json:"placeholders"`
-	Skip         []string      `json:"skip"`
-	Replace      *replacements `json:"replace"`
-	Substitute   string        `json:"Substitute"`
-	Validation   []validator   `json:"validation"`
-	Version      string        `json:"version"`
-}
-
 // LoadAnswers Load key/value pairs from a JSON file to fill in placeholders (provides that data for the Go templates).
 func LoadAnswers(filename string) (*AnswersJson, error) {
 	if !path.Exist(filename) {
@@ -74,7 +64,7 @@ func LoadAnswers(filename string) (*AnswersJson, error) {
 }
 
 // ReadTemplateJson read variables needed from the template.json file.
-func ReadTemplateJson(filePath string) (*templateJson, error) {
+func ReadTemplateJson(filePath string) (*tmplManifest, error) {
 	log.Dbugf("template manifest path: %v", filePath)
 
 	// Verify the TMPL_MANIFEST file is present.
@@ -89,7 +79,7 @@ func ReadTemplateJson(filePath string) (*templateJson, error) {
 
 	log.Infof("content = %s ", content)
 
-	q := templateJson{}
+	q := tmplManifest{}
 	if err2 := json.Unmarshal(content, &q); err2 != nil {
 		return nil, err2
 	}
