@@ -181,7 +181,7 @@ func main() {
 		return
 	}
 
-	// TODO: Remove FileExtension list of using the copy (as-is) feature
+	// TODO: Remove FileExtension list in-favor of using the copy (as-is) feature
 	fec, err1 := stdlib.NewFileExtChecker(appData.ExcludeFileExtensions, &[]string{})
 	if err1 != nil {
 		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
