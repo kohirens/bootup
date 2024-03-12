@@ -123,15 +123,7 @@ func main() {
 			mainErr = config.Run(ca[1:], AppName)
 			return
 		case manifest.Name:
-			if e := manifest.ParseFlags(ca[1:]); e != nil {
-				mainErr = e
-				return
-			}
-			ma := &manifest.Arguments{}
-
-			// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
-			fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
-			_, mainErr = manifest.GenerateATemplateManifest(ma.Path, fec, []string{})
+			mainErr = manifest.Run(ca[1:])
 			return
 		}
 	}

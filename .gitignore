@@ -5,9 +5,9 @@
 /internal/cli/testdata/repo-*/
 /internal/cli/tmp/
 /testdata/parse-dir-02/
-/testdata/repo-*/
 /out/
 /vendor/
+repo-*/
 tmp/
 
 # Files

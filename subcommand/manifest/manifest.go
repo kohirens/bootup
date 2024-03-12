@@ -30,7 +30,7 @@ type Arguments struct {
 }
 
 var (
-	Args  Arguments
+	input Arguments
 	flags *flag.FlagSet
 	help  bool
 )
@@ -43,7 +43,7 @@ func Init() *flag.FlagSet {
 	return flags
 }
 
-func ParseFlags(ca []string) error {
+func parseInput(ca []string) error {
 	if e := flags.Parse(ca); e != nil {
 		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
@@ -71,22 +71,22 @@ func ParseFlags(ca []string) error {
 		return fmt.Errorf("invalid path, %v", e1.Error())
 	}
 
-	Args.Path = p
+	input.Path = p
 
-	log.Dbugf("manifest.Args.Path = %v", Args.Path)
+	log.Dbugf("manifest.input.Path = %v", input.Path)
 
 	return nil
 }
 
 func Run(ca []string) error {
-	if e := ParseFlags(ca); e != nil {
+	if e := parseInput(ca); e != nil {
 		return e
 	}
 
 	// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
 	fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
 
-	_, e1 := GenerateATemplateManifest(Args.Path, fec, []string{})
+	_, e1 := generateATemplateManifest(input.Path, fec, []string{})
 	if e1 != nil {
 		return e1
 	}
@@ -94,15 +94,14 @@ func Run(ca []string) error {
 	return nil
 }
 
-// GenerateATemplateManifest Make a JSON file with your templates placeholders.
-func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
-	log.Logf("tmplPath = %v", tmplPath)
+// generateATemplateManifest Make a JSON file with your templates placeholders.
+func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
 	if !path.Exist(tmplPath) {
 		return nil, fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 
 	// Traverse the path recursively, filtering out files that should be excluded
-	templates, err := ManifestParseDir(tmplPath, fec, excludes)
+	templates, err := parseDir(tmplPath, fec, excludes)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +117,7 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 			return nil, fmt.Errorf(msg.Stderr.ParsingFile, tmpl, e.Error())
 		}
 
-		ListTemplateFields(t, actions)
+		listTemplateFields(t, actions)
 	}
 
 	if e := saveFile(tmplPath+ps+press.TmplManifestFile, actions); e != nil {
@@ -128,13 +127,13 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 	return actions, nil
 }
 
-// ListTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
-func ListTemplateFields(t *template.Template, res map[string]string) {
+// listTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
+func listTemplateFields(t *template.Template, res map[string]string) {
 	listNodeFields(t.Tree.Root, res)
 }
 
-// ManifestParseDir Recursively walk a directory parsing all files along the way as Go templates.
-func ManifestParseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]string, error) {
+// parseDir Recursively walk a directory parsing all files along the way as Go templates.
+func parseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	nPath := strings.ReplaceAll(path, "/", ps)
 	nPath = strings.ReplaceAll(nPath, "\\", ps)
@@ -210,7 +209,7 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes
 	return sourcePath, nil
 }
 
-// ListTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
+// listTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
 func listNodeFields(node txtParse.Node, res map[string]string) {
 	if node.Type() == txtParse.NodeAction {
 		res[strings.Trim(node.String(), "{}.")] = ""
