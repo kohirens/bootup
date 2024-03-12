@@ -48,24 +48,55 @@ func ParseFlags(ca []string) error {
 		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
 
-	if len(ca) < 1 {
-		return fmt.Errorf(msg.Stderr.InvalidNoSubCmdArgs, Name, 1)
-	}
-
 	if help {
 		flags.Usage()
 		return nil
 	}
 
-	Args.Path = ca[0]
+	if len(ca) < 1 {
+		// Fall back to the current working directory when no path is specified.
+		cwd, e1 := os.Getwd()
+		if e1 != nil {
+			return fmt.Errorf(stderr.ListWorkingDirectory, e1.Error())
+		}
+
+		log.Dbugf("current working directory = %v", cwd)
+
+		ca = append(ca, cwd)
+	}
+
+	// clean up the path.
+	p, e1 := filepath.Abs(ca[0])
+	if e1 != nil {
+		return fmt.Errorf("invalid path, %v", e1.Error())
+	}
+
+	Args.Path = p
 
 	log.Dbugf("manifest.Args.Path = %v", Args.Path)
 
 	return nil
 }
 
+func Run(ca []string) error {
+	if e := ParseFlags(ca); e != nil {
+		return e
+	}
+
+	// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
+	fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
+
+	_, e1 := GenerateATemplateManifest(Args.Path, fec, []string{})
+	if e1 != nil {
+		return e1
+	}
+
+	return nil
+}
+
 // GenerateATemplateManifest Make a JSON file with your templates placeholders.
 func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
+	log.Logf("tmplPath = %v", tmplPath)
 	if !path.Exist(tmplPath) {
 		return nil, fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
@@ -78,7 +109,7 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 
 	actions := make(map[string]string)
 
-	// Parse the file as a template
+	// Parse the file as a template and extract all actions from each file.
 	for _, tmpl := range templates {
 		fmt.Printf("checking %v\n", tmpl)
 
@@ -94,7 +125,6 @@ func GenerateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 		return nil, e
 	}
 
-	// extract all actions from each file.
 	return actions, nil
 }
 

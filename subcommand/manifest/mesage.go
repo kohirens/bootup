@@ -3,11 +3,13 @@ package manifest
 import "github.com/kohirens/stdlib/cli"
 
 var stderr = struct {
-	EncodingJson   string
-	SavingManifest string
+	EncodingJson         string
+	ListWorkingDirectory string
+	SavingManifest       string
 }{
-	EncodingJson:   "could not marshall actions in file %v, error: %v",
-	SavingManifest: "could not save file %v, error: %v",
+	EncodingJson:         "could not marshall actions in file %v, error: %v",
+	ListWorkingDirectory: "could not get current working directory, %v",
+	SavingManifest:       "could not save file %v, error: %v",
 }
 
 var stdout = struct {
