@@ -275,7 +275,7 @@ func validateMainArgs(af *appFlags) error {
 		return fmt.Errorf(errors.AnswerFile404, af.AnswersPath)
 	}
 
-	regExpTmplType := regexp.MustCompile("^(zip|git|dir)$")
+	regExpTmplType := regexp.MustCompile("^(git|dir)$")
 
 	if !regExpTmplType.MatchString(af.TmplType) {
 		return fmt.Errorf(errors.BadTmplType, af.TmplType)
