@@ -90,7 +90,7 @@ func isUInt(userInput string) (bool, error) {
 func runRegex(expression, userInput string) (bool, error) {
 	re, e := regexp.Compile(expression)
 	if e != nil {
-		return false, fmt.Errorf("invalid regex %v; %v", expression, e.Error())
+		return false, fmt.Errorf(msg.Stderr.InvalidRegExp, expression, e.Error())
 	}
 
 	return re.MatchString(userInput), nil

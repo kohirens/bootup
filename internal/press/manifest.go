@@ -65,7 +65,7 @@ func LoadAnswers(filename string) (*AnswersJson, error) {
 
 // ReadTemplateJson read variables needed from the template.json file.
 func ReadTemplateJson(filePath string) (*tmplManifest, error) {
-	log.Dbugf("template manifest path: %v", filePath)
+	log.Dbugf(msg.Stdout.TemplatePath, filePath)
 
 	// Verify the TMPL_MANIFEST file is present.
 	if !path.Exist(filePath) {
@@ -77,21 +77,19 @@ func ReadTemplateJson(filePath string) (*tmplManifest, error) {
 		return nil, fmt.Errorf(msg.Stderr.CannotReadFile, filePath, e1)
 	}
 
-	log.Infof("content = %s ", content)
-
 	q := tmplManifest{}
 	if err2 := json.Unmarshal(content, &q); err2 != nil {
 		return nil, err2
 	}
 
-	log.Dbugf("TmplJson.Version = %v", q.Version)
+	log.Dbugf(msg.Stdout.TemplateVersion, q.Version)
 	if q.Version == "" {
 		return nil, fmt.Errorf(msg.Stderr.MissingTmplJsonVersion)
 	}
 
-	log.Dbugf("TmplJson.Placeholders = %v", len(q.Placeholders))
+	log.Dbugf(msg.Stdout.TemplatePlaceholders, len(q.Placeholders))
 	if q.Placeholders == nil {
-		return nil, fmt.Errorf("missing the placeholders propery in template.json")
+		return nil, fmt.Errorf(msg.Stderr.PlaceholdersProperty)
 	}
 
 	return &q, nil

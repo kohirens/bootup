@@ -42,11 +42,11 @@ func FindTemplates(dir string) ([]string, error) {
 
 		// Skip directories.
 		if fi.IsDir() {
-			log.Dbugf("skipping directory %v", tmpl)
+			log.Dbugf(msg.Stdout.Skipping, tmpl)
 			return nil
 		}
 
-		log.Infof("adding file %v", tmpl)
+		log.Infof(msg.Stdout.AddFile, tmpl)
 
 		files = append(files, tmpl)
 
@@ -78,7 +78,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 			return wErr
 		}
 
-		log.Infof("processing: %v", sourcePath)
+		log.Infof(msg.Stdout.Processing, sourcePath)
 
 		// Do not parse directories.
 		if fi.IsDir() {
@@ -108,25 +108,25 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 		// append it to the output directory, so that files are placed in the
 		// same subdirectories in the output directory.
 		relativePath := strings.TrimLeft(strings.ReplaceAll(normSourcePath, normTplDir, ""), "\\/")
-		log.Infof("relativePath dir: %v", relativePath)
+		log.Infof(msg.Stdout.RelativeDir, relativePath)
 
 		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
-		log.Infof("save dir: %v", saveDir)
+		log.Infof(msg.Stdout.SaveDir, saveDir)
 
 		// Skip template manifest file and the git config directory.
 		if currFile == TmplManifestFile || strings.Contains(relativePath, gitConfigDir+PS) {
-			log.Infof(msg.Stdout.SkipFile, relativePath)
+			log.Infof(msg.Stdout.Skipping, relativePath)
 			return nil
 		}
 
 		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
-			log.Infof(msg.Stdout.SkipFile, sourcePath)
+			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
 
 		// skip the directory with replace files.
 		if tmplJson.Substitute != "" {
-			log.Infof(msg.Stdout.SkipFile, sourcePath)
+			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
 
@@ -150,7 +150,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 				fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
 				fileToCheckB = strings.ReplaceAll(exclude, "/", "")
 				if fileToCheckB == fileToCheck {
-					log.Infof("file %v will be copied as-is", sourcePath)
+					log.Infof(msg.Stdout.CopyAsIs, sourcePath)
 					_, errC := copyToDir(sourcePath, saveDir, PS)
 					return errC
 				}
@@ -178,7 +178,7 @@ func GetPlaceholderInput(placeholders *tmplManifest, tmplValues cli.StringMap, r
 		// Just use the default value for all un-set placeholders.
 		if defaultVal != " " {
 			tVals[placeholder] = defaultVal
-			log.Infof("using default value for placeholder %v", placeholder)
+			log.Infof(msg.Stdout.VarDefaultValue, placeholder)
 			continue
 		}
 
@@ -186,8 +186,8 @@ func GetPlaceholderInput(placeholders *tmplManifest, tmplValues cli.StringMap, r
 		fmt.Printf("\n%v - %v: ", placeholder, desc)
 		nPut.Scan()
 		tVals[placeholder] = nPut.Text()
-		log.Infof(msg.Stdout.PlaceholderAnswer, desc, tVals[placeholder])
-		log.Infof("%v = %q\n", placeholder, tVals[placeholder])
+		log.Infof(msg.Stdout.Assignment, desc, tVals[placeholder])
+		log.Infof(msg.Stdout.Assignment, placeholder, tVals[placeholder])
 	}
 
 	return nil
@@ -195,9 +195,9 @@ func GetPlaceholderInput(placeholders *tmplManifest, tmplValues cli.StringMap, r
 
 func ShowAllPlaceholderValues(placeholders *tmplManifest, tmplValues *cli.StringMap) {
 	tVals := *tmplValues
-	log.Logf("the following values have been provided\n")
+	log.Logf(msg.Stdout.ValuesProvided)
 	for placeholder := range placeholders.Placeholders {
-		log.Logf(msg.Stdout.PlaceholderAnswer, placeholder, tVals[placeholder])
+		log.Logf(msg.Stdout.Assignment, placeholder, tVals[placeholder])
 	}
 }
 
@@ -216,7 +216,7 @@ func copyAsIs(tmplRoot, file, out string, excludedFiles []string) (rVal bool) {
 		rp = strings.ToLower(rp)
 	}
 
-	log.Logf("fileToCheck: %q against excludes", rp)
+	log.Logf(msg.Stdout.FileToCheck, rp)
 
 	for _, ef := range excludedFiles {
 		ef = path.Normalize(ef)
@@ -257,7 +257,7 @@ func copyToDir(sourcePath, destDir, separator string) (int64, error) {
 
 // parse a file as a Go template.
 func parse(tplFile, dstDir string, vars cli.StringMap) error {
-	log.Infof("parsing %v", tplFile)
+	log.Infof(msg.Stdout.Parsing, tplFile)
 	funcMap := template.FuncMap{
 		"title":   strings.Title,
 		"toLower": strings.ToLower,

@@ -60,7 +60,7 @@ func parseInput(ca []string) error {
 			return fmt.Errorf(stderr.ListWorkingDirectory, e1.Error())
 		}
 
-		log.Dbugf("current working directory = %v", cwd)
+		log.Dbugf(msg.Stdout.Cwd, cwd)
 
 		ca = append(ca, cwd)
 	}
@@ -68,12 +68,12 @@ func parseInput(ca []string) error {
 	// clean up the path.
 	p, e1 := filepath.Abs(ca[0])
 	if e1 != nil {
-		return fmt.Errorf("invalid path, %v", e1.Error())
+		return fmt.Errorf(msg.Stderr.NoPath, e1.Error())
 	}
 
 	input.Path = p
 
-	log.Dbugf("manifest.input.Path = %v", input.Path)
+	log.Dbugf(msg.Stdout.TemplatePath, input.Path)
 
 	return nil
 }

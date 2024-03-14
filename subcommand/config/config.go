@@ -52,17 +52,16 @@ func ParseInput(ca []string) error {
 	args.Method = ca[0]
 	args.Setting = ca[1]
 
+	log.Dbugf(msg.Stdout.ConfigMethodSetting, args.Method, args.Setting)
+
 	if len(ca) > 2 {
+		log.Dbugf(msg.Stdout.SetValue, args.Method, args.Value)
 		args.Value = ca[2]
 	}
 
 	if args.Method == "set" && len(ca) != 3 {
 		return fmt.Errorf(Stderr.ConfigValueNotSet)
 	}
-
-	log.Dbugf("args.Method = %v", args.Method)
-	log.Dbugf("args.Setting = %v", args.Setting)
-	log.Dbugf("args.Value = %v", args.Value)
 
 	return nil
 }
@@ -123,7 +122,7 @@ func get(key string, cp string) error {
 		break
 
 	default:
-		return fmt.Errorf("no setting %v found", key)
+		return fmt.Errorf(msg.Stderr.NoSetting, key)
 	}
 
 	return nil
@@ -145,7 +144,7 @@ func set(key, val string, cp, appName string) error {
 		break
 
 	default:
-		return fmt.Errorf("no %q setting found", key)
+		return fmt.Errorf(msg.Stderr.NoSetting, key)
 	}
 
 	if !path.Exist(cp) {

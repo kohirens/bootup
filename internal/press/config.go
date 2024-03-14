@@ -126,7 +126,7 @@ func BuildAppDataPath(appName string) (string, error) {
 		return "", e
 	}
 
-	log.Dbugf("app data dir = %v", appDataDir)
+	log.Dbugf(msg.Stdout.AppDataDir, appDataDir)
 
 	return appDataDir, nil
 }
@@ -151,7 +151,7 @@ func buildCacheDirPath(appName string) (string, error) {
 		return "", fmt.Errorf(msg.Stderr.CouldNotMakeCacheDir, e.Error())
 	}
 
-	log.Dbugf("app cache dir = %v", appCacheDir)
+	log.Dbugf(msg.Stdout.AppCacheDir, appCacheDir)
 
 	return appCacheDir, nil
 }

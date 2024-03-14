@@ -26,16 +26,20 @@ var Stderr = struct {
 	GetRemoteTags          string
 	InvalidNoArgs          string
 	InvalidNoSubCmdArgs    string
+	InvalidRegExp          string
 	InvalidTmplDir         string
 	MissingTmplJson        string
 	MissingTmplJsonVersion string
 	NoGitTagFound          string
 	NoInput                string
+	NoPath                 string
+	NoSetting              string
 	ParseBool              string
 	ParseInt               string
 	ParseUInt              string
 	ParsingConfigArgs      string
 	PathNotAllowed         string
+	PlaceholdersProperty   string
 	RunGitFailed           string
 	TmplManifest404        string
 	TmplOutput             string
@@ -66,16 +70,20 @@ var Stderr = struct {
 	GetLatestTag:           "failed to get latest tag from %v: %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
+	InvalidRegExp:          "invalid regular expression \"%v\", %v",
 	InvalidTmplDir:         "invalid template directory %q",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
-	MissingTmplJsonVersion: "missing the Version propery in template.json",
+	MissingTmplJsonVersion: "missing the Version property in template.json",
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
+	NoPath:                 "unable to determine absolute path for %v, because %v",
+	NoSetting:              "no setting %v found",
 	ParseBool:              "%v is not a valid boolean value",
 	ParseInt:               "could not parse %v as a integer, %v",
 	ParseUInt:              "could not parse %v as a natural number, %v",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
+	PlaceholdersProperty:   "missing the placeholders property in template.json",
 	TmplManifest404:        "the required manifest %q file was not found",
 	TmplOutput:             "template has NOT been cloned locally",
 	UnhandledHttpErr:       "template Download aborted; I'm coded to NOT do anything when HTTP status is %q and status code is %d",
