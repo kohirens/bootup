@@ -77,7 +77,7 @@ var Stderr = struct {
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
 	NoPath:                 "unable to determine absolute path for %v, because %v",
-	NoSetting:              "no setting %v found",
+	NoSetting:              "no setting named %q found",
 	ParseBool:              "%v is not a valid boolean value",
 	ParseInt:               "could not parse %v as a integer, %v",
 	ParseUInt:              "could not parse %v as a natural number, %v",

@@ -95,7 +95,7 @@ func TestSubCmdConfigExitCode(tester *testing.T) {
 		expected string
 	}{
 		{"noArgs", 1, []string{config.Name}, "invalid number of arguments"},
-		{"keyDoesNotExist", 1, []string{config.Name, "set", "key", "value"}, "no \"key\" setting found"},
+		{"keyDoesNotExist", 1, []string{config.Name, "set", "key", "value"}, "no setting named \"key\" found"},
 	}
 
 	for _, tc := range tests {
