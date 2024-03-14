@@ -31,6 +31,9 @@ var Stderr = struct {
 	MissingTmplJsonVersion string
 	NoGitTagFound          string
 	NoInput                string
+	ParseBool              string
+	ParseInt               string
+	ParseUInt              string
 	ParsingConfigArgs      string
 	PathNotAllowed         string
 	RunGitFailed           string
@@ -68,6 +71,9 @@ var Stderr = struct {
 	MissingTmplJsonVersion: "missing the Version propery in template.json",
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
+	ParseBool:              "%v is not a valid boolean value",
+	ParseInt:               "could not parse %v as a integer, %v",
+	ParseUInt:              "could not parse %v as a natural number, %v",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
 	TmplManifest404:        "the required manifest %q file was not found",

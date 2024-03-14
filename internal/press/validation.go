@@ -1,7 +1,10 @@
 package press
 
 import (
+	"fmt"
+	"github.com/kohirens/tmpltoapp/internal/msg"
 	"regexp"
+	"strconv"
 )
 
 type validator struct {
@@ -38,6 +41,12 @@ func validate(userInput, placeholder string, validators []validator) (bool, erro
 		case "alphaNumeric":
 			re := regexp.MustCompile("^[a-zA-Z0-9]+$")
 			return re.MatchString(userInput), nil
+		case "bool":
+			return isBoolean(userInput)
+		case "int":
+			return isInt(userInput)
+		case "unsigned":
+			return isUInt(userInput)
 		case "regExp":
 			re, e := regexp.Compile(val.expression)
 			if e == nil {
@@ -48,4 +57,41 @@ func validate(userInput, placeholder string, validators []validator) (bool, erro
 	}
 
 	return false, nil
+}
+
+func isBoolean(userInput string) (bool, error) {
+	if userInput != "true" && userInput != "false" {
+		//return false, fmt.Errorf(msg.Stderr.ParseBool, userInput)
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func isInt(userInput string) (bool, error) {
+	_, e := strconv.ParseInt(userInput, 10, 64)
+	if e != nil {
+		return false, fmt.Errorf(msg.Stderr.ParseInt, userInput, e.Error())
+	}
+
+	return true, nil
+}
+
+func isUInt(userInput string) (bool, error) {
+	_, e := strconv.ParseUint(userInput, 10, 64)
+	if e != nil {
+		//return false, fmt.Errorf(msg.Stderr.ParseInt, userInput, e.Error())
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func runRegex(expression, userInput string) (bool, error) {
+	re, e := regexp.Compile(expression)
+	if e != nil {
+		return false, fmt.Errorf("invalid regex %v; %v", expression, e.Error())
+	}
+
+	return re.MatchString(userInput), nil
 }

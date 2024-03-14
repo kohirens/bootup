@@ -97,6 +97,213 @@ func TestValidateAlphaNumeric(t *testing.T) {
 	}
 }
 
+func TestValidateBoolean(t *testing.T) {
+	rule := "bool"
+	testCases := []struct {
+		name string
+		ui   string
+		ph   string
+		v    []validator
+		want bool
+	}{
+		{
+			"true",
+			"true",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"false",
+			"false",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"false",
+			"false",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"badInput",
+			"1",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, _ := validate(tc.ui, tc.ph, tc.v)
+			if got != tc.want {
+				t.Errorf("got %v want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestValidateInt(t *testing.T) {
+	rule := "int"
+	testCases := []struct {
+		name string
+		ui   string
+		ph   string
+		v    []validator
+		want bool
+	}{
+		{
+			"number",
+			"21",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"negative",
+			"-32",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"NaN",
+			"NaN",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+		{
+			"decimal",
+			"1.00",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, _ := validate(tc.ui, tc.ph, tc.v)
+			if got != tc.want {
+				t.Errorf("got %v want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestValidateUInt(t *testing.T) {
+	rule := "unsigned"
+	testCases := []struct {
+		name string
+		ui   string
+		ph   string
+		v    []validator
+		want bool
+	}{
+		{
+			"number",
+			"21",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			true,
+		},
+		{
+			"negative",
+			"-32",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+		{
+			"NaN",
+			"NaN",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+		{
+			"decimal",
+			"1.00",
+			"var1",
+			[]validator{{
+				expression: "",
+				fields:     []string{"var1"},
+				rule:       rule,
+				message:    "var1 failed to validate",
+			}},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, _ := validate(tc.ui, tc.ph, tc.v)
+			if got != tc.want {
+				t.Errorf("got %v want %v", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestValidateRegExp(t *testing.T) {
 	rule := "regExp"
 	testCases := []struct {
