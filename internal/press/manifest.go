@@ -18,7 +18,7 @@ type AnswersJson struct {
 	Placeholders cli.StringMap `json:"placeholders"`
 }
 
-type tmplManifest struct {
+type TmplManifest struct {
 	// A list of files to exclude from processing through the template,
 	// but still are output in the final output.
 	Excludes []string `json:"excludes"`
@@ -64,7 +64,7 @@ func LoadAnswers(filename string) (*AnswersJson, error) {
 }
 
 // ReadTemplateJson read variables needed from the template.json file.
-func ReadTemplateJson(filePath string) (*tmplManifest, error) {
+func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 	log.Dbugf(msg.Stdout.TemplatePath, filePath)
 
 	// Verify the TMPL_MANIFEST file is present.
@@ -77,7 +77,7 @@ func ReadTemplateJson(filePath string) (*tmplManifest, error) {
 		return nil, fmt.Errorf(msg.Stderr.CannotReadFile, filePath, e1)
 	}
 
-	q := tmplManifest{}
+	q := TmplManifest{}
 	if err2 := json.Unmarshal(content, &q); err2 != nil {
 		return nil, err2
 	}

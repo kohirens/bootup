@@ -61,7 +61,7 @@ func FindTemplates(dir string) ([]string, error) {
 }
 
 // Print templates to the output directory.
-func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker, tmplJson *tmplManifest) error {
+func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker, tmplJson *TmplManifest) error {
 	if !path.Exist(tplDir) {
 		return fmt.Errorf(msg.Stderr.PathNotExist, tplDir)
 	}
@@ -162,7 +162,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 }
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
-func GetPlaceholderInput(placeholders *tmplManifest, tmplValues cli.StringMap, r *os.File, defaultVal string) error {
+func GetPlaceholderInput(placeholders *TmplManifest, tmplValues cli.StringMap, r *os.File, defaultVal string) error {
 	tVals := tmplValues
 	nPut := bufio.NewScanner(r)
 
@@ -193,7 +193,7 @@ func GetPlaceholderInput(placeholders *tmplManifest, tmplValues cli.StringMap, r
 	return nil
 }
 
-func ShowAllPlaceholderValues(placeholders *tmplManifest, tmplValues *cli.StringMap) {
+func ShowAllPlaceholderValues(placeholders *TmplManifest, tmplValues *cli.StringMap) {
 	tVals := *tmplValues
 	log.Logf(msg.Stdout.ValuesProvided)
 	for placeholder := range placeholders.Placeholders {

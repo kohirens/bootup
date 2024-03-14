@@ -74,7 +74,7 @@ func TestEmptyDirectoryFeature(runner *testing.T) {
 	fileChkr, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	for _, tc := range fixtures {
 		runner.Run(tc.name, func(t *testing.T) {
-			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, fileChkr, &tmplManifest{Excludes: []string{}})
+			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, fileChkr, &TmplManifest{Excludes: []string{}})
 
 			if e1 != nil {
 				t.Errorf("got error %v, want nil", e1.Error())
@@ -112,7 +112,7 @@ func TestPrinting(tester *testing.T) {
 		tester.Run(tc.name, func(test *testing.T) {
 			fec, _ := stdlib.NewFileExtChecker(nil, &[]string{"md", "yml"})
 
-			err := Print(tc.tmplPath, tc.outPath, tc.tplVars, fec, &tmplManifest{})
+			err := Print(tc.tmplPath, tc.outPath, tc.tplVars, fec, &TmplManifest{})
 
 			if err != nil {
 				test.Errorf("got an error %q", err.Error())
@@ -141,7 +141,7 @@ func TestSkipping(tester *testing.T) {
 		absent  []string
 		present []string
 		answers cli.StringMap
-		ph      *tmplManifest
+		ph      *TmplManifest
 	}{
 		"pressTmplWithNoConfig",
 		[]string{
@@ -156,7 +156,7 @@ func TestSkipping(tester *testing.T) {
 			"README.md",
 		},
 		cli.StringMap{"appName": "Repo 09"},
-		&tmplManifest{
+		&TmplManifest{
 			Version: "1.2",
 			Placeholders: cli.StringMap{
 				"appName": "Application name, the formal name with capitalization and spaces",
@@ -205,7 +205,7 @@ func TestSubstitute(tester *testing.T) {
 		absent  []string
 		content []string
 		answers cli.StringMap
-		ph      *tmplManifest
+		ph      *TmplManifest
 	}{
 		"success",
 		[]string{
@@ -223,7 +223,7 @@ func TestSubstitute(tester *testing.T) {
 			"# Repo 11",
 		},
 		cli.StringMap{"appName": "Repo 11"},
-		&tmplManifest{
+		&TmplManifest{
 			Version: "1.2",
 			Placeholders: cli.StringMap{
 				"appName": "Application name, the formal name with capitalization and spaces",
