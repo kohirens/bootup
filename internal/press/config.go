@@ -16,27 +16,24 @@ const (
 
 // AppData runtime settings shared throughout the application.
 type AppData struct {
-	AnswersJson           *AnswersJson // data use for template processing
-	CacheDir              string       // Directory to store app data.
-	DataDir               string       // Directory to store app data.
-	ExcludeFileExtensions *[]string
-	Path                  string // Path to configuration file.
-	SubCmd                string // sub-command to execute
-	Tmpl                  string // Path to template, this will be the cached path.
-	TmplLocation          string // Indicates local or remote location to downloaded
+	AnswersJson  *AnswersJson // data use for template processing
+	CacheDir     string       // Directory to store app data.
+	DataDir      string       // Directory to store app data.
+	Path         string       // Path to configuration file.
+	SubCmd       string       // sub-command to execute
+	Tmpl         string       // Path to template, this will be the cached path.
+	TmplLocation string       // Indicates local or remote location to downloaded
 	//	TmplJson              *TmplJson // Data about the template such as placeholders, their descriptions, version, etc.
 }
 
 type ConfigSaveData struct {
-	CacheDir              string
-	ExcludeFileExtensions *[]string
+	CacheDir string
 }
 
 func NewAppData(sc *ConfigSaveData) (*AppData, error) {
 	// Override defaults with user settings.
 	ad := &AppData{
-		CacheDir:              sc.CacheDir,
-		ExcludeFileExtensions: sc.ExcludeFileExtensions,
+		CacheDir: sc.CacheDir,
 	}
 
 	return ad, nil
@@ -50,8 +47,7 @@ func InitConfig(filepath, appName string) (*ConfigSaveData, error) {
 	}
 
 	sc := &ConfigSaveData{
-		CacheDir:              cd,
-		ExcludeFileExtensions: &[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"},
+		CacheDir: cd,
 	}
 
 	f, err2 := os.Create(filepath)

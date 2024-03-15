@@ -23,6 +23,8 @@ type TmplManifest struct {
 	// but still are output in the final output.
 	Excludes []string `json:"excludes"`
 
+	IgnoreExtensions *[]string `json:"ignoreExtensions"`
+
 	// Values to supply to the template to fill in variables.
 	Placeholders cli.StringMap `json:"placeholders"`
 

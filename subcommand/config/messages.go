@@ -24,12 +24,10 @@ Command
 `
 
 var Stderr = struct {
-	BadExcludeFileExt    string
 	CouldNotEncodeConfig string
 	ConfigValueNotSet    string
 	InvalidConfigMethod  string
 }{
-	BadExcludeFileExt:    "invalid ExcludeFileExtensions, check format, for example: item1,item2,item3",
 	CouldNotEncodeConfig: "could not JSON encode user configuration settings, %v",
 	ConfigValueNotSet:    "no value passed in for the setting, try quotes to enter an empty string",
 	InvalidConfigMethod:  "invalid config method %v",

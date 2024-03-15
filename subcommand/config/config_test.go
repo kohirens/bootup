@@ -1,6 +1,9 @@
 package config
 
 import (
+	"errors"
+	"fmt"
+	"github.com/kohirens/tmpltoapp/internal/msg"
 	"os"
 	"testing"
 )
@@ -49,13 +52,13 @@ func TestSubCmdConfigBadExit(tester *testing.T) {
 		name     string
 		wantCode int
 		ca       []string
-		expected string
+		expected error
 	}{
 		{
 			"set-exclude-file-extensions",
 			1,
 			[]string{"set", "ExcludeFileExtensions", "jpg,gif"},
-			"no config setting \"keyDoesNotExist\" found",
+			fmt.Errorf(msg.Stderr.NoSetting, "ExcludeFileExtensions"),
 		},
 	}
 
@@ -64,7 +67,7 @@ func TestSubCmdConfigBadExit(tester *testing.T) {
 			Init()
 
 			e2 := Run(tc.ca, "TestBonanza")
-			if e2 != nil {
+			if e2 == nil && !errors.Is(e2, tc.expected) {
 				t.Error(e2)
 			}
 		})

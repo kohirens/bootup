@@ -7,8 +7,6 @@ import (
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
-	"regexp"
-	"strings"
 )
 
 type Arguments struct {
@@ -111,16 +109,6 @@ func get(key string, cp string) error {
 		log.Logf("%v", val)
 		break
 
-	case "ExcludeFileExtensions":
-		v2 := fmt.Sprintf("%v", val)
-		ok, _ := regexp.Match("^[a-zA-Z0-9-.]+(?:,[a-zA-Z0-9-.]+)*", []byte(v2))
-		if !ok {
-			return fmt.Errorf(Stderr.BadExcludeFileExt, val)
-		}
-		val = strings.Join(*sc.ExcludeFileExtensions, ",")
-		log.Logf("%v", val)
-		break
-
 	default:
 		return fmt.Errorf(msg.Stderr.NoSetting, key)
 	}
@@ -135,12 +123,6 @@ func set(key, val string, cp, appName string) error {
 	switch key {
 	case "CacheDir":
 		sc.CacheDir = val
-		break
-
-	case "ExcludeFileExtensions":
-		tmp := strings.Split(val, ",")
-		sc.ExcludeFileExtensions = &tmp
-		log.Dbugf("adding exclusions %q to config", val)
 		break
 
 	default:

@@ -173,12 +173,6 @@ func main() {
 		return
 	}
 
-	// TODO: Remove FileExtension list in-favor of using the copy (as-is) feature
-	fec, err1 := stdlib.NewFileExtChecker(appData.ExcludeFileExtensions, &[]string{})
-	if err1 != nil {
-		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
-	}
-
 	// Require template directories to have a specific file in order to be processed to prevent processing directories unintentionally.
 	tmplManifestFile := tmplToPress + ps + press.TmplManifestFile
 	tmplJson, errX := press.ReadTemplateJson(tmplManifestFile)
@@ -198,17 +192,25 @@ func main() {
 
 	if path.Exist(flags.AnswersPath) {
 		appData.AnswersJson, mainErr = press.LoadAnswers(flags.AnswersPath)
-		if mainErr != nil {
-			return
-		}
+	}
+	if mainErr != nil {
+		return
 	}
 
 	// Checks for any missing placeholder values waits for their input from the CLI.
 	if e := press.GetPlaceholderInput(tmplJson, appData.AnswersJson.Placeholders, os.Stdin, flags.DefaultVal); e != nil {
 		mainErr = fmt.Errorf(msg.Stderr.GettingAnswers, e.Error())
+		return
 	}
 
 	press.ShowAllPlaceholderValues(tmplJson, &appData.AnswersJson.Placeholders)
+
+	// TODO: Remove FileExtension list in-favor of using the copy (as-is) feature
+	fec, err1 := stdlib.NewFileExtChecker(tmplJson.IgnoreExtensions, &[]string{})
+	if err1 != nil {
+		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
+		return
+	}
 
 	mainErr = press.Print(tmplToPress, flags.OutPath, appData.AnswersJson.Placeholders, fec, tmplJson)
 }

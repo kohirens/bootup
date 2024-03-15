@@ -11,7 +11,6 @@ import (
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -74,17 +73,6 @@ func TestCallingMain(tester *testing.T) {
 			}
 		})
 	}
-}
-
-// runMain execute main in a sub process
-func runMain(testFunc string, args []string) *exec.Cmd {
-	// Run the test binary and tell it to run just this test with environment set.
-	cmd := exec.Command(os.Args[0], "-test.run", testFunc)
-
-	subEnvVar := stdt.SubCmdFlags + "=" + strings.Join(args, " ")
-	cmd.Env = append(os.Environ(), subEnvVar)
-
-	return cmd
 }
 
 func TestSubCmdConfigExitCode(tester *testing.T) {
@@ -204,12 +192,6 @@ func TestSetUserOptions(tester *testing.T) {
 		want     string
 	}{
 		{"setCache", 0, []string{"-verbosity", "6", config.Name, "set", "CacheDir", "ABC123"}, "ABC123"},
-		{
-			"setExcludeFileExtensions",
-			0,
-			[]string{config.Name, "set", "ExcludeFileExtensions", "md,txt"},
-			`"ExcludeFileExtensions":["md","txt"]`,
-		},
 	}
 
 	for _, tc := range tests {
