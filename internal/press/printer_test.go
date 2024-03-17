@@ -157,8 +157,8 @@ func TestSkipping(tester *testing.T) {
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
 			Skip: []string{
-				"dir-to-skip",
-				"skip-me-too.md",
+				"dir-to-skip/*",
+				"*skip-me-too.md",
 				"dir-to-include/second-level/skip-me-as-well.md",
 			},
 		},

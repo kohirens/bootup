@@ -2,20 +2,22 @@ package press
 
 import (
 	"github.com/kohirens/stdlib/path"
-	"strings"
+	"github.com/ryanuber/go-glob"
 )
 
-func inSkipArray(p string, skips []string) bool {
-	found := false
+// Get to know glob before you question the correctness of my program:
+// https://man7.org/linux/man-pages/man7/glob.7.html
+func inSkipArray(pathToFile string, skips []string) bool {
+	skip := false
 
-	for _, skip := range skips {
-		skip = path.Normalize(skip)
+	for _, pattern := range skips {
+		pattern = path.Normalize(pattern)
 
-		if strings.Contains(p, skip) {
-			found = true
+		if glob.Glob(pattern, pathToFile) {
+			skip = true
 			break
 		}
 	}
 
-	return found
+	return skip
 }

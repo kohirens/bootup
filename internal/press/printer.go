@@ -110,7 +110,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 			return nil
 		}
 
-		if inSkipArray(relativePath, tmplJson.Skip) { // Skip files in this list
+		if inSkipArray(relativePath, tmplJson.Skip) { // Skip means don't do anything with the files in this list
 			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
