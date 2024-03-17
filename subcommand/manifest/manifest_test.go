@@ -1,7 +1,6 @@
 package manifest
 
 import (
-	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/press"
@@ -16,8 +15,6 @@ const (
 )
 
 func TestGenerateATemplateJson(runner *testing.T) {
-	fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
-
 	testCases := []struct {
 		name string
 		repo string
@@ -34,7 +31,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 		runner.Run(tc.name, func(t *testing.T) {
 			repoPath := git.CloneFromBundle(tc.repo, tmpDir, fixtureDir, ps)
 
-			got, err := generateATemplateManifest(repoPath, fec)
+			got, err := generateATemplateManifest(repoPath)
 			if err != nil {
 				t.Errorf("want nil, got: %q", err.Error())
 			}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
@@ -82,10 +81,7 @@ func Run(ca []string) error {
 		return e
 	}
 
-	// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
-	fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
-
-	filename, e1 := generateATemplateManifest(input.Path, fec)
+	filename, e1 := generateATemplateManifest(input.Path)
 	if e1 != nil {
 		return e1
 	}
@@ -96,7 +92,7 @@ func Run(ca []string) error {
 }
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
-func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker) (string, error) {
+func generateATemplateManifest(tmplPath string) (string, error) {
 	if !path.Exist(tmplPath) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
@@ -108,7 +104,7 @@ func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker) (str
 		return "", e1
 	}
 	// Traverse the path recursively, filtering out files that should be excluded
-	templates, err := parseDir(tmplPath, fec, tm)
+	templates, err := parseDir(tmplPath, tm)
 	if err != nil {
 		return "", err
 	}
@@ -144,7 +140,7 @@ func listTemplateFields(t *template.Template, res map[string]string) {
 }
 
 // parseDir Recursively walk a directory parsing all files along the way as Go templates.
-func parseDir(path string, fec *stdlib.FileExtChecker, tm *press.TmplManifest) ([]string, error) {
+func parseDir(path string, tm *press.TmplManifest) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	nPath := strings.ReplaceAll(path, "/", ps)
 	nPath = strings.ReplaceAll(nPath, "\\", ps)
@@ -192,7 +188,6 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, tm *pres
 
 	currFile := filepath.Base(sourcePath)
 
-	// Skip files by extension.
 	// TODO: Add globbing is added. filepath.Glob(pattern)
 	if currFile == tm.EmptyDirFile || currFile == press.TmplManifestFile { // Use an exclusion list, include every file by default.
 		return "", nil
