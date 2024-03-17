@@ -19,26 +19,31 @@ type AnswersJson struct {
 }
 
 type TmplManifest struct {
+	// EmptyDirFile Name of a file that marks a directory as empty and has the
+	// effect of "mkdir -p". This file allows you to add directories to Git but
+	// have them made and empty when the template is pressed.
+	EmptyDirFile string `json:"emptyDirFile"`
+
 	// A list of files to exclude from processing through the template,
 	// but still are output in the final output.
-	Excludes []string `json:"excludes"`
+	Excludes []string `json:"excludes,omitempty"`
 
-	IgnoreExtensions *[]string `json:"ignoreExtensions"`
+	IgnoreExtensions *[]string `json:"ignoreExtensions,omitempty"`
 
 	// Values to supply to the template to fill in variables.
-	Placeholders cli.StringMap `json:"placeholders"`
+	Placeholders cli.StringMap `json:"placeholders,omitempty"`
 
 	// Files that should not be processed through the template engine nor added
 	// to the final output.
-	Skip []string `json:"skip"`
+	Skip []string `json:"skip,omitempty"`
 
 	// A path to a directory to overwrite other files/directories in the
 	// template, before processing output.
 	// Note that an empty directory can replace a directory with files.
-	Substitute string `json:"substitute"`
+	Substitute string `json:"substitute,omitempty"`
 
 	// Optional validation to use when entering placeholder values from the CLI.
-	Validation []validator `json:"validation"`
+	Validation []validator `json:"validation,omitempty"`
 
 	// The version of the schema to use, which serves only as an indicator of
 	// the template engines features.
@@ -79,9 +84,9 @@ func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 		return nil, fmt.Errorf(msg.Stderr.CannotReadFile, filePath, e1)
 	}
 
-	q := TmplManifest{}
-	if err2 := json.Unmarshal(content, &q); err2 != nil {
-		return nil, err2
+	q, e2 := NewTmplManifest(content)
+	if e2 != nil {
+		return nil, e2
 	}
 
 	log.Dbugf(msg.Stdout.TemplateVersion, q.Version)
@@ -94,5 +99,14 @@ func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 		return nil, fmt.Errorf(msg.Stderr.PlaceholdersProperty)
 	}
 
-	return &q, nil
+	return q, nil
+}
+
+func NewTmplManifest(content []byte) (*TmplManifest, error) {
+	tmf := &TmplManifest{}
+	if e := json.Unmarshal(content, &tmf); e != nil {
+		return nil, fmt.Errorf(msg.Stderr.NewManifest, e.Error())
+	}
+
+	return tmf, nil
 }

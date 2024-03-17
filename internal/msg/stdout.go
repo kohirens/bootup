@@ -14,6 +14,7 @@ var Stdout = struct {
 	CurrentVersionInfo    string
 	Cwd                   string
 	FileToCheck           string
+	GeneratedManifest     string
 	MadeNewConfig         string
 	NumNonFlagArgs        string
 	NumParsedFlags        string
@@ -54,6 +55,7 @@ var Stdout = struct {
 	CurrentVersionInfo:    "version: %v, %v",
 	Cwd:                   "current working directory is %v",
 	FileToCheck:           "fileToCheck: %v against excludes",
+	GeneratedManifest:     "manifest generated %v",
 	MadeNewConfig:         "saved %d bytes to a new config %v",
 	NumNonFlagArgs:        "number of non-flag arguments passed in: %d",
 	NumParsedFlags:        "number of parsed flags = %v",

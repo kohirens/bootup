@@ -1,7 +1,6 @@
 package manifest
 
 import (
-	"encoding/json"
 	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
@@ -34,18 +33,19 @@ func TestGenerateATemplateJson(runner *testing.T) {
 	for _, tc := range testCases {
 		runner.Run(tc.name, func(t *testing.T) {
 			repoPath := git.CloneFromBundle(tc.repo, tmpDir, fixtureDir, ps)
-			got, err := generateATemplateManifest(repoPath, fec, []string{})
-			f := repoPath + ps + press.TmplManifestFile
 
+			got, err := generateATemplateManifest(repoPath, fec)
 			if err != nil {
 				t.Errorf("want nil, got: %q", err.Error())
 			}
 
-			if !path.Exist(f) {
+			if !path.Exist(got) {
 				t.Errorf("no template.json found in %v", repoPath)
 			}
 
-			if !reflect.DeepEqual(got, tc.want) {
+			b, _ := os.ReadFile(got)
+			tm, _ := press.NewTmplManifest(b)
+			if !reflect.DeepEqual(tm.Placeholders, tc.want) {
 				t.Errorf("got %v, want %v", got, tc.want)
 			}
 		})
@@ -64,31 +64,21 @@ func TestRun(t *testing.T) {
 
 	for _, tt := range tests {
 		repoPath := git.CloneFromBundle(tt.repo, tmpDir, fixtureDir, ps)
+
 		Init()
+
 		t.Run(tt.name, func(t *testing.T) {
 			err := Run([]string{repoPath})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			got := loadFile("tmp/repo-07/template.json")
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("got %v, want %v", got, tt.want)
+			b, _ := os.ReadFile("tmp/repo-07/template.json")
+			tm, _ := press.NewTmplManifest(b)
+
+			if !reflect.DeepEqual(tm.Placeholders, tt.want) {
+				t.Errorf("got %v, want %v", tm.Placeholders, tt.want)
 			}
 		})
 	}
-}
-
-type mockManifest struct {
-	Placeholders map[string]string `json:"placeholders"`
-}
-
-func loadFile(filename string) map[string]string {
-	content, _ := os.ReadFile(filename)
-
-	ph := &mockManifest{}
-
-	_ = json.Unmarshal(content, ph)
-
-	return ph.Placeholders
 }

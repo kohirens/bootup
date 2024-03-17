@@ -29,6 +29,7 @@ var Stderr = struct {
 	InvalidTmplDir         string
 	MissingTmplJson        string
 	MissingTmplJsonVersion string
+	NewManifest            string
 	NoGitTagFound          string
 	NoInput                string
 	NoPath                 string
@@ -72,6 +73,7 @@ var Stderr = struct {
 	InvalidTmplDir:         "invalid template directory %q",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
 	MissingTmplJsonVersion: "missing the Version property in template.json",
+	NewManifest:            "could not initialize a new manifest, %v",
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
 	NoPath:                 "unable to determine absolute path for %v, because %v",

@@ -4,7 +4,7 @@
     "$id": "https://github.com/kohirens/tmpltoapp/blob/main/template.schema.json",
     "title": "Template Placeholder Manifest",
     "description": "Provide list a placeholder variables names for a template",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "type": "object",
     "required": [ "version", "placeholders" ],
     "properties": {
@@ -16,6 +16,11 @@
         "placeholders": {
             "description": "A map where the keys are the placeholder names and the values are strings to present as a question to ask for the value in a CLI prompt",
             "type": "object"
+        },
+        "emptyDirFile": {
+            "description": "Name of a file that marks a directory as empty and has the effect of \"mkdir -p\". This file allows you to add directories to Git but have them made and empty when the template is pressed.",
+            "type": "string",
+            "pattern": "^\\.?[a-zA-Z0-9-_.]+$"
         },
         "excludes": {
             "description": "A list of files and directories to exclude from template processing, and to copy as-is",

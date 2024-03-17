@@ -20,7 +20,6 @@ import (
 
 const (
 	dirMode      = 0744
-	emptyFile    = ".empty"
 	gitConfigDir = ".git"
 	maxTmplSize  = 1e+7
 	PS           = string(os.PathSeparator)
@@ -126,8 +125,8 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 			return e
 		}
 
-		// we skip the designated empty file here so that the directory is made.
-		if currFile == emptyFile {
+		// Return here so that the directory is made, but we do not copy the designated empty file.
+		if currFile == tmplJson.EmptyDirFile {
 			return nil
 		}
 

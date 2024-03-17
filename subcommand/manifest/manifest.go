@@ -19,7 +19,6 @@ import (
 
 const (
 	ps           = string(os.PathSeparator)
-	EmptyFile    = ".empty"
 	GitConfigDir = ".git"
 	Name         = "manifest"
 	Summary      = "Generate a template.json file for a template."
@@ -86,24 +85,32 @@ func Run(ca []string) error {
 	// TODO: BREAKING Add this to the template.json, the template designer should be responsible for this; ".empty" should still be embedded in this app though.
 	fec, _ := stdlib.NewFileExtChecker(&[]string{".empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"}, &[]string{})
 
-	_, e1 := generateATemplateManifest(input.Path, fec, []string{})
+	filename, e1 := generateATemplateManifest(input.Path, fec)
 	if e1 != nil {
 		return e1
 	}
+
+	log.Logf(msg.Stdout.GeneratedManifest, filename)
 
 	return nil
 }
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
-func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excludes []string) (map[string]string, error) {
+func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker) (string, error) {
 	if !path.Exist(tmplPath) {
-		return nil, fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
+		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 
+	// start with the default template.json
+
+	tm, e1 := press.NewTmplManifest([]byte(defaultJson))
+	if e1 != nil {
+		return "", e1
+	}
 	// Traverse the path recursively, filtering out files that should be excluded
-	templates, err := parseDir(tmplPath, fec, excludes)
+	templates, err := parseDir(tmplPath, fec, tm)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	actions := make(map[string]string)
@@ -114,17 +121,21 @@ func generateATemplateManifest(tmplPath string, fec *stdlib.FileExtChecker, excl
 
 		t, e := template.ParseFiles(tmpl)
 		if e != nil {
-			return nil, fmt.Errorf(msg.Stderr.ParsingFile, tmpl, e.Error())
+			return "", fmt.Errorf(msg.Stderr.ParsingFile, tmpl, e.Error())
 		}
 
 		listTemplateFields(t, actions)
 	}
 
-	if e := saveFile(tmplPath+ps+press.TmplManifestFile, actions); e != nil {
-		return nil, e
+	tm.Placeholders = actions
+
+	filename := tmplPath + ps + press.TmplManifestFile
+
+	if e := saveFile(filename, tm); e != nil {
+		return "", e
 	}
 
-	return actions, nil
+	return filename, nil
 }
 
 // listTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
@@ -133,7 +144,7 @@ func listTemplateFields(t *template.Template, res map[string]string) {
 }
 
 // parseDir Recursively walk a directory parsing all files along the way as Go templates.
-func parseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]string, error) {
+func parseDir(path string, fec *stdlib.FileExtChecker, tm *press.TmplManifest) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
 	nPath := strings.ReplaceAll(path, "/", ps)
 	nPath = strings.ReplaceAll(nPath, "\\", ps)
@@ -145,7 +156,7 @@ func parseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]str
 		i++
 		//fmt.Printf("%-2d %v\n", i, fPath)
 
-		file, e1 := filterFile(fPath, nPath, info, err, excludes)
+		file, e1 := filterFile(fPath, nPath, info, err, tm)
 		if err != nil {
 			return e1
 		}
@@ -165,7 +176,7 @@ func parseDir(path string, fec *stdlib.FileExtChecker, excludes []string) ([]str
 }
 
 // filterFile
-func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes []string) (string, error) {
+func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, tm *press.TmplManifest) (string, error) {
 	if wErr != nil {
 		return "", wErr
 	}
@@ -183,7 +194,7 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes
 
 	// Skip files by extension.
 	// TODO: Add globbing is added. filepath.Glob(pattern)
-	if currFile == EmptyFile || currFile == press.TmplManifestFile { // Use an exclusion list, include every file by default.
+	if currFile == tm.EmptyDirFile || currFile == press.TmplManifestFile { // Use an exclusion list, include every file by default.
 		return "", nil
 	}
 
@@ -192,11 +203,11 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, excludes
 	normSourcePath = strings.ReplaceAll(normSourcePath, "\\", ps)
 
 	// Skip files that are listed in the excludes.
-	if excludes != nil {
+	if tm.Excludes != nil {
 		fileToCheck := strings.ReplaceAll(normSourcePath, nPath, "")
 		fileToCheck = strings.ReplaceAll(fileToCheck, ps, "")
 
-		for _, exclude := range excludes {
+		for _, exclude := range tm.Excludes {
 			fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
 			fileToCheckB = strings.ReplaceAll(exclude, "/", "")
 
@@ -227,23 +238,16 @@ type templateSchema struct {
 }
 
 // save configuration file.
-func saveFile(jsonFile string, actions map[string]string) error {
-	data, e1 := json.Marshal(actions)
+func saveFile(jsonFile string, tm *press.TmplManifest) error {
+	data, e1 := json.Marshal(tm)
 
 	if e1 != nil {
 		return fmt.Errorf(stderr.EncodingJson, jsonFile, e1.Error())
 	}
 
-	tmpl := template.Must(template.New(press.TmplManifestFile).Parse(TmplJsonTmpl))
-
-	f, e2 := os.Create(jsonFile)
-	if e2 != nil {
-		return e2
-	}
-
 	// Write the template.json manifest to disk.
-	if e := tmpl.Execute(f, templateSchema{Placeholders: data}); e != nil {
-		return fmt.Errorf(stderr.SavingManifest, jsonFile, e.Error())
+	if e := os.WriteFile(jsonFile, data, 0744); e != nil {
+		return e
 	}
 
 	return nil
