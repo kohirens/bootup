@@ -45,8 +45,9 @@
             }
         },
         "substitute": {
-            "description": "Specify the name of the substitute directory. Files in this directory are copied to the root of the template right before pressing output.",
-            "type": "string"
+            "description": "Specify the name of the substitute directory. Files in this directory are copied (recursively) to the root of the template right before pressing output, and will also be processed by the template engine.",
+            "type": "string",
+            "pattern": "^\\.?[a-zA-Z0-9-_.]+$"
         }
     },
     "$defs": {

@@ -15,7 +15,6 @@ Examples
 Settings
 
 	CacheDir - Path to store template downloaded
-	ExcludeFileExtensions - Files ending with these extensions will be excluded from parsing and copied as-is
 
 Command
 

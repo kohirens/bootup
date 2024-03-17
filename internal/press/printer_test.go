@@ -188,8 +188,8 @@ func TestSkipping(tester *testing.T) {
 }
 
 // TestSubstitute Using the template printing press, make sure that the
-// files from the substitute directory overwrite files in the output, but then
-// but that the substitute directory itself is removed.
+// files from the substitute directory overwrite files in the output, and also
+// that the substitute directory itself is removed.
 func TestSubstitute(tester *testing.T) {
 	repoFixture := "repo-11"
 	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture

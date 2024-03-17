@@ -3,7 +3,6 @@ package msg
 var Stderr = struct {
 	AnswerFile404          string
 	AppDataDir             string
-	BadExcludeFileExt      string
 	CannotCopyDirToDir     string
 	CannotDecodeAnswerFile string
 	CannotInitFileChecker  string
@@ -49,7 +48,6 @@ var Stderr = struct {
 }{
 	AnswerFile404:          "could not find the answer file, please specify a path to a valid answer file that exist: given %q",
 	AppDataDir:             "the following error occurred trying to get the app data directory: %q",
-	BadExcludeFileExt:      "invalid ExcludeFileExtensions, check format, for example: item1,item2,item3",
 	CannotCopyDirToDir:     "could not copy %v to %v: %v",
 	CannotDecodeAnswerFile: "could not decode JSON in answer file %q, because of: %s",
 	CannotInitFileChecker:  "cannot instantiate file extension checker: %v",
