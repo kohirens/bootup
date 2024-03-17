@@ -3,7 +3,6 @@ package press
 import (
 	"bytes"
 	"fmt"
-	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/cli"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/path"
@@ -71,10 +70,9 @@ func TestEmptyDirectoryFeature(runner *testing.T) {
 		},
 	}
 
-	fileChkr, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	for _, tc := range fixtures {
 		runner.Run(tc.name, func(t *testing.T) {
-			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, fileChkr, &TmplManifest{Excludes: []string{}})
+			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, &TmplManifest{Excludes: []string{}})
 
 			if e1 != nil {
 				t.Errorf("got error %v, want nil", e1.Error())
@@ -110,9 +108,7 @@ func TestPrinting(tester *testing.T) {
 
 	for _, tc := range tests {
 		tester.Run(tc.name, func(test *testing.T) {
-			fec, _ := stdlib.NewFileExtChecker(nil, &[]string{"md", "yml"})
-
-			err := Print(tc.tmplPath, tc.outPath, tc.tplVars, fec, &TmplManifest{})
+			err := Print(tc.tmplPath, tc.outPath, tc.tplVars, &TmplManifest{})
 
 			if err != nil {
 				test.Errorf("got an error %q", err.Error())
@@ -135,7 +131,6 @@ func TestPrinting(tester *testing.T) {
 func TestSkipping(tester *testing.T) {
 	repoFixture := "repo-10"
 	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture
-	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	tc := struct {
 		name    string
 		absent  []string
@@ -171,7 +166,7 @@ func TestSkipping(tester *testing.T) {
 
 	tmplPath := git.CloneFromBundle(repoFixture, test2.TmpDir, test2.FixtureDir, PS)
 
-	err := Print(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
+	err := Print(tmplPath, outPath, tc.answers, tc.ph)
 
 	if err != nil {
 		tester.Errorf("got an error %q", err)
@@ -198,7 +193,6 @@ func TestSkipping(tester *testing.T) {
 func TestSubstitute(tester *testing.T) {
 	repoFixture := "repo-11"
 	outPath := test2.TmpDir + PS + "processed" + PS + repoFixture
-	fecFixture, _ := stdlib.NewFileExtChecker(&[]string{}, &[]string{"tpl"})
 	tc := struct {
 		name    string
 		files   []string
@@ -234,7 +228,7 @@ func TestSubstitute(tester *testing.T) {
 
 	tmplPath := git.CloneFromBundle(repoFixture, test2.TmpDir, test2.FixtureDir, PS)
 
-	err := Print(tmplPath, outPath, tc.answers, fecFixture, tc.ph)
+	err := Print(tmplPath, outPath, tc.answers, tc.ph)
 
 	if err != nil {
 		tester.Errorf("got an error %q", err)

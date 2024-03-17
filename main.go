@@ -5,7 +5,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/kohirens/stdlib"
 	stdc "github.com/kohirens/stdlib/cli"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/log"
@@ -205,14 +204,7 @@ func main() {
 
 	press.ShowAllPlaceholderValues(tmplJson, &appData.AnswersJson.Placeholders)
 
-	// TODO: Remove FileExtension list in-favor of using the copy (as-is) feature
-	fec, err1 := stdlib.NewFileExtChecker(tmplJson.IgnoreExtensions, &[]string{})
-	if err1 != nil {
-		mainErr = fmt.Errorf(msg.Stderr.CannotInitFileChecker, err1.Error())
-		return
-	}
-
-	mainErr = press.Print(tmplToPress, flags.OutPath, appData.AnswersJson.Placeholders, fec, tmplJson)
+	mainErr = press.Print(tmplToPress, flags.OutPath, appData.AnswersJson.Placeholders, tmplJson)
 }
 
 func parseMainArgs(af *appFlags, pArgs []string) error {

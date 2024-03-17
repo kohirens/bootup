@@ -26,15 +26,6 @@
             "minItems": 1,
             "uniqueItems": true
         },
-        "ignoreExtensions": {
-            "description": "A list of file extensions to exclude from template processing, then copy as-is.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "minItems": 1,
-            "uniqueItems": true
-        },
         "skip": {
             "description": "A list of files and directories to completely skip, will not be processed or copied",
             "type": "array",

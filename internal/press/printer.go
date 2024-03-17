@@ -6,15 +6,14 @@ package press
 import (
 	"bufio"
 	"fmt"
-	"github.com/kohirens/stdlib"
 	"github.com/kohirens/stdlib/cli"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/ryanuber/go-glob"
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"text/template"
 )
@@ -61,7 +60,7 @@ func FindTemplates(dir string) ([]string, error) {
 }
 
 // Print templates to the output directory.
-func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker, tmplJson *TmplManifest) error {
+func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) error {
 	if !path.Exist(tplDir) {
 		return fmt.Errorf(msg.Stderr.PathNotExist, tplDir)
 	}
@@ -92,14 +91,6 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 		}
 
 		currFile := filepath.Base(sourcePath)
-
-		// Skip when the extension matches a file extension ignore list.
-		// these files are included in the output but skipped by the template
-		// processor.
-		if !fec.IsValid(sourcePath) { // Skip files by extension; Use an exclusion list, include every file by default.
-			log.Infof(msg.Stdout.UnknownFileType, sourcePath)
-			return nil
-		}
 
 		// Normalize the path separator in these 2 variables before comparing them.
 		normSourcePath := path.Normalize(sourcePath)
@@ -141,24 +132,36 @@ func Print(tplDir, outDir string, vars cli.StringMap, fec *stdlib.FileExtChecker
 		}
 
 		// TODO: Replace with better method of comparing files.
-		if tmplJson.Excludes != nil { // exclude from parsing, but copy as-is.
-			fileToCheck := strings.ReplaceAll(normSourcePath, normTplDir, "")
-			fileToCheck = strings.ReplaceAll(fileToCheck, PS, "")
-
-			for _, exclude := range tmplJson.Excludes {
-				// we want to see if the paths are the same, so we remove
-				fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
-				fileToCheckB = strings.ReplaceAll(exclude, "/", "")
-				if fileToCheckB == fileToCheck {
-					log.Infof(msg.Stdout.CopyAsIs, sourcePath)
-					_, errC := copyToDir(sourcePath, saveDir, PS)
-					return errC
-				}
-			}
+		copied, e1 := copyAsIs(tmplJson.Excludes, normSourcePath, normTplDir, sourcePath, saveDir)
+		if e1 != nil {
+			return e1
+		} else if copied {
+			return nil
 		}
 
 		return parse(sourcePath, saveDir, vars)
 	})
+}
+
+// copyAsIs Check should be excluded from parsing as a template, if so, then
+// copy the file to the destination as-is.
+func copyAsIs(ignores []string, normSourcePath, normTplDir, sourcePath, saveDir string) (bool, error) {
+	if len(ignores) < 1 { // exclude from parsing, but copy as-is.
+		return false, nil
+	}
+
+	// remove the template directory prefixed to the file name.
+	fileToCheck := strings.ReplaceAll(normSourcePath, normTplDir, "")
+
+	for _, exclude := range ignores {
+		if glob.Glob(exclude, fileToCheck) {
+			log.Infof(msg.Stdout.CopyAsIs, sourcePath)
+			_, e := copyToDir(sourcePath, saveDir, PS)
+			return false, e
+		}
+	}
+
+	return true, nil
 }
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
@@ -199,38 +202,6 @@ func ShowAllPlaceholderValues(placeholders *TmplManifest, tmplValues *cli.String
 	for placeholder := range placeholders.Placeholders {
 		log.Logf(msg.Stdout.Assignment, placeholder, tVals[placeholder])
 	}
-}
-
-func copyAsIs(tmplRoot, file, out string, excludedFiles []string) (rVal bool) {
-	rVal = false
-
-	if excludedFiles == nil {
-		return
-	}
-
-	// Using the relative path should always remove the drive letter on windows
-	// and make it uniform across all OS.
-	rp := strings.Replace(file, tmplRoot, "", 1)
-
-	if runtime.GOOS == "windows" { // I dislike the fact that Windows is case-insensitive.
-		rp = strings.ToLower(rp)
-	}
-
-	log.Logf(msg.Stdout.FileToCheck, rp)
-
-	for _, ef := range excludedFiles {
-		ef = path.Normalize(ef)
-		if runtime.GOOS == "windows" { // I dislike the fact that Windows is case-insensitive.
-			ef = strings.ToLower(ef)
-		}
-
-		if ef == rp {
-			rVal = true
-			break
-		}
-	}
-
-	return
 }
 
 // copyToDir Copy a file to a directory.

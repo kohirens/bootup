@@ -5,7 +5,6 @@ var TmplJsonTmpl = `{
     "version": "2.1.0",
 	"placeholders": {{printf "%s" .Placeholders}},
 	"excludes": {},
-	"ignoreExtensions": ["empty", "exe", "gif", "jpg", "mp3", "pdf", "png", "tiff", "wmv"],
 	"skip": {}
 }
 `
