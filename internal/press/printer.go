@@ -115,14 +115,14 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 			return nil
 		}
 
-		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
-		log.Infof(msg.Stdout.SaveDir, saveDir)
-
 		// Don't do anything with the files in this list.
 		if inSkipArray(relativePath, tmplJson.Skip) {
 			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
+
+		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
+		log.Infof(msg.Stdout.SaveDir, saveDir)
 
 		// Make all subdirectories in output path.
 		if e := os.MkdirAll(saveDir, dirMode); e != nil {
