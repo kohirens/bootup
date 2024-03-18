@@ -1,7 +1,0 @@
-{
-    "version": "1.0.0",
-    "placeholders": {
-        "appName": "enter your application name",
-        "REPO": "enter a repository name/path (example.com/org/appName)"
-    }
-}
