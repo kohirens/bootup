@@ -281,3 +281,45 @@ func Test_hasParentDir(t *testing.T) {
 		})
 	}
 }
+
+func Test_copyAsIs(t *testing.T) {
+	// Git bundle to use as the template.
+	repoFixture := "repo-13"
+	fixture := git.CloneFromBundle(repoFixture, tmpDir, fixtureDir, PS)
+	// Where to place the template output.
+	saveDir := tmpDir + PS + "processed" + PS + repoFixture
+	_ = os.MkdirAll(saveDir, dirMode)
+
+	tests := []struct {
+		name    string
+		ignores []string
+		file    string
+		saveDir string
+		want    bool
+		wantErr bool
+	}{
+		{"case-1", []string{"*.txt"}, ".auto/auto-test.txt", saveDir + PS + ".auto", true, false},
+		{"case-2", []string{"*.txt"}, "file-1.tmpl", "", false, false},
+		{"case-3", []string{"*.gif", "*.txt"}, "test.txt", saveDir, true, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_ = os.MkdirAll(tt.saveDir, 0774)
+
+			got, err := copyAsIs(tt.ignores, tt.file, fixture+PS+tt.file, tt.saveDir)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("copyAsIs() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("copyAsIs() got = %v, want %v", got, tt.want)
+			}
+
+			if tt.want && !path.Exist(saveDir+PS+tt.file) {
+				t.Errorf("copyAsIs() did not copy %v", tt.file)
+			}
+		})
+	}
+}

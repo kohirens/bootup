@@ -134,7 +134,8 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 			return nil
 		}
 
-		copied, e1 := copyAsIs(tmplJson.Excludes, normSourcePath, normTplDir, sourcePath, saveDir)
+		// TODO: replace normSourcePath, normTplDir parameters to use relativePath.
+		copied, e1 := copyAsIs(tmplJson.Excludes, relativePath, sourcePath, saveDir)
 		if e1 != nil {
 			return e1
 		} else if copied {
@@ -145,25 +146,23 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 	})
 }
 
-// copyAsIs Check should be excluded from parsing as a template, if so, then
-// copy the file to the destination as-is.
-func copyAsIs(ignores []string, normSourcePath, normTplDir, sourcePath, saveDir string) (bool, error) {
-	if len(ignores) < 1 { // exclude from parsing, but copy as-is.
+// copyAsIs Check a file matches a glob pattern, if so, then copy it to the
+// output as-is (without template parsing).
+func copyAsIs(files []string, relativePath, sourcePath, saveDir string) (bool, error) {
+	if len(files) < 1 { // no-op
 		return false, nil
 	}
 
-	// remove the template directory prefixed to the file name.
-	fileToCheck := strings.ReplaceAll(normSourcePath, normTplDir, "")
-
-	for _, exclude := range ignores {
-		if glob.Glob(exclude, fileToCheck) {
+	for _, exclude := range files {
+		// check if the file matches a pattern
+		if glob.Glob(exclude, relativePath) {
 			log.Infof(msg.Stdout.CopyAsIs, sourcePath)
 			_, e := copyToDir(sourcePath, saveDir, PS)
-			return false, e
+			return true, e
 		}
 	}
 
-	return true, nil
+	return false, nil
 }
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
