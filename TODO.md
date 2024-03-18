@@ -11,6 +11,5 @@
 6. Replace cli.StringMap or stdlib.StringMap with local strMap.
 7. Search to remove any reference to "zip" or "archive."
 8. Remove the .git directory after cloning, then remove logic looking for .git to skip.
-9. Change the manifest command to require the word "generate" in order to
-   generate a new template.json.
-10. Add "validate" to the subcommand manifest. To validate a template manifest.
+9. Add "validate" to the subcommand manifest. To validate a template manifest.
+10. TODO: BREAKING Change template.json to tmplpress.json

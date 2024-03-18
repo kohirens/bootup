@@ -12,26 +12,22 @@ var stderr = struct {
 	SavingManifest:       "could not save file %v, error: %v",
 }
 
-var stdout = struct {
-}{}
-
 var UsageMessages = map[string]string{
-	"manifest": "Generate a template.json file for a template.", // TODO: Update "template.json" to tmplpress.json
+	"manifest": "Perform operations on the template manifest file.",
 	"help":     "Display this usage information.",
 }
 
 // UsageTmpl Usage information template of this command.
-// TODO: BREAKING Change template.json to tmplpress.json
 const UsageTmpl = `
-Generate a template.json in the {{.AppName}} schema format containing all the
-specified templates placeholders. This is a quality-of-life tool to help
-template designers keep the template.json file up-to-date as changes are made.
-Reducing human error of syncing placeholders in the template.json file
-as they are added, removed, and/or updated.
+Generate a template manifest in the {{.AppName}} schema format containing any
+placeholders found in the directory. This is a quality-of-life tool to help
+build new or update an existing template manifest file as changes to the
+template are made. Reducing human error of syncing placeholders as they are
+added, removed, or updated.
 
-Usage: {{.AppName}} {{.Command}} <template-path>
+Usage: {{.AppName}} {{.Command}} generate <template-path>
 
-example: {{.AppName}} {{.Command}} ./
+example: {{.AppName}} {{.Command}} generate ./
 `
 
 var UsageVars = cli.StringMap{}

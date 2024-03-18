@@ -23,6 +23,7 @@ var Stderr = struct {
 	GitFetchFailed         string
 	GetLatestTag           string
 	GetRemoteTags          string
+	InvalidCmd             string
 	InvalidNoArgs          string
 	InvalidNoSubCmdArgs    string
 	InvalidRegExp          string
@@ -67,6 +68,7 @@ var Stderr = struct {
 	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
 	GettingAnswers:         "problem getting answers; error %q",
 	GetLatestTag:           "failed to get latest tag from %v: %v",
+	InvalidCmd:             "invalid command %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
 	InvalidRegExp:          "invalid regular expression \"%v\", %v",

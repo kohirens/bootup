@@ -24,6 +24,7 @@ const (
 )
 
 type Arguments struct {
+	Cmd  string // command to run.
 	Path string // path to generate a manifest for.
 }
 
@@ -52,6 +53,11 @@ func parseInput(ca []string) error {
 	}
 
 	if len(ca) < 1 {
+		flags.Usage()
+		return fmt.Errorf(msg.Stderr.InvalidNoSubCmdArgs, Name, 1)
+	}
+
+	if len(ca) < 2 {
 		// Fall back to the current working directory when no path is specified.
 		cwd, e1 := os.Getwd()
 		if e1 != nil {
@@ -63,8 +69,9 @@ func parseInput(ca []string) error {
 		ca = append(ca, cwd)
 	}
 
+	input.Cmd = ca[0]
 	// clean up the path.
-	p, e1 := filepath.Abs(ca[0])
+	p, e1 := filepath.Abs(ca[1])
 	if e1 != nil {
 		return fmt.Errorf(msg.Stderr.NoPath, e1.Error())
 	}
@@ -81,12 +88,18 @@ func Run(ca []string) error {
 		return e
 	}
 
-	filename, e1 := generateATemplateManifest(input.Path)
-	if e1 != nil {
-		return e1
-	}
+	switch input.Cmd {
+	default:
+		flags.Usage()
+		return fmt.Errorf(msg.Stderr.InvalidCmd, input.Cmd)
+	case "generate":
+		filename, e1 := generateATemplateManifest(input.Path)
+		if e1 != nil {
+			return e1
+		}
 
-	log.Logf(msg.Stdout.GeneratedManifest, filename)
+		log.Logf(msg.Stdout.GeneratedManifest, filename)
+	}
 
 	return nil
 }
@@ -234,7 +247,7 @@ type templateSchema struct {
 
 // save configuration file.
 func saveFile(jsonFile string, tm *press.TmplManifest) error {
-	data, e1 := json.Marshal(tm)
+	data, e1 := json.MarshalIndent(tm, "", "    ")
 
 	if e1 != nil {
 		return fmt.Errorf(stderr.EncodingJson, jsonFile, e1.Error())
