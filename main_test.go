@@ -432,3 +432,80 @@ func TestTmplPress(tester *testing.T) {
 		})
 	}
 }
+
+func TestTemplateWithNoPlaceholders(tester *testing.T) {
+	// Git bundle to use as the template.
+	repoFixture := "repo-12"
+	// Where to place the template output.
+	outPath := TmpDir + ps + "processed" + ps + repoFixture
+
+	var tests = []struct {
+		name     string
+		files    map[string]string
+		absent   []string
+		wantCode int
+		args     []string
+		want     bool
+	}{
+		{
+			"case-1",
+			map[string]string{
+				".circleci/config.yml": "config\n",
+				"a.txt":                "a\n",
+				"sub1/README.md":       "readme\n",
+				"z.txt":                "z\n",
+			},
+			[]string{
+				"replace/.circleci/config.yml",
+				"template.json",
+			},
+			0,
+			[]string{
+				"-out-path", outPath,
+				"-tmpl-type", "git",
+			},
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		tester.Run(tc.name, func(t *testing.T) {
+			repo := git.CloneFromBundle(repoFixture, TmpDir, FixtureDir, ps)
+
+			defer test.TmpSetParentDataDir(TmpDir)()
+
+			// set the template path to the cloned bundle directory.
+			tc.args = append(tc.args, "-tmpl-path", repo)
+
+			cmd := stdt.GetTestBinCmd(stdt.SubCmdFlags, tc.args)
+
+			_, _ = stdt.VerboseSubCmdOut(cmd.CombinedOutput())
+
+			// get exit code.
+			got := cmd.ProcessState.ExitCode()
+
+			if got != tc.wantCode {
+				t.Errorf("got %v, want %v", got, tc.wantCode)
+			}
+
+			if path.Exist(outPath) != tc.want {
+				t.Errorf("got %v, want %v", path.Exist(outPath), tc.want)
+			}
+
+			for _, p := range tc.absent {
+				file := outPath + ps + p
+				if path.Exist(file) {
+					tester.Errorf("file %v should NOT exist. check the replace code or test bundle %v", file, repoFixture)
+				}
+			}
+
+			for p, expected := range tc.files {
+				file := outPath + ps + p
+				gotContent, _ := os.ReadFile(file)
+				if bytes.NewBuffer(gotContent).String() == expected {
+					tester.Errorf("file %q should NOT exist. check the replace code or test bundle %q", gotContent, expected)
+				}
+			}
+		})
+	}
+}

@@ -196,11 +196,15 @@ func GetPlaceholderInput(placeholders *TmplManifest, tmplValues cli.StringMap, r
 	return nil
 }
 
-func ShowAllPlaceholderValues(placeholders *TmplManifest, tmplValues *cli.StringMap) {
-	tVals := *tmplValues
+func ShowAllPlaceholderValues(tm *TmplManifest, tmplValues map[string]string) {
+	if tm.Placeholders == nil {
+		log.Logf(msg.Stdout.NoPlaceholders)
+		return
+	}
+
 	log.Logf(msg.Stdout.ValuesProvided)
-	for placeholder := range placeholders.Placeholders {
-		log.Logf(msg.Stdout.Assignment, placeholder, tVals[placeholder])
+	for placeholder := range tm.Placeholders {
+		log.Logf(msg.Stdout.Assignment, placeholder, tmplValues[placeholder])
 	}
 }
 

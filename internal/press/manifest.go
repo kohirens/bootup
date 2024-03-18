@@ -94,10 +94,8 @@ func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 		return nil, fmt.Errorf(msg.Stderr.MissingTmplJsonVersion)
 	}
 
+	// It is possible to have a template with no placeholders.
 	log.Dbugf(msg.Stdout.TemplatePlaceholders, len(q.Placeholders))
-	if q.Placeholders == nil {
-		return nil, fmt.Errorf(msg.Stderr.PlaceholdersProperty)
-	}
 
 	return q, nil
 }

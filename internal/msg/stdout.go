@@ -16,6 +16,7 @@ var Stdout = struct {
 	FileToCheck           string
 	GeneratedManifest     string
 	MadeNewConfig         string
+	NoPlaceholders        string
 	NumNonFlagArgs        string
 	NumParsedFlags        string
 	Parsing               string
@@ -57,6 +58,7 @@ var Stdout = struct {
 	FileToCheck:           "fileToCheck: %v against excludes",
 	GeneratedManifest:     "manifest generated %v",
 	MadeNewConfig:         "saved %d bytes to a new config %v",
+	NoPlaceholders:        "this template contains no placeholders/actions, which is ok",
 	NumNonFlagArgs:        "number of non-flag arguments passed in: %d",
 	NumParsedFlags:        "number of parsed flags = %v",
 	Parsing:               "parsing %v",
