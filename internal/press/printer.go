@@ -67,8 +67,8 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 	// Normalize the path separator in these 2 variables.
 	normTplDir := path.Normalize(tplDir)
 	normOutDir := path.Normalize(outDir)
-	log.Infof("%v -> %v", tplDir, normTplDir)
-	log.Infof("%v -> %v", outDir, normOutDir)
+	log.Infof("template: %v", normTplDir)
+	log.Infof("output: %v", normOutDir)
 
 	// Recursively walk the template directory.
 	return filepath.Walk(normTplDir, func(sourcePath string, fi os.FileInfo, wErr error) error {
@@ -76,62 +76,64 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 			return wErr
 		}
 
-		log.Infof(msg.Stdout.Processing, sourcePath)
-
 		// Do not parse directories.
 		if fi.IsDir() {
+			return nil
+		}
+
+		if strings.Contains(sourcePath, gitConfigDir+PS) {
+			return nil
+		}
+
+		// Skip all files in the substitute directory.
+		if hasParentDir(tmplJson.Substitute, sourcePath) {
+			log.Infof("substitute skip %v", sourcePath)
 			return nil
 		}
 
 		// Skip processing files if a template file is too big.
 		if fi.Size() > maxTmplSize {
 			return fmt.Errorf(msg.Stderr.FileTooBig, maxTmplSize)
-
 		}
+
+		log.Infof(msg.Stdout.Processing, sourcePath)
 
 		currFile := filepath.Base(sourcePath)
 
-		// Normalize the path separator in these 2 variables before comparing them.
+		// Normalize the path separator before performing any operations.
 		normSourcePath := path.Normalize(sourcePath)
 
 		// Get the relative path of the file from root of the template and
-		// append it to the output directory, so that files are placed in the
-		// same subdirectories in the output directory.
+		// append it to the output directory, so that files are placed in their
+		// correct subdirectories in the output.
 		relativePath := strings.TrimLeft(strings.ReplaceAll(normSourcePath, normTplDir, ""), "\\/")
 		log.Infof(msg.Stdout.RelativeDir, relativePath)
 
-		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
-		log.Infof(msg.Stdout.SaveDir, saveDir)
-
-		// Skip template manifest file and the git config directory.
-		if currFile == TmplManifestFile || strings.Contains(relativePath, gitConfigDir+PS) {
+		// Skip the template manifest file and the git config directory.
+		if currFile == TmplManifestFile {
 			log.Infof(msg.Stdout.Skipping, relativePath)
 			return nil
 		}
 
-		if inSkipArray(relativePath, tmplJson.Skip) { // Skip means don't do anything with the files in this list
+		saveDir := filepath.Clean(normOutDir + PS + filepath.Dir(relativePath))
+		log.Infof(msg.Stdout.SaveDir, saveDir)
+
+		// Don't do anything with the files in this list.
+		if inSkipArray(relativePath, tmplJson.Skip) {
 			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
 
-		// skip the directory with replace files.
-		// TODO: Fix, This looks like a major bug where if substitute is set then you get no output.
-		if hasParentDir(tmplJson.Substitute, sourcePath) {
-			log.Infof("substitute skip %v", sourcePath)
-			return nil
-		}
-
-		// Make the subdirectories in the new savePath.
+		// Make all subdirectories in output path.
 		if e := os.MkdirAll(saveDir, dirMode); e != nil {
 			return e
 		}
 
-		// Return here so that the directory is made, but we do not copy the designated empty file.
+		// For empty directories, return here so that the directory is made and nothing else.
 		if currFile == tmplJson.EmptyDirFile {
 			return nil
 		}
 
-		// TODO: Replace with better method of comparing files.
 		copied, e1 := copyAsIs(tmplJson.Excludes, normSourcePath, normTplDir, sourcePath, saveDir)
 		if e1 != nil {
 			return e1
