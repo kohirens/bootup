@@ -218,7 +218,7 @@ func TestSubstitute(tester *testing.T) {
 		},
 		cli.StringMap{"appName": "Repo 11"},
 		&TmplManifest{
-			Version: "1.2",
+			Version: "2.2.0",
 			Placeholders: cli.StringMap{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},

@@ -53,10 +53,11 @@ func TestRun(t *testing.T) {
 	tests := []struct {
 		name    string
 		repo    string
+		cmd     string
 		wantErr bool
 		want    map[string]string
 	}{
-		{"case-1", "repo-07", false, map[string]string{"Placeholder1": ""}},
+		{"case-1", "repo-07", "generate", false, map[string]string{"Placeholder1": ""}},
 	}
 
 	for _, tt := range tests {
@@ -65,7 +66,7 @@ func TestRun(t *testing.T) {
 		Init()
 
 		t.Run(tt.name, func(t *testing.T) {
-			err := Run([]string{repoPath})
+			err := Run([]string{tt.cmd, repoPath})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 			}

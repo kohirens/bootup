@@ -502,8 +502,8 @@ func TestTemplateWithNoPlaceholders(tester *testing.T) {
 			for p, expected := range tc.files {
 				file := outPath + ps + p
 				gotContent, _ := os.ReadFile(file)
-				if bytes.NewBuffer(gotContent).String() == expected {
-					tester.Errorf("file %q should NOT exist. check the replace code or test bundle %q", gotContent, expected)
+				if gotContent == nil || bytes.NewBuffer(gotContent).String() == expected {
+					tester.Errorf("file %q should exist and contain %q, check the replace code or test bundle", file, expected)
 				}
 			}
 		})
