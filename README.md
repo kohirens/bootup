@@ -8,6 +8,7 @@ Start an app (or something) from a template.
     * [Info](#info)
     * [Description](#description)
     * [Installation](#installation)
+        * [Requirements](#requirements)
         * [Using Go](#using-go)
         * [Using Docker](#using-docker)
         * [Using cURL & tar](#using-curl--tar)
@@ -44,6 +45,12 @@ the `answer.json` file with automation.
 
 ## Installation
 
+### Requirements
+
+Git must be installed on your system in order to use this tool. Git is used
+to perform actions such as cloning and checking out branches or tags, and is
+necessary for this application to perform its functions.
+
 ### Using Go
 
 ```
@@ -56,17 +63,16 @@ go install github.com/kohirens/tmpltoapp
 docker pull kohirens/tmpltoapp:x.x.x
 ```
 
-### Using cURL & tar
+### Using Pre-built Binary
 
 ```
-cd /tmp
 mkdir -p "${HOME}/bin"
 curl -L -o tmpltoapp.tar.gz https://github.com/kohirens/tmpltoapp/releases/download/x.x.x/tmpltoapp-linux-amd64.tar.gz
 tar -xzvf tmpltoapp.tar.gz  ${HOME}/bin
 export PATH="${HOME}/bin:${PATH}"
 ```
 
-### Using a Template
+## Using a Template
 
 You'll need to download this tool in order to use a template. See [Installation]
 if you have not done so.
