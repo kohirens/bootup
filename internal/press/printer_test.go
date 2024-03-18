@@ -249,3 +249,35 @@ func TestSubstitute(tester *testing.T) {
 		}
 	}
 }
+
+func Test_hasParentDir(t *testing.T) {
+	tests := []struct {
+		name   string
+		parent string
+		dir    string
+		want   bool
+	}{
+		{
+			"case-1",
+			"abc",
+			"c:\\abc\\123\\file1",
+			true,
+		},
+		{
+			"case-2",
+			"xyz",
+			"c:\\abc\\123\\file1",
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := hasParentDir(tt.parent, tt.dir)
+
+			if got != tt.want {
+				t.Errorf("hasParentDir() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -115,8 +115,9 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 		}
 
 		// skip the directory with replace files.
-		if tmplJson.Substitute != "" {
-			log.Infof(msg.Stdout.Skipping, sourcePath)
+		// TODO: Fix, This looks like a major bug where if substitute is set then you get no output.
+		if hasParentDir(tmplJson.Substitute, sourcePath) {
+			log.Infof("substitute skip %v", sourcePath)
 			return nil
 		}
 
@@ -223,6 +224,14 @@ func copyToDir(sourcePath, destDir, separator string) (int64, error) {
 	}
 
 	return io.Copy(dFile, sFile)
+}
+
+// hasParentDir Detect if a strings is part of a path.
+func hasParentDir(parent, dir string) bool {
+	if parent != "" && strings.Contains(dir, parent) {
+		return true
+	}
+	return false
 }
 
 // parse a file as a Go template.
