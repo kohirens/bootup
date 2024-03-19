@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/kohirens/tmpltoapp/2.0.1/template.schema.json",
+    "$schema": "https://raw.githubusercontent.com/kohirens/tmplpress/2.0.1/template.schema.json",
     "version": "1.1",
     "placeholders": {
         "appName": "Application name, the formal name with capitalization and spaces",

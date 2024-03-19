@@ -3,7 +3,7 @@ package manifest
 import (
 	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
-	"github.com/kohirens/tmpltoapp/internal/press"
+	"github.com/kohirens/tmplpress/internal/press"
 	"os"
 	"reflect"
 	"testing"

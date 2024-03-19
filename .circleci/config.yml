@@ -22,8 +22,8 @@ parameters:
     type: boolean
 
 default-env-vars: &default-env-vars
-    DH_IMG_REPO: "kohirens/tmpltoapp"
-    DH_CONTAINER: "tmpltoapp-node-1"
+    DH_IMG_REPO: "kohirens/tmplpress"
+    DH_CONTAINER: "tmplpress-node-1"
 
 filter-semantic-tag: &filter-semantic-tag
   tags:

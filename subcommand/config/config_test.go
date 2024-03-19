@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmplpress/internal/msg"
 	"os"
 	"testing"
 )

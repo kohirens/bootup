@@ -1,4 +1,4 @@
-module github.com/kohirens/tmpltoapp
+module github.com/kohirens/tmplpress
 
 go 1.21
 

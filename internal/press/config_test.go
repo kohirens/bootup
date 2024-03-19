@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/kohirens/stdlib/fsio"
-	"github.com/kohirens/tmpltoapp/internal/test"
+	"github.com/kohirens/tmplpress/internal/test"
 	"os"
 	"path/filepath"
 	"strings"

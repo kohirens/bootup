@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/kohirens/tmpltoapp/blob/main/answers.schema.json",
+    "$id": "https://github.com/kohirens/tmplpress/blob/main/answers.schema.json",
     "title": "Template Answers",
     "description": "Provide list of values for placeholder variables in a template",
     "version": "0.1.0",

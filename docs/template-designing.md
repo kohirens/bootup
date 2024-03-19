@@ -6,7 +6,7 @@ You can quickly make a Template by following these steps.
 
 1. Make a new directory with a name of your choosing.
 2. Make a README.md and add `# {{.AppName}}` as the content.
-3. Open a command line to this folder and run `tmpltoapp manifest ./`. This
+3. Open a command line to this folder and run `tmplpress manifest ./`. This
    will generate the manifest `template.json` file containing some details about
    your template. Mainly the placeholder.
 4. You can edit this file by giving the AppName key a value like:

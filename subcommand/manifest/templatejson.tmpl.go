@@ -1,7 +1,7 @@
 package manifest
 
 var defaultJson = `{
-    "$schema": "https://github.com/kohirens/tmpltoapp/blob/main/template.schema.json",
+    "$schema": "https://github.com/kohirens/tmplpress/blob/main/template.schema.json",
     "version": "2.2.0",
 	"copyAsIs": [
 		"*.exe",

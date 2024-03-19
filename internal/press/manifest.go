@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmplpress/internal/msg"
 	"os"
 )
 

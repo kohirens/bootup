@@ -2,7 +2,7 @@ package press
 
 import (
 	"fmt"
-	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmplpress/internal/msg"
 	"regexp"
 	"strconv"
 )

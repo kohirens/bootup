@@ -1,10 +1,10 @@
-# TmplToApp
+# TmplPress
 
 Start an app (or something) from a template.
 
 ## Table of Contents
 
-* [TmplToApp](#tmpltoapp)
+* [TmplPress](#tmplpress)
     * [Info](#info)
     * [Description](#description)
     * [Installation](#installation)
@@ -19,7 +19,7 @@ Start an app (or something) from a template.
 
 ## Info
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/kohirens/tmpltoapp/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/kohirens/tmpltoapp/tree/main)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/kohirens/tmplpress/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kohirens/tmplpress/tree/main)
 
 ## Description
 
@@ -54,21 +54,21 @@ necessary for this application to perform its functions.
 ### Using Go
 
 ```
-go install github.com/kohirens/tmpltoapp
+go install github.com/kohirens/tmplpress
 ```
 
 ### Using Docker
 
 ```
-docker pull kohirens/tmpltoapp:x.x.x
+docker pull kohirens/tmplpress:x.x.x
 ```
 
 ### Using Pre-built Binary
 
 ```
 mkdir -p "${HOME}/bin"
-curl -L -o tmpltoapp.tar.gz https://github.com/kohirens/tmpltoapp/releases/download/x.x.x/tmpltoapp-linux-amd64.tar.gz
-tar -xzvf tmpltoapp.tar.gz  ${HOME}/bin
+curl -L -o tmplpress.tar.gz https://github.com/kohirens/tmplpress/releases/download/x.x.x/tmplpress-linux-amd64.tar.gz
+tar -xzvf tmplpress.tar.gz  ${HOME}/bin
 export PATH="${HOME}/bin:${PATH}"
 ```
 

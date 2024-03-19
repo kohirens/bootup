@@ -3,7 +3,7 @@
 ## Overview
 
 ```shell
-tmpltoapp [options] "<dir/url>" "<outputDir>" "<answers>"
+tmplpress [options] "<dir/url>" "<outputDir>" "<answers>"
 ```
 
 ## Description

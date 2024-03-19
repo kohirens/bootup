@@ -2,7 +2,7 @@
 
 set -e
 
-package_name="tmpltoapp"
+package_name="tmplpress"
 platforms=("windows/amd64" "windows/386" "linux/amd64" "linux/386")
 
 declare -a releaseFiles=()

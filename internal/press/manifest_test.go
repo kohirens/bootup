@@ -1,7 +1,7 @@
 package press
 
 import (
-	"github.com/kohirens/tmpltoapp/internal/test"
+	"github.com/kohirens/tmplpress/internal/test"
 	"testing"
 )
 

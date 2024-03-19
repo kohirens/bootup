@@ -9,10 +9,10 @@ import (
 	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/tmpltoapp/internal/msg"
-	"github.com/kohirens/tmpltoapp/internal/press"
-	"github.com/kohirens/tmpltoapp/subcommand/config"
-	"github.com/kohirens/tmpltoapp/subcommand/manifest"
+	"github.com/kohirens/tmplpress/internal/msg"
+	"github.com/kohirens/tmplpress/internal/press"
+	"github.com/kohirens/tmplpress/subcommand/config"
+	"github.com/kohirens/tmplpress/subcommand/manifest"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,7 +21,7 @@ import (
 // TODO: Change name to tmplpress
 
 const (
-	AppName    = "tmpltoapp"
+	AppName    = "tmplpress"
 	gitConfDir = ".git"
 	Summary    = "Generate an application from a template."
 	ps         = string(os.PathSeparator)

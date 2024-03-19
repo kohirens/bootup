@@ -2,7 +2,7 @@ ARG USER_NAME='app'
 ARG USER_UID='1000'
 ARG USER_GID='1000'
 ARG USER_GROUP='app_users'
-ARG REPO='github.com/kohirens/tmpltoapp'
+ARG REPO='github.com/kohirens/tmplpress'
 
 FROM kohirens/go:1.21.0 AS dev
 
@@ -104,10 +104,10 @@ USER ${USER_NAME}
 # Make directories with correct permissions
 RUN mkdir -p ~/bin
 
-COPY --from=build --chown=${USER_NAME}:${USER_GROUP} /home/${USER_NAME}/bin/tmpltoapp /home/${USER_NAME}/bin
+COPY --from=build --chown=${USER_NAME}:${USER_GROUP} /home/${USER_NAME}/bin/tmplpress /home/${USER_NAME}/bin
 
 ENV PATH="/home/${USER_NAME}/bin:${PATH}"
 
-ENTRYPOINT [ "tmpltoapp" ]
+ENTRYPOINT [ "tmplpress" ]
 
 CMD [ "-h" ]

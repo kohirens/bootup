@@ -3,7 +3,7 @@ package press
 import (
 	"fmt"
 	"github.com/kohirens/stdlib/fsio"
-	"github.com/kohirens/tmpltoapp/internal/msg"
+	"github.com/kohirens/tmplpress/internal/msg"
 )
 
 // Substitute Looks for a special directory, can be specified in the

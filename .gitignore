@@ -13,8 +13,8 @@ tmp/
 # Files
 # -----
 /info.go
-/tmpltoapp
-/tmpltoapp.exe
-/tmpltoapp.test
-/tmpltoapp.test.exe
+/tmplpress
+/tmplpress.exe
+/tmplpress.test
+/tmplpress.test.exe
 ...

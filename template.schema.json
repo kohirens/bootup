@@ -1,7 +1,7 @@
 {
     "$comment": "see here for clarity: https://json-schema.org/understanding-json-schema/index.html",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/kohirens/tmpltoapp/blob/main/template.schema.json",
+    "$id": "https://github.com/kohirens/tmplpress/blob/main/template.schema.json",
     "title": "Template Placeholder Manifest",
     "description": "Provide list a placeholder variables names for a template",
     "version": "2.2.0",
