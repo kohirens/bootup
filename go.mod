@@ -1,8 +1,10 @@
 module github.com/kohirens/tmpltoapp
 
-go 1.20
+go 1.21
+
+toolchain go1.21.6
 
 require (
-	github.com/kohirens/stdlib v0.0.0-20231026083551-9af3a536270a
+	github.com/kohirens/stdlib v0.0.0-20240317173523-467fce39bae3
 	github.com/ryanuber/go-glob v1.0.0
 )

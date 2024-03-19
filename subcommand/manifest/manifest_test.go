@@ -1,8 +1,8 @@
 package manifest
 
 import (
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"os"
 	"reflect"
@@ -36,7 +36,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 				t.Errorf("want nil, got: %q", err.Error())
 			}
 
-			if !path.Exist(got) {
+			if !fsio.Exist(got) {
 				t.Errorf("no template.json found in %v", repoPath)
 			}
 

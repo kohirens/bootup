@@ -3,9 +3,8 @@ package press
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"os"
 )
@@ -15,7 +14,7 @@ const (
 )
 
 type AnswersJson struct {
-	Placeholders cli.StringMap `json:"placeholders"`
+	Placeholders map[string]string `json:"placeholders"`
 }
 
 type TmplManifest struct {
@@ -31,7 +30,7 @@ type TmplManifest struct {
 	IgnoreExtensions *[]string `json:"ignoreExtensions,omitempty"`
 
 	// Values to supply to the template to fill in variables.
-	Placeholders cli.StringMap `json:"placeholders,omitempty"`
+	Placeholders map[string]string `json:"placeholders,omitempty"`
 
 	// Files that should not be processed through the template engine nor added
 	// to the final output.
@@ -52,7 +51,7 @@ type TmplManifest struct {
 
 // LoadAnswers Load key/value pairs from a JSON file to fill in placeholders (provides that data for the Go templates).
 func LoadAnswers(filename string) (*AnswersJson, error) {
-	if !path.Exist(filename) {
+	if !fsio.Exist(filename) {
 		return nil, fmt.Errorf(msg.Stderr.AnswerFile404, filename)
 	}
 
@@ -75,7 +74,7 @@ func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 	log.Dbugf(msg.Stdout.TemplatePath, filePath)
 
 	// Verify the TMPL_MANIFEST file is present.
-	if !path.Exist(filePath) {
+	if !fsio.Exist(filePath) {
 		return nil, fmt.Errorf(msg.Stderr.TmplManifest404, TmplManifestFile)
 	}
 

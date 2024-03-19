@@ -6,9 +6,8 @@ package press
 import (
 	"bufio"
 	"fmt"
-	"github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/ryanuber/go-glob"
 	"io"
@@ -28,7 +27,7 @@ const (
 // FindTemplates Recursively walk a directory looking for files along the way.
 func FindTemplates(dir string) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
-	normTplDir := path.Normalize(dir)
+	normTplDir := fsio.Normalize(dir)
 
 	files := []string{}
 
@@ -59,14 +58,14 @@ func FindTemplates(dir string) ([]string, error) {
 }
 
 // Print templates to the output directory.
-func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) error {
-	if !path.Exist(tplDir) {
+func Print(tplDir, outDir string, vars map[string]string, tmplJson *TmplManifest) error {
+	if !fsio.Exist(tplDir) {
 		return fmt.Errorf(msg.Stderr.PathNotExist, tplDir)
 	}
 
 	// Normalize the path separator in these 2 variables.
-	normTplDir := path.Normalize(tplDir)
-	normOutDir := path.Normalize(outDir)
+	normTplDir := fsio.Normalize(tplDir)
+	normOutDir := fsio.Normalize(outDir)
 	log.Infof("template: %v", normTplDir)
 	log.Infof("output: %v", normOutDir)
 
@@ -101,7 +100,7 @@ func Print(tplDir, outDir string, vars cli.StringMap, tmplJson *TmplManifest) er
 		currFile := filepath.Base(sourcePath)
 
 		// Normalize the path separator before performing any operations.
-		normSourcePath := path.Normalize(sourcePath)
+		normSourcePath := fsio.Normalize(sourcePath)
 
 		// Get the relative path of the file from root of the template and
 		// append it to the output directory, so that files are placed in their
@@ -166,7 +165,7 @@ func copyAsIs(files []string, relativePath, sourcePath, saveDir string) (bool, e
 }
 
 // GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
-func GetPlaceholderInput(placeholders *TmplManifest, tmplValues cli.StringMap, r *os.File, defaultVal string) error {
+func GetPlaceholderInput(placeholders *TmplManifest, tmplValues map[string]string, r *os.File, defaultVal string) error {
 	tVals := tmplValues
 	nPut := bufio.NewScanner(r)
 
@@ -240,7 +239,7 @@ func hasParentDir(parent, dir string) bool {
 }
 
 // parse a file as a Go template.
-func parse(tplFile, dstDir string, vars cli.StringMap) error {
+func parse(tplFile, dstDir string, vars map[string]string) error {
 	log.Infof(msg.Stdout.Parsing, tplFile)
 	funcMap := template.FuncMap{
 		"title":   strings.Title,

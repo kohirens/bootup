@@ -1,8 +1,8 @@
 package press
 
 import (
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/stdlib/test"
 	"os"
 	"strings"
@@ -50,7 +50,7 @@ func TestCopyDirToDir(runner *testing.T) {
 			}
 
 			for _, f := range tt.want {
-				if !path.Exist(f) {
+				if !fsio.Exist(f) {
 					t.Errorf("file not found %v", f)
 				}
 			}

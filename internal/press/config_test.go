@@ -3,7 +3,7 @@ package press
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/kohirens/stdlib/path"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/tmpltoapp/internal/test"
 	"os"
 	"path/filepath"
@@ -29,7 +29,7 @@ func TestInitConfig(tr *testing.T) {
 				t.Errorf("InitConfig() error = %v, wantErr %v", err, tc.wantErr)
 			}
 
-			if !path.Exist(tc.filepath) {
+			if !fsio.Exist(tc.filepath) {
 				t.Errorf("InitConfig did not save config file %v", tc.filepath)
 			}
 		})
@@ -60,7 +60,7 @@ func TestSaveConfig(tr *testing.T) {
 				t.Errorf("SaveConfig() error = %v, wantErr %v", err, tc.wantErr)
 			}
 
-			if !path.Exist(tc.filepath) {
+			if !fsio.Exist(tc.filepath) {
 				t.Errorf("SaveConfig did not save config file %v", tc.filepath)
 			}
 		})

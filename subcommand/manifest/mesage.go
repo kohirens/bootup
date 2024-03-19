@@ -1,7 +1,5 @@
 package manifest
 
-import "github.com/kohirens/stdlib/cli"
-
 var stderr = struct {
 	EncodingJson         string
 	ListWorkingDirectory string
@@ -30,4 +28,4 @@ Usage: {{.AppName}} {{.Command}} generate <template-path>
 example: {{.AppName}} {{.Command}} generate ./
 `
 
-var UsageVars = cli.StringMap{}
+var UsageVars = map[string]string{}

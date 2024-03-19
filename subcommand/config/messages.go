@@ -1,9 +1,5 @@
 package config
 
-import (
-	"github.com/kohirens/stdlib/cli"
-)
-
 const UsageTmpl = `
 Usage: config set|get <setting> [<value>]
 
@@ -32,10 +28,10 @@ var Stderr = struct {
 	InvalidConfigMethod:  "invalid config method %v",
 }
 
-var UsageMessages = cli.StringMap{
+var UsageMessages = map[string]string{
 	"config":      "Set or get a configuration value.",
 	"config_help": "Print config usage help.",
 	"help":        "display this help message.",
 }
 
-var UsageVars = cli.StringMap{}
+var UsageVars = map[string]string{}

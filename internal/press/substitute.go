@@ -2,7 +2,7 @@ package press
 
 import (
 	"fmt"
-	"github.com/kohirens/stdlib/path"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 )
 
@@ -15,7 +15,7 @@ func Substitute(source, dest string) error {
 	// This has to overwrite files, delete the directory would be bad as
 	// there may be files that the template designer place there that was meant
 	// to keep.
-	if e := path.CopyDirToDir(source, dest, PS, dirMode); e != nil {
+	if e := fsio.CopyDirToDir(source, dest, PS, dirMode); e != nil {
 		return fmt.Errorf(msg.Stderr.CannotCopyDirToDir, source, dest, e.Error())
 	}
 

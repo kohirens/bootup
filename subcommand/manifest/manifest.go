@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"io/fs"
@@ -106,7 +106,7 @@ func Run(ca []string) error {
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
 func generateATemplateManifest(tmplPath string) (string, error) {
-	if !path.Exist(tmplPath) {
+	if !fsio.Exist(tmplPath) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 
@@ -163,7 +163,6 @@ func parseDir(path string, tm *press.TmplManifest) ([]string, error) {
 	// Recursively walk the template directory.
 	err := filepath.Walk(nPath, func(fPath string, info fs.FileInfo, err error) error {
 		i++
-		//fmt.Printf("%-2d %v\n", i, fPath)
 
 		file, e1 := filterFile(fPath, nPath, info, err, tm)
 		if err != nil {

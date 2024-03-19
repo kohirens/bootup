@@ -3,8 +3,8 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 )
@@ -80,7 +80,7 @@ func Run(ca []string, appName string) error {
 		return err1
 	}
 
-	cp := appDataDir + path.PS + press.ConfigFileName
+	cp := appDataDir + fsio.PS + press.ConfigFileName
 
 	switch args.Method {
 	case "set":
@@ -129,7 +129,7 @@ func set(key, val string, cp, appName string) error {
 		return fmt.Errorf(msg.Stderr.NoSetting, key)
 	}
 
-	if !path.Exist(cp) {
+	if !fsio.Exist(cp) {
 		_, e := press.InitConfig(cp, appName)
 		return e
 	}

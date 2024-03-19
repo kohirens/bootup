@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
-	"github.com/kohirens/stdlib/path"
 	stdt "github.com/kohirens/stdlib/test"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/internal/test"
@@ -319,7 +319,7 @@ func TestFirstTimeRun(tester *testing.T) {
 			}
 
 			gotPressedTmpl := tc.args[5]
-			if !path.DirExist(gotPressedTmpl) {
+			if !fsio.DirExist(gotPressedTmpl) {
 				t.Errorf("output directory %q was not found", gotPressedTmpl)
 			}
 		})
@@ -374,14 +374,14 @@ func TestSkipFeature(tester *testing.T) {
 
 	for _, p := range tc.absent {
 		file := outPath + ps + p
-		if path.Exist(file) {
+		if fsio.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, fixture)
 		}
 	}
 
 	for _, p := range tc.present {
 		file := outPath + ps + p
-		if !path.Exist(file) {
+		if !fsio.Exist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, fixture)
 		}
 	}
@@ -426,8 +426,8 @@ func TestTmplPress(tester *testing.T) {
 				t.Errorf("got %v, want %v", got, tc.wantCode)
 			}
 
-			if path.Exist(op) != tc.want {
-				t.Errorf("got %v, want %v", path.Exist(op), tc.want)
+			if fsio.Exist(op) != tc.want {
+				t.Errorf("got %v, want %v", fsio.Exist(op), tc.want)
 			}
 		})
 	}
@@ -488,13 +488,13 @@ func TestTemplateWithNoPlaceholders(tester *testing.T) {
 				t.Errorf("got %v, want %v", got, tc.wantCode)
 			}
 
-			if path.Exist(outPath) != tc.want {
-				t.Errorf("got %v, want %v", path.Exist(outPath), tc.want)
+			if fsio.Exist(outPath) != tc.want {
+				t.Errorf("got %v, want %v", fsio.Exist(outPath), tc.want)
 			}
 
 			for _, p := range tc.absent {
 				file := outPath + ps + p
-				if path.Exist(file) {
+				if fsio.Exist(file) {
 					tester.Errorf("file %v should NOT exist. check the replace code or test bundle %v", file, repoFixture)
 				}
 			}
@@ -510,7 +510,7 @@ func TestTemplateWithNoPlaceholders(tester *testing.T) {
 
 			// Verify a directory that should be empty is empty.
 			expectedEmptyDir := outPath + ps + "i-have-no-files"
-			if !path.Exist(expectedEmptyDir) {
+			if !fsio.Exist(expectedEmptyDir) {
 				tester.Errorf("directory %v should exist", expectedEmptyDir)
 			}
 

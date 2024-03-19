@@ -1,7 +1,7 @@
 package press
 
 import (
-	"github.com/kohirens/stdlib/path"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/ryanuber/go-glob"
 )
 
@@ -11,7 +11,7 @@ func inSkipArray(pathToFile string, skips []string) bool {
 	skip := false
 
 	for _, pattern := range skips {
-		pattern = path.Normalize(pattern)
+		pattern = fsio.Normalize(pattern)
 
 		if glob.Glob(pattern, pathToFile) {
 			skip = true

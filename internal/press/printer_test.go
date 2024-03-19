@@ -3,9 +3,8 @@ package press
 import (
 	"bytes"
 	"fmt"
-	"github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
-	"github.com/kohirens/stdlib/path"
 	test2 "github.com/kohirens/stdlib/test"
 	"os"
 	"path/filepath"
@@ -52,7 +51,7 @@ func TestEmptyDirectoryFeature(runner *testing.T) {
 		name,
 		srcDir string
 		want func() bool
-		vars cli.StringMap
+		vars map[string]string
 	}{
 		{
 			test2.TmpDir + PS + "template-04-out",
@@ -66,7 +65,7 @@ func TestEmptyDirectoryFeature(runner *testing.T) {
 				}
 				return len(fs) == 0
 			},
-			cli.StringMap{},
+			map[string]string{},
 		},
 	}
 
@@ -96,12 +95,12 @@ func TestPrinting(tester *testing.T) {
 	tmpDir, _ := filepath.Abs(test2.TmpDir)
 	tests := []struct {
 		name, tmplPath, outPath string
-		tplVars                 cli.StringMap
+		tplVars                 map[string]string
 		fileToCheck, want       string
 	}{
 		{
 			"parse-dir-01", fixturePath1, tmpDir + PS + "parse-dir-01",
-			cli.StringMap{"APP_NAME": "SolarPolar"},
+			map[string]string{"APP_NAME": "SolarPolar"},
 			tmpDir + "/parse-dir-01/dir1/README.md", "SolarPolar\n",
 		},
 	}
@@ -135,7 +134,7 @@ func TestSkipping(tester *testing.T) {
 		name    string
 		absent  []string
 		present []string
-		answers cli.StringMap
+		answers map[string]string
 		ph      *TmplManifest
 	}{
 		"pressTmplWithNoConfig",
@@ -150,10 +149,10 @@ func TestSkipping(tester *testing.T) {
 			"dir-to-include/second-level/README.md",
 			"README.md",
 		},
-		cli.StringMap{"appName": "Repo 09"},
+		map[string]string{"appName": "Repo 09"},
 		&TmplManifest{
 			Version: "1.2",
-			Placeholders: cli.StringMap{
+			Placeholders: map[string]string{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
 			Skip: []string{
@@ -174,14 +173,14 @@ func TestSkipping(tester *testing.T) {
 
 	for _, p := range tc.absent {
 		file := outPath + PS + p
-		if path.Exist(file) {
+		if fsio.Exist(file) {
 			tester.Errorf("file %q should NOT exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
 
 	for _, p := range tc.present {
 		file := outPath + PS + p
-		if !path.Exist(file) {
+		if !fsio.Exist(file) {
 			tester.Errorf("file %q should exist. check the skip code or test bundle %q", file, repoFixture)
 		}
 	}
@@ -198,7 +197,7 @@ func TestSubstitute(tester *testing.T) {
 		files   []string
 		absent  []string
 		content []string
-		answers cli.StringMap
+		answers map[string]string
 		ph      *TmplManifest
 	}{
 		"success",
@@ -216,10 +215,10 @@ func TestSubstitute(tester *testing.T) {
 			"This is the correct file for Repo 11",
 			"# Repo 11",
 		},
-		cli.StringMap{"appName": "Repo 11"},
+		map[string]string{"appName": "Repo 11"},
 		&TmplManifest{
 			Version: "2.2.0",
-			Placeholders: cli.StringMap{
+			Placeholders: map[string]string{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
 			Substitute: "replace",
@@ -236,7 +235,7 @@ func TestSubstitute(tester *testing.T) {
 
 	for _, p := range tc.absent {
 		file := outPath + PS + p
-		if path.Exist(file) {
+		if fsio.Exist(file) {
 			tester.Errorf("file %v should NOT exist. check the replace code or test bundle %v", file, repoFixture)
 		}
 	}
@@ -317,7 +316,7 @@ func Test_copyAsIs(t *testing.T) {
 				t.Errorf("copyAsIs() got = %v, want %v", got, tt.want)
 			}
 
-			if tt.want && !path.Exist(saveDir+PS+tt.file) {
+			if tt.want && !fsio.Exist(saveDir+PS+tt.file) {
 				t.Errorf("copyAsIs() did not copy %v", tt.file)
 			}
 		})

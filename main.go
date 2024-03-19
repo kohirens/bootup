@@ -6,9 +6,9 @@ import (
 	"flag"
 	"fmt"
 	stdc "github.com/kohirens/stdlib/cli"
+	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/git"
 	"github.com/kohirens/stdlib/log"
-	"github.com/kohirens/stdlib/path"
 	"github.com/kohirens/tmpltoapp/internal/msg"
 	"github.com/kohirens/tmpltoapp/internal/press"
 	"github.com/kohirens/tmpltoapp/subcommand/config"
@@ -98,7 +98,7 @@ func main() {
 	cf := ap + ps + press.ConfigFileName
 	var sc *press.ConfigSaveData
 
-	if path.Exist(cf) {
+	if fsio.Exist(cf) {
 		sc, mainErr = press.LoadConfig(cf)
 	} else {
 		// Make a configuration file when there is none.
@@ -151,7 +151,7 @@ func main() {
 		log.Infof(msg.Stdout.RepoDir, repoDir)
 
 		// Do a pull when the repo already exists.
-		if path.DirExist(repoDir + ps + gitConfDir) {
+		if fsio.DirExist(repoDir + ps + gitConfDir) {
 			log.Infof(msg.Stdout.UsingCache, repoDir)
 			repo, commitHash, err2 = git.Checkout(repoDir, flags.Branch)
 		} else {
@@ -167,7 +167,7 @@ func main() {
 		tmplToPress = repo
 	}
 
-	if !path.DirExist(tmplToPress) {
+	if !fsio.DirExist(tmplToPress) {
 		mainErr = fmt.Errorf(msg.Stderr.InvalidTmplDir, tmplToPress)
 		return
 	}
@@ -186,10 +186,10 @@ func main() {
 	}
 
 	appData.AnswersJson = &press.AnswersJson{
-		Placeholders: make(stdc.StringMap),
+		Placeholders: make(press.StrMap),
 	}
 
-	if path.Exist(flags.AnswersPath) {
+	if fsio.Exist(flags.AnswersPath) {
 		appData.AnswersJson, mainErr = press.LoadAnswers(flags.AnswersPath)
 	}
 	if mainErr != nil {
@@ -261,11 +261,11 @@ func validateMainArgs(af *appFlags) error {
 		return fmt.Errorf(errors.OutPathCollision, af.TmplPath, af.OutPath)
 	}
 
-	if path.DirExist(af.OutPath) {
+	if fsio.DirExist(af.OutPath) {
 		return fmt.Errorf(stdout.OutPathExist, af.OutPath)
 	}
 
-	if af.AnswersPath != "" && !path.Exist(af.AnswersPath) {
+	if af.AnswersPath != "" && !fsio.Exist(af.AnswersPath) {
 		return fmt.Errorf(errors.AnswerFile404, af.AnswersPath)
 	}
 
