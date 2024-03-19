@@ -202,7 +202,7 @@ func main() {
 		return
 	}
 
-	press.ShowAllPlaceholderValues(tmplJson, &appData.AnswersJson.Placeholders)
+	press.ShowAllPlaceholderValues(tmplJson, appData.AnswersJson.Placeholders)
 
 	mainErr = press.Print(tmplToPress, flags.OutPath, appData.AnswersJson.Placeholders, tmplJson)
 }
