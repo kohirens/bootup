@@ -501,10 +501,22 @@ func TestTemplateWithNoPlaceholders(tester *testing.T) {
 
 			for p, expected := range tc.files {
 				file := outPath + ps + p
+
 				gotContent, _ := os.ReadFile(file)
-				if gotContent == nil || bytes.NewBuffer(gotContent).String() == expected {
-					tester.Errorf("file %q should exist and contain %q, check the replace code or test bundle", file, expected)
+				if gotContent == nil || !bytes.Equal(gotContent, []byte(expected)) {
+					tester.Errorf("file %q should exist and contain %q, got %q; check the replace code or test bundle", file, expected, gotContent)
 				}
+			}
+
+			// Verify a directory that should be empty is empty.
+			expectedEmptyDir := outPath + ps + "i-have-no-files"
+			if !path.Exist(expectedEmptyDir) {
+				tester.Errorf("directory %v should exist", expectedEmptyDir)
+			}
+
+			files, _ := os.ReadDir(expectedEmptyDir)
+			if len(files) > 0 {
+				tester.Errorf("directory %v should have no files", expectedEmptyDir)
 			}
 		})
 	}

@@ -180,7 +180,7 @@ func main() {
 		return
 	}
 
-	if e := press.Substitute(tmplToPress+ps+tmplJson.Substitute, flags.OutPath); e != nil {
+	if e := press.Substitute(tmplToPress+ps+tmplJson.Substitute, tmplToPress); e != nil {
 		mainErr = e
 		return
 	}
