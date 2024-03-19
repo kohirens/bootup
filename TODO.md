@@ -9,3 +9,4 @@
 3. Verify that copying empty directories from the substitute directory does not leave the empty file.
 4. Search to remove any reference to "zip" or "archive."
 5. Remove the .git directory after cloning, then remove logic looking for .git to skip.
+6. Update CircleCI Version Release Orb.
