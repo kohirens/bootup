@@ -169,16 +169,12 @@ func listTemplateFields(t *template.Template, res map[string]string) {
 // parseDir Recursively walk a directory parsing all files along the way as Go templates.
 func parseDir(path string, tm *press.TmplManifest) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
-	// TODO: change to
 	nPath := fsio.Normalize(path)
-	//nPath := strings.ReplaceAll(path, "/", ps)
-	//nPath = strings.ReplaceAll(nPath, "\\", ps)
 
 	var files []string
-	i := 0
+
 	// Recursively walk the template directory.
 	err := filepath.Walk(nPath, func(fPath string, info fs.FileInfo, err error) error {
-		i++
 
 		file, e1 := filterFile(fPath, nPath, info, err, tm)
 		if err != nil {
