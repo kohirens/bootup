@@ -71,7 +71,7 @@ func TestEmptyDirectoryFeature(runner *testing.T) {
 
 	for _, tc := range fixtures {
 		runner.Run(tc.name, func(t *testing.T) {
-			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, &TmplManifest{EmptyDirFile: ".empty", Excludes: []string{}})
+			e1 := Print(tc.srcDir, tc.dstDir, tc.vars, &TmplManifest{EmptyDirFile: ".empty", CopyAsIs: []string{}})
 
 			if e1 != nil {
 				t.Errorf("got error %v, want nil", e1.Error())

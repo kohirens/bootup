@@ -134,7 +134,7 @@ func Print(tplDir, outDir string, vars map[string]string, tmplJson *TmplManifest
 		}
 
 		// TODO: replace normSourcePath, normTplDir parameters to use relativePath.
-		copied, e1 := copyAsIs(tmplJson.Excludes, relativePath, sourcePath, saveDir)
+		copied, e1 := copyAsIs(tmplJson.CopyAsIs, relativePath, sourcePath, saveDir)
 		if e1 != nil {
 			return e1
 		} else if copied {

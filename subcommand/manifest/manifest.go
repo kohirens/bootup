@@ -210,11 +210,11 @@ func filterFile(sourcePath, nPath string, info os.FileInfo, wErr error, tm *pres
 	normSourcePath = strings.ReplaceAll(normSourcePath, "\\", ps)
 
 	// Skip files that are listed in the excludes.
-	if tm.Excludes != nil {
+	if tm.CopyAsIs != nil {
 		fileToCheck := strings.ReplaceAll(normSourcePath, nPath, "")
 		fileToCheck = strings.ReplaceAll(fileToCheck, ps, "")
 
-		for _, exclude := range tm.Excludes {
+		for _, exclude := range tm.CopyAsIs {
 			fileToCheckB := strings.ReplaceAll(exclude, "\\", "")
 			fileToCheckB = strings.ReplaceAll(exclude, "/", "")
 

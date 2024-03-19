@@ -22,8 +22,8 @@
             "type": "string",
             "pattern": "^\\.?[a-zA-Z0-9-_.]+$"
         },
-        "excludes": {
-            "description": "A list of files and directories to exclude from template processing, and to copy as-is",
+        "copyAsIs": {
+            "description": "A list of files and directories to skip template processing and copy to the output directory unaltered.",
             "type": "array",
             "items": {
                 "type": "string"
@@ -32,7 +32,7 @@
             "uniqueItems": true
         },
         "skip": {
-            "description": "A list of files and directories to completely skip, will not be processed or copied",
+            "description": "A list of files and directories to completely skip, will not be processed or copied to the output directory",
             "type": "array",
             "items": {
                 "type": "string"

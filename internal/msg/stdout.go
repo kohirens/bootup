@@ -13,7 +13,6 @@ var Stdout = struct {
 	CurrentVersion        string
 	CurrentVersionInfo    string
 	Cwd                   string
-	FileToCheck           string
 	GeneratedManifest     string
 	MadeNewConfig         string
 	NoPlaceholders        string
@@ -55,7 +54,6 @@ var Stdout = struct {
 	CurrentVersion:        "%v, %v",
 	CurrentVersionInfo:    "version: %v, %v",
 	Cwd:                   "current working directory is %v",
-	FileToCheck:           "fileToCheck: %v against excludes",
 	GeneratedManifest:     "manifest generated %v",
 	MadeNewConfig:         "saved %d bytes to a new config %v",
 	NoPlaceholders:        "this template contains no placeholders/actions, which is ok",

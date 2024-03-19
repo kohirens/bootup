@@ -25,7 +25,7 @@ type TmplManifest struct {
 
 	// A list of files to exclude from processing through the template,
 	// but still are output in the final output.
-	Excludes []string `json:"excludes,omitempty"`
+	CopyAsIs []string `json:"copyAsIs,omitempty"`
 
 	IgnoreExtensions *[]string `json:"ignoreExtensions,omitempty"`
 
