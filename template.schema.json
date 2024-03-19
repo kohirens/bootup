@@ -50,7 +50,7 @@
             }
         },
         "substitute": {
-            "description": "Specify the name of the substitute directory. Files in this directory are copied (recursively) to the root of the template right before pressing output, and will also be processed by the template engine.",
+            "description": "Name of a directory containing files to overwrite at the root of the template before template processing. This is for cases where you need to include files, for example, automation but also want one for the template.",
             "type": "string",
             "pattern": "^\\.?[a-zA-Z0-9-_.]+$"
         }

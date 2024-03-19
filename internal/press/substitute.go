@@ -11,20 +11,12 @@ import (
 // the TmplPath, overwriting any existing files.
 // This is done before any templates are processed, to ensure they are run
 // also through the template engine.
-func Substitute(dir, tp string) error {
-	if !path.Exist(dir) {
-		return nil
-	}
-
-	if !path.Exist(tp) {
-		return fmt.Errorf(msg.Stderr.PathNotExist, tp)
-	}
-
-	// This has to overwrite files, delete the direcory would be bad as
+func Substitute(source, dest string) error {
+	// This has to overwrite files, delete the directory would be bad as
 	// there may be files that the template designer place there that was meant
 	// to keep.
-	if e := path.CopyDirToDir(dir, tp, PS, dirMode); e != nil {
-		return fmt.Errorf(msg.Stderr.CannotCopyDirToDir, dir, tp, e.Error())
+	if e := path.CopyDirToDir(source, dest, PS, dirMode); e != nil {
+		return fmt.Errorf(msg.Stderr.CannotCopyDirToDir, source, dest, e.Error())
 	}
 
 	return nil

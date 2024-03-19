@@ -14,6 +14,7 @@ var defaultJson = `{
 		"*.wmv"
 	],
 	"emptyDirFile": ".empty",
-	"skip": []
+	"skip": [],
+	"substitute": "replace"
 }
 `
