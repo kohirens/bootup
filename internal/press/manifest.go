@@ -18,16 +18,14 @@ type AnswersJson struct {
 }
 
 type TmplManifest struct {
-	// EmptyDirFile Name of a file that marks a directory as empty and has the
-	// effect of "mkdir -p". This file allows you to add directories to Git but
-	// have them made and empty when the template is pressed.
-	EmptyDirFile string `json:"emptyDirFile"`
-
 	// A list of files to exclude from processing through the template,
 	// but still are output in the final output.
 	CopyAsIs []string `json:"copyAsIs,omitempty"`
 
-	IgnoreExtensions *[]string `json:"ignoreExtensions,omitempty"`
+	// EmptyDirFile Name of a file that marks a directory as empty and has the
+	// effect of "mkdir -p". This file allows you to add directories to Git but
+	// have them made and empty when the template is pressed.
+	EmptyDirFile string `json:"emptyDirFile"`
 
 	// Values to supply to the template to fill in variables.
 	Placeholders map[string]string `json:"placeholders,omitempty"`

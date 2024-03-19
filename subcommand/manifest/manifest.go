@@ -110,16 +110,32 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
 
-	// start with the default template.json
-
+	filename := tmplPath + ps + press.TmplManifestFile
+	// otherwise, start with the default template.json
 	tm, e1 := press.NewTmplManifest([]byte(defaultJson))
 	if e1 != nil {
 		return "", e1
 	}
+
+	// check for existing template manifest and load it
+	existing, e2 := press.ReadTemplateJson(filename)
+	if e2 != nil {
+		log.Infof(e2.Error())
+	}
+
+	if existing != nil { // merge old into the new updating it at the same time.
+		tm.CopyAsIs = existing.CopyAsIs
+		tm.EmptyDirFile = existing.EmptyDirFile
+		tm.Placeholders = existing.Placeholders
+		tm.Skip = existing.Skip
+		tm.Substitute = existing.Substitute
+		tm.Validation = existing.Validation
+	}
+
 	// Traverse the path recursively, filtering out files that should be excluded
-	templates, err := parseDir(tmplPath, tm)
-	if err != nil {
-		return "", err
+	templates, e3 := parseDir(tmplPath, tm)
+	if e3 != nil {
+		return "", e3
 	}
 
 	actions := make(map[string]string)
@@ -137,8 +153,6 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 	}
 
 	tm.Placeholders = actions
-
-	filename := tmplPath + ps + press.TmplManifestFile
 
 	if e := saveFile(filename, tm); e != nil {
 		return "", e

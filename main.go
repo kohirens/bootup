@@ -186,7 +186,7 @@ func main() {
 	}
 
 	appData.AnswersJson = &press.AnswersJson{
-		Placeholders: make(press.StrMap),
+		Placeholders: make(map[string]string),
 	}
 
 	if fsio.Exist(flags.AnswersPath) {

@@ -20,11 +20,20 @@ func TestGenerateATemplateJson(runner *testing.T) {
 		repo string
 		want map[string]string
 	}{
-		{"onlyDataEvaluations", "repo-06", map[string]string{
-			"appTitle": "",
-			"name":     "",
-			"age":      "",
-		}},
+		{
+			"onlyDataEvaluations",
+			"repo-06",
+			map[string]string{
+				"appTitle": "",
+				"name":     "",
+				"age":      "",
+			},
+		},
+		{
+			"overwrite-bad-with-default",
+			"repo-14",
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -43,7 +52,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 			b, _ := os.ReadFile(got)
 			tm, _ := press.NewTmplManifest(b)
 			if !reflect.DeepEqual(tm.Placeholders, tc.want) {
-				t.Errorf("got %v, want %v", got, tc.want)
+				t.Errorf("got %v, want %v", tm.Placeholders, tc.want)
 			}
 		})
 	}
