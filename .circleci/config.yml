@@ -4,11 +4,14 @@ orbs:
     vr: kohirens/version-release@3.1.0
 
 parameters:
+    app_name:
+        default: "tmplpress"
+        type: string
     ctx_ci_cd:
         default: kohirens-automation
         description: automation context
         type: string
-    ctx_dockerhub:
+    ctx_docker_hub:
         default: kohirens-automation-dockerhub
         description: docker credentials context
         type: string
@@ -32,96 +35,72 @@ filter-semantic-tag: &filter-semantic-tag
         ignore: /.*/
 
 jobs:
-  co:
-    docker:
-      - image: cimg/go:1.21
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.mod" }}
-      - run:
-          name: Install Dependencies
-          command: go mod tidy
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.mod" }}
-          paths:
-            - "/go/pkg/mod"
-      - persist_to_workspace:
-          root: .
-          paths: [ . ]
+    co:
+        docker:
+            - image: cimg/go:1.21
+        steps:
+            - checkout
+            - restore_cache:
+                  keys:
+                      - go-mod-v1-{{ checksum "go.mod" }}
+            - run:
+                  name: Install Dependencies
+                  command: go mod tidy
+            - save_cache:
+                  key: go-mod-v1-{{ checksum "go.mod" }}
+                  paths:
+                      - "/go/pkg/mod"
+            - persist_to_workspace:
+                  root: .
+                  paths: [ . ]
+    run-test:
+        docker:
+            - image: cimg/go:1.21
+        steps:
+            - attach_workspace:
+                  at: .
+            - restore_cache:
+                  keys:
+                      - go-mod-v1-{{ checksum "go.mod" }}
+            - run:
+                  name: "Unit Test"
+                  command: |
+                      go test -v ./...
+            - run:
+                  name: "Validate Answers/Template Schemas"
+                  command: |
+                      curl -L -o "yajsv" https://github.com/neilpa/yajsv/releases/download/v1.4.1/yajsv.linux.amd64
+                      chmod +x ./yajsv
+                      ./yajsv -s answers.schema.json testdata/answers-01.json
+                      ./yajsv -s template.schema.json testdata/template-01.json
+                      ./yajsv -s template.schema.json testdata/template-1.2.json
 
-  run-test:
-    docker:
-      - image: cimg/go:1.21
-    steps:
-      - attach_workspace:
-          at: .
-      - restore_cache:
-            keys:
-                - go-mod-v1-{{ checksum "go.mod" }}
-      - run:
-          name: "Unit Test"
-          command: |
-              go test -v ./...
-      - run:
-          name: "Validate Answers/Template Schemas"
-          command: |
-              curl -L -o "yajsv" https://github.com/neilpa/yajsv/releases/download/v1.4.1/yajsv.linux.amd64
-              chmod +x ./yajsv
-              ./yajsv -s answers.schema.json testdata/answers-01.json
-              ./yajsv -s template.schema.json testdata/template-01.json
-              ./yajsv -s template.schema.json testdata/template-1.2.json
-
-  publish-image:
-    docker:
-      - image: kohirens/circleci-go:0.4.0
-        auth:
-          username: ${DH_USER}
-          password: ${DH_PASS}
-    environment:
-      <<: *default-env-vars
-    steps:
-      - setup_remote_docker:
-          version: "20.10.14"
-      - checkout
-      - run:
-          name: "Build and Publish Docker Release Image"
-          command: |
-            echo "Publishing tag '<< pipeline.git.tag >>'"
-            export BUILD_VER="<< pipeline.git.tag >>"
-            if [ -z "${BUILD_VER}" ]; then
-              echo "cannot publish a Docker image, release-tag is empty"
-              exit 1
-            fi
-            echo "${DH_PASS}" | docker login -u "${DH_USER}" --password-stdin
-            export DH_IMAGE="${DH_IMG_REPO}:${BUILD_VER}"
-            docker build -t "${DH_IMAGE}" --rm -f .docker/Dockerfile .
-            docker push "${DH_IMAGE}"
-            docker rmi "${DH_IMAGE}"
-
-  publish-execs:
-    docker:
-        - image: kohirens/circleci-go:0.4.0
-          auth:
-            username: ${DH_USER}
-            password: ${DH_PASS}
-    steps:
-        - checkout
-        - run:
-            name: "Build"
-            command: |
-              echo "Publishing tag '<< pipeline.git.tag >>'"
-              export BUILD_VER="<< pipeline.git.tag >>"
-              if [ -z "${BUILD_VER}" ]; then
-                echo "cannot publish executables, release-tag file not found"
-                exit 1
-              fi
-              go install
-              export PATH="${PATH}:/root/go/bin"
-              go generate
-              chmod +x ./build-gh-artifacts.sh
-              ./build-gh-artifacts.sh
+    publish-execs:
+        parameters:
+            app_name:
+                type: string
+            build_tag:
+                default: << pipeline.git.tag >>
+                type: string
+        docker:
+            - image: kohirens/go-release:0.2.7
+              auth:
+                  username: ${DH_USER}
+                  password: ${DH_PASS}
+        steps:
+            - checkout
+            - run:
+                  name: Build
+                  command: |
+                      echo "Publishing GitHub release '<< parameters.build_tag >>' assets"
+                      src_dir=.
+                      go generate "${src_dir}"
+                      go-release build \
+                          "${src_dir}" \
+                          "<< parameters.app_name >>" \
+                          "<< parameters.build_tag >>" \
+                          "kohirens" \
+                          "<< parameters.app_name >>"
 
 workflows:
     quality-control:
@@ -160,13 +139,22 @@ workflows:
 
     on-tag-release:
         jobs:
-            - publish-image:
-                  context:
-                      - << pipeline.parameters.ctx_ci_cd >>
-                      - << pipeline.parameters.ctx_dockerhub >>
-                  filters:
-                      <<: *filter-semantic-tag
             - publish-execs:
                   context: << pipeline.parameters.ctx_ci_cd >>
                   filters:
                       <<: *filter-semantic-tag
+                  app_name: <<pipeline.parameters.app_name>>
+            - vr/publish-docker-hub:
+                  context: << pipeline.parameters.ctx_docker_hub >>
+                  filters:
+                      <<: *filter-semantic-tag
+                  dockerfile: ".docker/Dockerfile"
+                  image_tag: "<< pipeline.git.tag >>"
+                  repository: "kohirens/<< pipeline.parameters.app_name >>"
+            - vr/publish-docker-hub:
+                  context: << pipeline.parameters.ctx_docker_hub >>
+                  filters:
+                      <<: *filter-semantic-tag
+                  dockerfile: ".docker/Dockerfile"
+                  image_tag: "latest"
+                  repository: "kohirens/<< pipeline.parameters.app_name >>"
