@@ -1,35 +1,35 @@
 version: 2.1
 
 orbs:
-  vro: kohirens/version-release@2.3.5
+    vr: kohirens/version-release@3.1.0
 
 parameters:
-  secrets:
-    default: kohirens-automation
-    description: Secrets context
-    type: string
-  secrets_dockerhub:
-    default: kohirens-automation-dockerhub
-    description: Secrets context
-    type: string
-  ssh_finger:
-    description: SSH fingerprint.
-    type: string
-    default: "SHA256:CgtYkgOsmwp8z79MwpBeXTs4sI1ba3S9RUCFjQ1xR3g"
-  triggered_by_bot:
-    default: false
-    description: Trigger publishing a release tag workflow.
-    type: boolean
+    ctx_ci_cd:
+        default: kohirens-automation
+        description: automation context
+        type: string
+    ctx_dockerhub:
+        default: kohirens-automation-dockerhub
+        description: docker credentials context
+        type: string
+    ssh_finger:
+        description: SSH fingerprint.
+        type: string
+        default: "SHA256:CgtYkgOsmwp8z79MwpBeXTs4sI1ba3S9RUCFjQ1xR3g"
+    triggered_flow:
+        default: "workflow-selector"
+        description: Workflow to be executed.
+        type: string
 
 default-env-vars: &default-env-vars
     DH_IMG_REPO: "kohirens/tmplpress"
     DH_CONTAINER: "tmplpress-node-1"
 
 filter-semantic-tag: &filter-semantic-tag
-  tags:
-    only: /^v?\d+\.\d+\.\d+$/
-  branches:
-    ignore: /.*/
+    tags:
+        only: /^v?\d+\.\d+\.\d+$/
+    branches:
+        ignore: /.*/
 
 jobs:
   co:
@@ -124,41 +124,49 @@ jobs:
               ./build-gh-artifacts.sh
 
 workflows:
-  quality-control:
-    jobs:
-      - co:
-          filters: { branches: { ignore: /main|auto-update-changelog/ } }
-      - run-test:
-          requires: [ co ]
+    quality-control:
+        jobs:
+            - co:
+                filters: { branches: { ignore: /main|auto-update-changelog/ } }
+            - run-test:
+                requires: [ co ]
 
-  publish-changelog:
-    when:
-      and:
-        - equal: [main, << pipeline.git.branch >>]
-        - equal: [webhook, << pipeline.trigger_source >>]
-    jobs:
-        - vro/publish-changelog:
-            context: << pipeline.parameters.secrets >>
-            ssh_finger: << pipeline.parameters.ssh_finger >>
+    workflow-selector:
+        when:
+            and:
+                - equal: ["workflow-selector", << pipeline.parameters.triggered_flow >>]
+                - equal: [ main, << pipeline.git.branch >> ]
+        jobs:
+            - vr/workflow-selector:
+                  context: << pipeline.parameters.ctx_ci_cd >>
+                  ssh_finger: << pipeline.parameters.ssh_finger >>
 
-  publish-release-tag:
-    when:
-      and:
-        - equal: [main, << pipeline.git.branch >>]
-        - << pipeline.parameters.triggered_by_bot >>
-    jobs:
-      - vro/tag-and-release:
-          context: << pipeline.parameters.secrets >>
+    publish-changelog:
+        when:
+            and:
+                - equal: ["publish-changelog", << pipeline.parameters.triggered_flow >>]
+        jobs:
+            - vr/publish-changelog:
+                  context: << pipeline.parameters.ctx_ci_cd >>
+                  ssh_finger: << pipeline.parameters.ssh_finger >>
 
-  on-tag-release:
-    jobs:
-      - publish-image:
-          context:
-              - << pipeline.parameters.secrets >>
-              - << pipeline.parameters.secrets_dockerhub >>
-          filters:
-            <<: *filter-semantic-tag
-      - publish-execs:
-          context: << pipeline.parameters.secrets >>
-          filters:
-            <<: *filter-semantic-tag
+    publish-release-tag:
+        when:
+            and:
+                - equal: ["publish-release-tag", << pipeline.parameters.triggered_flow >>]
+        jobs:
+            - vr/tag-and-release:
+                  context: << pipeline.parameters.ctx_ci_cd >>
+
+    on-tag-release:
+        jobs:
+            - publish-image:
+                  context:
+                      - << pipeline.parameters.ctx_ci_cd >>
+                      - << pipeline.parameters.ctx_dockerhub >>
+                  filters:
+                      <<: *filter-semantic-tag
+            - publish-execs:
+                  context: << pipeline.parameters.ctx_ci_cd >>
+                  filters:
+                      <<: *filter-semantic-tag
