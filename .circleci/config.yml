@@ -15,7 +15,7 @@ parameters:
   ssh_finger:
     description: SSH fingerprint.
     type: string
-    default: "8b:ca:bf:49:cc:d6:87:8c:0f:f8:de:63:6f:4c:92:ac"
+    default: "SHA256:CgtYkgOsmwp8z79MwpBeXTs4sI1ba3S9RUCFjQ1xR3g"
   triggered_by_bot:
     default: false
     description: Trigger publishing a release tag workflow.
