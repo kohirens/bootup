@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	TmplManifestFile = "template.json" // TODO: BREAKING Rename to tmplpress.json
+	schemaVersion    = "2.2.0"
+	TmplManifestFile = "template.json"
 )
 
 type AnswersJson struct {

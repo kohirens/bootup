@@ -1,0 +1,15 @@
+{
+    "emptyDirFile": ".empty",
+    "excludes": [
+        "*.exe",
+        "*.gif",
+        "*.jpg",
+        "*.mp3",
+        "*.pdf",
+        "*.png",
+        "*.tiff",
+        "*.wmv"
+    ],
+    "substitute": "replace",
+    "version": "2.2.0"
+}

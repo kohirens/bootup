@@ -16,15 +16,18 @@ var Stderr = struct {
 	CouldNotMakeCacheDir   string
 	CouldNotSaveConf       string
 	CouldNotWriteFile      string
+	EmptyDirFilename       string
 	FatalHeader            string
-	FlagOrderErr           string
+	Filename               string
 	FileTooBig             string
+	FlagOrderErr           string
 	GettingAnswers         string
 	GitFetchFailed         string
 	GetLatestTag           string
 	GetRemoteTags          string
 	InvalidCmd             string
 	InvalidManifest        string
+	InvalidManifestVersion string
 	InvalidNoArgs          string
 	InvalidNoSubCmdArgs    string
 	InvalidRegExp          string
@@ -32,6 +35,7 @@ var Stderr = struct {
 	MissingTmplJson        string
 	MissingTmplJsonVersion string
 	NewManifest            string
+	NoDir                  string
 	NoGitTagFound          string
 	NoInput                string
 	NoPath                 string
@@ -64,13 +68,16 @@ var Stderr = struct {
 	CouldNotMakeCacheDir:   "could not make cache directory, error: %s",
 	CouldNotSaveConf:       "could not save a config file, reason: %v",
 	CouldNotWriteFile:      "could not write file %v, reason: %v",
+	EmptyDirFilename:       "bad filename %q was set for property emptyDirFile",
 	FatalHeader:            "\nfatal error detected: ",
-	FlagOrderErr:           "flag %v MUST come before any non-flag arguments, a fix would be to move this flag to the left of other input arguments",
+	Filename:               "invalid filename/pattern %q",
 	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
+	FlagOrderErr:           "flag %v MUST come before any non-flag arguments, a fix would be to move this flag to the left of other input arguments",
 	GettingAnswers:         "problem getting answers; error %q",
 	GetLatestTag:           "failed to get latest tag from %v: %v",
 	InvalidCmd:             "invalid command %v",
 	InvalidManifest:        "invalid manifest found at %v, will replace it with the default",
+	InvalidManifestVersion: "bad manifest version %v, current version is %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
 	InvalidRegExp:          "invalid regular expression \"%v\", %v",
@@ -78,6 +85,7 @@ var Stderr = struct {
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
 	MissingTmplJsonVersion: "missing the Version property in template.json",
 	NewManifest:            "could not initialize a new manifest, %v",
+	NoDir:                  "directory %v was not found",
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
 	NoPath:                 "unable to determine absolute path for %v, because %v",
@@ -87,7 +95,7 @@ var Stderr = struct {
 	ParseUInt:              "could not parse %v as a natural number, %v",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
-	PlaceholdersProperty:   "missing the placeholders property in template.json",
+	PlaceholdersProperty:   "bad placeholders variables %v, %v",
 	TmplManifest404:        "the required manifest %q file was not found",
 	TmplOutput:             "template has NOT been cloned locally",
 	UnhandledHttpErr:       "template Download aborted; I'm coded to NOT do anything when HTTP status is %q and status code is %d",

@@ -99,6 +99,8 @@ func Run(ca []string) error {
 		}
 
 		log.Logf(msg.Stdout.GeneratedManifest, filename)
+	case "validate":
+		return press.ValidateManifest(input.Path)
 	}
 
 	return nil
@@ -250,10 +252,6 @@ func listNodeFields(node txtParse.Node, res map[string]string) {
 			listNodeFields(n, res)
 		}
 	}
-}
-
-type templateSchema struct {
-	Placeholders []byte
 }
 
 // save configuration file.

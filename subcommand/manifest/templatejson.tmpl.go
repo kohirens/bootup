@@ -13,8 +13,6 @@ var defaultJson = `{
 		"*.tiff",
 		"*.wmv"
 	],
-	"emptyDirFile": ".empty",
-	"skip": [],
-	"substitute": "replace"
+	"emptyDirFile": ".empty"
 }
 `

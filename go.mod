@@ -7,4 +7,5 @@ toolchain go1.21.6
 require (
 	github.com/kohirens/stdlib v0.0.0-20240317173523-467fce39bae3
 	github.com/ryanuber/go-glob v1.0.0
+	golang.org/x/mod v0.16.0
 )

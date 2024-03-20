@@ -379,3 +379,66 @@ func TestValidateRegExpCompileError(t *testing.T) {
 		t.Errorf("got %v want an error", e)
 	}
 }
+
+func Test_checkFilename(t *testing.T) {
+	tests := []struct {
+		name     string
+		filename string
+		wantErr  bool
+	}{
+		{"case-01", "file-01", false},
+		{"case-01", "/file-01", false},
+		{"case-01", "/\u0061\u0300-file-02", false},
+		{"case-01", "\u0300-file-02", true},
+		{"case-01", "/\u00E0-file-03", false},
+		{"case-01", "[!a-z]-0*.html?", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkFilename(tt.filename); (err != nil) != tt.wantErr {
+				t.Errorf("checkFilename() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestRunValidate(t *testing.T) {
+	tests := []struct {
+		name     string
+		filename string
+		cmd      string
+		wantErr  bool
+	}{
+		{"case-1", fixtureDir + PS + "template-01.json", "validate", true},
+		{"case-2", fixtureDir + PS + "template-02.json", "validate", true},
+		{"case-3", fixtureDir + PS + "template-03.json", "validate", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateManifest(tt.filename)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateManifest() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_checkSubstitute(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		filename string
+		dir      string
+		wantErr  bool
+	}{
+		{"case-1", fixtureDir + PS + t.Name(), "replace", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkSubstitute(tt.filename, tt.dir); (err != nil) != tt.wantErr {
+				t.Errorf("checkSubstitute() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

@@ -89,3 +89,26 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
+func TestRunValidate(t *testing.T) {
+	tests := []struct {
+		name     string
+		template string
+		cmd      string
+		wantErr  bool
+	}{
+		{"replace-dir-missing", fixtureDir + ps + "template-05/template.json", "validate", true},
+		{"case-2", fixtureDir + ps + "template-06/template.json", "validate", false},
+	}
+
+	for _, tt := range tests {
+		Init()
+
+		t.Run(tt.name, func(t *testing.T) {
+			err := Run([]string{tt.cmd, tt.template})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

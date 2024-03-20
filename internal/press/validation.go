@@ -2,7 +2,11 @@ package press
 
 import (
 	"fmt"
+	"github.com/kohirens/stdlib/fsio"
+	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmplpress/internal/msg"
+	"golang.org/x/mod/semver"
+	"path/filepath"
 	"regexp"
 	"strconv"
 )
@@ -12,6 +16,110 @@ type validator struct {
 	fields     []string
 	rule       string
 	message    string
+}
+
+// ValidateManifest Read a template manifest and report any errors. This is a
+// quality-of-life tool for template designers.
+func ValidateManifest(aFile string) error {
+	// check for existing template manifest and load it
+	tm, e1 := ReadTemplateJson(aFile)
+	if e1 != nil {
+		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e1.Error())
+	}
+
+	if e := checkVersion(tm.Version); e != nil {
+		return e
+	}
+
+	if e := checkCopyAsIs(tm.CopyAsIs); e != nil {
+		return e
+	}
+
+	if e := checkFilename(tm.EmptyDirFile); e != nil {
+		return fmt.Errorf(msg.Stderr.EmptyDirFilename, aFile, e.Error())
+	}
+
+	if e := checkVarName(tm.Placeholders); e != nil {
+		return fmt.Errorf(msg.Stderr.PlaceholdersProperty, aFile, e.Error())
+	}
+
+	if e := checkFilePatterns(tm.Skip); e != nil {
+		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
+	}
+
+	if e := checkSubstitute(aFile, tm.Substitute); e != nil {
+		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
+	}
+
+	if e := checkValidationRules(tm.Validation); e != nil {
+		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
+	}
+
+	return nil
+}
+
+func checkCopyAsIs(filePatterns []string) error {
+	if e := checkFilePatterns(filePatterns); e != nil {
+		return e
+	}
+
+	return nil
+}
+
+// checkFilename Verify a filename is valid. Make use of Unicode for better
+// language compatability. See https://www.regular-expressions.info/unicode.html
+func checkFilename(filename string) error {
+	re := regexp.MustCompile(`^([\p{L}\p{N}\-\\_./]|\P{M}\p{M}*)+$`)
+
+	if !re.MatchString(filename) {
+		return fmt.Errorf(msg.Stderr.Filename, filename)
+	}
+
+	return nil
+}
+
+func checkFilePatterns(files []string) error {
+	for _, aFile := range files {
+		if e := checkFilename(aFile); e != nil {
+			return e
+		}
+	}
+
+	return nil
+}
+
+func checkSubstitute(filename, dir string) error {
+	substituteDir := filepath.Dir(filename) + PS + dir
+
+	log.Infof("checking for substiture dir %v", substituteDir)
+
+	if dir != "" && !fsio.Exist(substituteDir) {
+		return fmt.Errorf(msg.Stderr.NoDir, substituteDir)
+	}
+
+	return nil
+}
+
+func checkValidationRules(rules []validator) error {
+	return nil
+}
+
+func checkVarName(vars map[string]string) error {
+	return nil
+}
+
+func checkVersion(semantic string) error {
+	ver := "v" + semantic
+	if !semver.IsValid(ver) {
+		return fmt.Errorf(msg.Stderr.MissingTmplJsonVersion)
+	}
+
+	c := semver.Compare(ver, "v"+schemaVersion)
+	if c == 1 {
+		return fmt.Errorf(msg.Stderr.InvalidManifestVersion, semantic)
+	}
+
+	return nil
 }
 
 // findValidator locate the validator for a placeholder
@@ -30,33 +138,6 @@ func findValidator(placeholder string, validators []validator) (validator, bool)
 	}
 
 	return val, found
-}
-
-// validate user input for placeholders
-func validate(userInput, placeholder string, validators []validator) (bool, error) {
-	val, found := findValidator(placeholder, validators)
-
-	if found { // perform validation
-		switch val.rule {
-		case "alphaNumeric":
-			re := regexp.MustCompile("^[a-zA-Z0-9]+$")
-			return re.MatchString(userInput), nil
-		case "bool":
-			return isBoolean(userInput)
-		case "int":
-			return isInt(userInput)
-		case "unsigned":
-			return isUInt(userInput)
-		case "regExp":
-			re, e := regexp.Compile(val.expression)
-			if e == nil {
-				return re.MatchString(userInput), nil
-			}
-			return false, e
-		}
-	}
-
-	return false, nil
 }
 
 func isBoolean(userInput string) (bool, error) {
@@ -94,4 +175,31 @@ func runRegex(expression, userInput string) (bool, error) {
 	}
 
 	return re.MatchString(userInput), nil
+}
+
+// validate user input for placeholders
+func validate(userInput, placeholder string, validators []validator) (bool, error) {
+	val, found := findValidator(placeholder, validators)
+
+	if found { // perform validation
+		switch val.rule {
+		case "alphaNumeric":
+			re := regexp.MustCompile("^[a-zA-Z0-9]+$")
+			return re.MatchString(userInput), nil
+		case "bool":
+			return isBoolean(userInput)
+		case "int":
+			return isInt(userInput)
+		case "unsigned":
+			return isUInt(userInput)
+		case "regExp":
+			re, e := regexp.Compile(val.expression)
+			if e == nil {
+				return re.MatchString(userInput), nil
+			}
+			return false, e
+		}
+	}
+
+	return false, nil
 }
