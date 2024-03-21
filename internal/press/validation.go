@@ -35,8 +35,10 @@ func ValidateManifest(aFile string) error {
 		return e
 	}
 
-	if e := checkFilename(tm.EmptyDirFile); e != nil {
-		return fmt.Errorf(msg.Stderr.EmptyDirFilename, aFile, e.Error())
+	if len(tm.EmptyDirFile) > 1 {
+		if e := checkFilename(tm.EmptyDirFile); e != nil {
+			return fmt.Errorf(msg.Stderr.EmptyDirFilename, aFile, e.Error())
+		}
 	}
 
 	if e := checkVarName(tm.Placeholders); e != nil {
@@ -51,7 +53,7 @@ func ValidateManifest(aFile string) error {
 		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
 	}
 
-	if e := checkValidationRules(tm.Validation); e != nil {
+	if e := checkValidationRules(tm.Placeholders, tm.Validation); e != nil {
 		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
 	}
 
@@ -100,7 +102,31 @@ func checkSubstitute(filename, dir string) error {
 	return nil
 }
 
-func checkValidationRules(rules []validator) error {
+// checkValidationRules Verify rules apply and are of some correctness.
+// 1. Each rule maps to existing placeholders.
+// 2. Each regex rule will compile.
+func checkValidationRules(placeholders map[string]string, validators []*validator) error {
+	for _, vldtr := range validators {
+		// verify each field is a placeholder.
+		for _, name := range vldtr.fields {
+			_, ok := placeholders[name]
+			if !ok {
+				return fmt.Errorf(msg.Stderr.NoPlaceholder, name)
+			}
+		}
+
+		if vldtr.rule == "regExp" {
+			if vldtr.expression == "" {
+				return fmt.Errorf(msg.Stderr.EmptyRegExp, vldtr.expression)
+			}
+
+			_, e := regexp.Compile(vldtr.expression)
+			if e != nil {
+				return fmt.Errorf(msg.Stderr.InvalidRegExp, vldtr.expression, e.Error())
+			}
+		}
+	}
+
 	return nil
 }
 

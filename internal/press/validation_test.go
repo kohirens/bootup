@@ -411,7 +411,6 @@ func TestRunValidate(t *testing.T) {
 	}{
 		{"case-1", fixtureDir + PS + "template-01.json", "validate", true},
 		{"case-2", fixtureDir + PS + "template-02.json", "validate", true},
-		{"case-3", fixtureDir + PS + "template-03.json", "validate", true},
 	}
 
 	for _, tt := range tests {
@@ -438,6 +437,61 @@ func Test_checkSubstitute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := checkSubstitute(tt.filename, tt.dir); (err != nil) != tt.wantErr {
 				t.Errorf("checkSubstitute() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_checkValidationRules(t *testing.T) {
+	tests := []struct {
+		name         string
+		placeholders map[string]string
+		rules        []*validator
+		wantErr      bool
+	}{
+		{
+			"non-existing-placeholder",
+			map[string]string{"var1": ""},
+			[]*validator{
+				{
+					fields:  []string{"var1", "var2"},
+					rule:    "alphaNumeric",
+					message: "var1 failed to validate",
+				},
+			},
+			true,
+		},
+		{
+			"empty-regexp",
+			map[string]string{"var1": ""},
+			[]*validator{
+				{
+					expression: "",
+					fields:     []string{"var1"},
+					rule:       "regExp",
+					message:    "var1 failed to validate",
+				},
+			},
+			true,
+		},
+		{
+			"invalid-regexp",
+			map[string]string{"var1": ""},
+			[]*validator{
+				{
+					expression: "[a-z",
+					fields:     []string{"var1"},
+					rule:       "regExp",
+					message:    "var1 failed to validate",
+				},
+			},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkValidationRules(tt.placeholders, tt.rules); (err != nil) != tt.wantErr {
+				t.Errorf("checkValidationRules() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -17,6 +17,7 @@ var Stderr = struct {
 	CouldNotSaveConf       string
 	CouldNotWriteFile      string
 	EmptyDirFilename       string
+	EmptyRegExp            string
 	FatalHeader            string
 	Filename               string
 	FileTooBig             string
@@ -39,6 +40,7 @@ var Stderr = struct {
 	NoGitTagFound          string
 	NoInput                string
 	NoPath                 string
+	NoPlaceholder          string
 	NoSetting              string
 	ParseBool              string
 	ParseInt               string
@@ -69,6 +71,7 @@ var Stderr = struct {
 	CouldNotSaveConf:       "could not save a config file, reason: %v",
 	CouldNotWriteFile:      "could not write file %v, reason: %v",
 	EmptyDirFilename:       "bad filename %q was set for property emptyDirFile",
+	EmptyRegExp:            "regExp validation rule cannot have their expression left empty",
 	FatalHeader:            "\nfatal error detected: ",
 	Filename:               "invalid filename/pattern %q",
 	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
@@ -80,7 +83,7 @@ var Stderr = struct {
 	InvalidManifestVersion: "bad manifest version %v, current version is %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
-	InvalidRegExp:          "invalid regular expression \"%v\", %v",
+	InvalidRegExp:          "invalid regular expression %q, %v",
 	InvalidTmplDir:         "invalid template directory %q",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
 	MissingTmplJsonVersion: "missing the Version property in template.json",
@@ -89,6 +92,7 @@ var Stderr = struct {
 	NoGitTagFound:          "no tag found in %v",
 	NoInput:                "no input",
 	NoPath:                 "unable to determine absolute path for %v, because %v",
+	NoPlaceholder:          "there is no placeholder %v",
 	NoSetting:              "no setting named %q found",
 	ParseBool:              "%v is not a valid boolean value",
 	ParseInt:               "could not parse %v as a integer, %v",
