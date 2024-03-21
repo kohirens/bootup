@@ -19,7 +19,7 @@ type appFlags struct {
 	DefaultVal     string // A default placeholder value when a placeholder is empty.
 	Help           bool   // The usage for all flags.
 	TmplPath       string // The URL or local template path to a template.
-	TmplType       string // Indicate the type of package for a template, such as a zip to Extract or a repository to Download.
+	TmplType       string // Indicate the type of package for a template, such as a local directory or git repository.
 	OutPath        string // The location to save the processed template output.
 	Verbosity      int
 	Version        bool // The current version
