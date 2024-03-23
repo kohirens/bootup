@@ -197,7 +197,6 @@ func isInt(userInput string) (bool, error) {
 func isUInt(userInput string) (bool, error) {
 	_, e := strconv.ParseUint(userInput, 10, 64)
 	if e != nil {
-		//return false, fmt.Errorf(msg.Stderr.ParseInt, userInput, e.Error())
 		return false, nil
 	}
 

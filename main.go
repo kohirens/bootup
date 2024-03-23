@@ -18,8 +18,6 @@ import (
 	"regexp"
 )
 
-// TODO: Change name to tmplpress
-
 const (
 	AppName    = "tmplpress"
 	gitConfDir = ".git"
