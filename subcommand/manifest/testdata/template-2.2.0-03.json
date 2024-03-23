@@ -1,0 +1,15 @@
+{
+    "emptyDirFile": ".empty",
+    "placeholders": {
+        "var1": ""
+    },
+    "validation": [
+        {
+            "rule": "regExp",
+            "fields": ["var1"],
+            "expression": "",
+            "message": "empty regex will fail validation"
+        }
+    ],
+    "version": "2.2.0"
+}

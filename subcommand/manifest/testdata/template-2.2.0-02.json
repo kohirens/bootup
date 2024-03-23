@@ -1,0 +1,14 @@
+{
+    "emptyDirFile": ".empty",
+    "placeholders": {
+        "var1": ""
+    },
+    "validation": [
+        {
+            "rule": "alphaNumeric",
+            "fields": ["var1", "var2"],
+            "message": "human readable name with capitalization and spaces"
+        }
+    ],
+    "version": "2.2.0"
+}

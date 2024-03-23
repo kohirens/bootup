@@ -99,6 +99,9 @@ func TestRunValidate(t *testing.T) {
 	}{
 		{"replace-dir-missing", fixtureDir + ps + "template-05/template.json", "validate", true},
 		{"case-2", fixtureDir + ps + "template-06/template.json", "validate", false},
+		{"placeholder-not-found", fixtureDir + ps + "template-2.2.0-02.json", "validate", true},
+		{"empty-regexp", fixtureDir + ps + "template-2.2.0-03.json", "validate", true},
+		{"invalid-regexp", fixtureDir + ps + "template-2.2.0-04.json", "validate", true},
 	}
 
 	for _, tt := range tests {
