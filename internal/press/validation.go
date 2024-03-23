@@ -12,10 +12,10 @@ import (
 )
 
 type validator struct {
-	expression string
-	fields     []string
-	rule       string
-	message    string
+	Expression string   `json:"Expression,omitempty"`
+	Fields     []string `json:"Fields"`
+	Rule       string   `json:"Rule"`
+	Message    string   `json:"Message"`
 }
 
 // ValidateManifest Read a template manifest and report any errors. This is a
@@ -108,21 +108,21 @@ func checkSubstitute(filename, dir string) error {
 func checkValidationRules(placeholders map[string]string, validators []*validator) error {
 	for _, vldtr := range validators {
 		// verify each field is a placeholder.
-		for _, name := range vldtr.fields {
+		for _, name := range vldtr.Fields {
 			_, ok := placeholders[name]
 			if !ok {
 				return fmt.Errorf(msg.Stderr.NoPlaceholder, name)
 			}
 		}
 
-		if vldtr.rule == "regExp" {
-			if vldtr.expression == "" {
-				return fmt.Errorf(msg.Stderr.EmptyRegExp, vldtr.expression)
+		if vldtr.Rule == "regExp" {
+			if vldtr.Expression == "" {
+				return fmt.Errorf(msg.Stderr.EmptyRegExp, vldtr.Expression)
 			}
 
-			_, e := regexp.Compile(vldtr.expression)
+			_, e := regexp.Compile(vldtr.Expression)
 			if e != nil {
-				return fmt.Errorf(msg.Stderr.InvalidRegExp, vldtr.expression, e.Error())
+				return fmt.Errorf(msg.Stderr.InvalidRegExp, vldtr.Expression, e.Error())
 			}
 		}
 	}
@@ -155,7 +155,7 @@ func findValidator(placeholder string, validators []validator) (validator, bool)
 
 	// locate the validator
 	for _, x := range validators {
-		for _, y := range x.fields {
+		for _, y := range x.Fields {
 			if y == placeholder {
 				val = x
 				found = true
@@ -208,7 +208,7 @@ func validate(userInput, placeholder string, validators []validator) (bool, erro
 	val, found := findValidator(placeholder, validators)
 
 	if found { // perform validation
-		switch val.rule {
+		switch val.Rule {
 		case "alphaNumeric":
 			re := regexp.MustCompile("^[a-zA-Z0-9]+$")
 			return re.MatchString(userInput), nil
@@ -219,7 +219,7 @@ func validate(userInput, placeholder string, validators []validator) (bool, erro
 		case "unsigned":
 			return isUInt(userInput)
 		case "regExp":
-			re, e := regexp.Compile(val.expression)
+			re, e := regexp.Compile(val.Expression)
 			if e == nil {
 				return re.MatchString(userInput), nil
 			}
