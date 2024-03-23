@@ -41,7 +41,7 @@ type TmplManifest struct {
 	Substitute string `json:"substitute,omitempty"`
 
 	// Optional validation to use when entering placeholder values from the CLI.
-	Validation []validator `json:"validation,omitempty"`
+	Validation []*validator `json:"validation,omitempty"`
 
 	// The version of the schema to use, which serves only as an indicator of
 	// the template engines features.

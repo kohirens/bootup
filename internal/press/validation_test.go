@@ -10,14 +10,14 @@ func TestValidateAlphaNumeric(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		{
 			"letters",
 			"abc",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -29,7 +29,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 			"hyphen",
 			"a-bc",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -41,7 +41,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 			"underscore",
 			"a_bc",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -53,7 +53,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 			"numbers",
 			"123",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -65,7 +65,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 			"lettersAndNumbers",
 			"acb123",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -77,7 +77,7 @@ func TestValidateAlphaNumeric(t *testing.T) {
 			"specialChars",
 			"*.(#",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -103,14 +103,14 @@ func TestValidateBoolean(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		{
 			"true",
 			"true",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -122,7 +122,7 @@ func TestValidateBoolean(t *testing.T) {
 			"false",
 			"false",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -134,7 +134,7 @@ func TestValidateBoolean(t *testing.T) {
 			"false",
 			"false",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -146,7 +146,7 @@ func TestValidateBoolean(t *testing.T) {
 			"badInput",
 			"1",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -172,14 +172,14 @@ func TestValidateInt(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		{
 			"number",
 			"21",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -191,7 +191,7 @@ func TestValidateInt(t *testing.T) {
 			"negative",
 			"-32",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -203,7 +203,7 @@ func TestValidateInt(t *testing.T) {
 			"NaN",
 			"NaN",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -215,7 +215,7 @@ func TestValidateInt(t *testing.T) {
 			"decimal",
 			"1.00",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -241,14 +241,14 @@ func TestValidateUInt(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		{
 			"number",
 			"21",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -260,7 +260,7 @@ func TestValidateUInt(t *testing.T) {
 			"negative",
 			"-32",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -272,7 +272,7 @@ func TestValidateUInt(t *testing.T) {
 			"NaN",
 			"NaN",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -284,7 +284,7 @@ func TestValidateUInt(t *testing.T) {
 			"decimal",
 			"1.00",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -310,14 +310,14 @@ func TestValidateRegExp(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		{
 			"compilesAndValidInput",
 			"abc",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "[a-z]",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -329,7 +329,7 @@ func TestValidateRegExp(t *testing.T) {
 			"compilesAndInvalidInput",
 			"ABC",
 			"var1",
-			[]validator{{
+			[]*validator{{
 				Expression: "[a-z]",
 				Fields:     []string{"var1"},
 				Rule:       rule,
@@ -356,13 +356,13 @@ func TestValidateRegExpCompileError(t *testing.T) {
 		name string
 		ui   string
 		ph   string
-		v    []validator
+		v    []*validator
 		want bool
 	}{
 		"doesNotCompiles",
 		"ABC",
 		"var1",
-		[]validator{{
+		[]*validator{{
 			Expression: "[a-z",
 			Fields:     []string{"var1"},
 			Rule:       rule,

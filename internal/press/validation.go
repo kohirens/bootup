@@ -149,8 +149,8 @@ func checkVersion(semantic string) error {
 }
 
 // findValidator locate the validator for a placeholder
-func findValidator(placeholder string, validators []validator) (validator, bool) {
-	var val validator
+func findValidator(placeholder string, validators []*validator) (*validator, bool) {
+	var val *validator
 	found := false
 
 	// locate the validator
@@ -204,7 +204,7 @@ func runRegex(expression, userInput string) (bool, error) {
 }
 
 // validate user input for placeholders
-func validate(userInput, placeholder string, validators []validator) (bool, error) {
+func validate(userInput, placeholder string, validators []*validator) (bool, error) {
 	val, found := findValidator(placeholder, validators)
 
 	if found { // perform validation
