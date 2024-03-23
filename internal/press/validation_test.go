@@ -496,3 +496,50 @@ func Test_checkValidationRules(t *testing.T) {
 		})
 	}
 }
+
+func Test_checkVarName(t *testing.T) {
+	tests := []struct {
+		name    string
+		vars    map[string]string
+		wantErr bool
+	}{
+		{
+			"case-1",
+			map[string]string{"1var": ""},
+			true,
+		},
+		{
+			"case-2",
+			map[string]string{"-var": ""},
+			true,
+		},
+		{
+			"accent-letter",
+			map[string]string{"\u0061\u0300": ""},
+			true,
+		},
+		{
+			"accent-letter",
+			map[string]string{"\u00E0": ""},
+			true,
+		},
+		{
+			"start-with-number",
+			map[string]string{"1bat": ""},
+			true,
+		},
+		{
+			"one-letter",
+			map[string]string{"a": ""},
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkVarName(tt.vars); (err != nil) != tt.wantErr {
+				t.Errorf("checkVarName() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

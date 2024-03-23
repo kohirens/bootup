@@ -17,6 +17,7 @@ var Stderr = struct {
 	CouldNotSaveConf       string
 	CouldNotWriteFile      string
 	EmptyDirFilename       string
+	EmptyPlaceholderName   string
 	EmptyRegExp            string
 	FatalHeader            string
 	Filename               string
@@ -31,6 +32,7 @@ var Stderr = struct {
 	InvalidManifestVersion string
 	InvalidNoArgs          string
 	InvalidNoSubCmdArgs    string
+	InvalidPlaceholderName string
 	InvalidRegExp          string
 	InvalidTmplDir         string
 	MissingTmplJson        string
@@ -71,6 +73,7 @@ var Stderr = struct {
 	CouldNotSaveConf:       "could not save a config file, reason: %v",
 	CouldNotWriteFile:      "could not write file %v, reason: %v",
 	EmptyDirFilename:       "bad filename %q was set for property emptyDirFile",
+	EmptyPlaceholderName:   "empty placeholder %q, %q",
 	EmptyRegExp:            "regExp validation rule cannot have their expression left empty",
 	FatalHeader:            "\nfatal error detected: ",
 	Filename:               "invalid filename/pattern %q",
@@ -83,6 +86,7 @@ var Stderr = struct {
 	InvalidManifestVersion: "bad manifest version %v, current version is %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
+	InvalidPlaceholderName: "invalid placeholder name %v",
 	InvalidRegExp:          "invalid regular expression %q, %v",
 	InvalidTmplDir:         "invalid template directory %q",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",

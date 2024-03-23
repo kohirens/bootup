@@ -131,6 +131,16 @@ func checkValidationRules(placeholders map[string]string, validators []*validato
 }
 
 func checkVarName(vars map[string]string) error {
+	re := regexp.MustCompile(`^\p{L}[\p{L}\p{N}\-_]+$`)
+	for name, val := range vars {
+		if name == "" {
+			return fmt.Errorf(msg.Stderr.EmptyPlaceholderName, name, val)
+		}
+
+		if !re.MatchString(name) {
+			return fmt.Errorf(msg.Stderr.InvalidPlaceholderName, name)
+		}
+	}
 	return nil
 }
 
