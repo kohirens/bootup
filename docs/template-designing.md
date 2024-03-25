@@ -98,4 +98,4 @@ they weren't used during development and conceptualizing.
   the extension its looking for.
 ---
 
-[How To Build A Template JSON Manifest]: /docs/building-a-template-json.md
+[How To Build A Template JSON Manifest]: /docs/build-a-template-json
