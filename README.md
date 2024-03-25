@@ -1,12 +1,13 @@
 # TmplPress
 
-Start an app (or something) from a template.
+A Go Template Rendering Tool. Start a project from a template rather than from scratch.
 
 ## Table of Contents
 
 * [TmplPress](#tmplpress)
     * [Info](#info)
     * [Description](#description)
+    * [What Is A Template](#what-is-a-template)
     * [Installation](#installation)
         * [Requirements](#requirements)
         * [Using Go](#using-go)
@@ -23,21 +24,23 @@ Start an app (or something) from a template.
 
 ## Description
 
-A template is a collection of files organized in a folder hierarchy. Any
-extension can be used as long as it is text (only tested with UTF-8) containing
-Go template syntax. This application takes such a folder and processes each
-file in the folder structure to an output folder of your choosing.
+Designed for initializing applications; it can be applied generally. For
+example, configuration of a dynamic CI/CD pipeline (very useful). Don't limit
+your imagination and, use it for any type of project where you need to fill-in
+values in multiple files within a single directory. Initialize those files
+with specific values, especially in an automated repeatable way.
+Where you can benefit from saving time and reducing errors.
 
-Data for the template is supplied with questions answer from the CLI or a
-JSON file as input. This is extremely powerful; you are only limited to your
-knowledge of Go templates.
+## What Is A Template
 
-You can make whole project templates or smaller pieces your more likely to use
-on a regular basis. For examole, making a Docker file template or a CI/CD
-configuration you use for many projects. Making a tempalte out of them to fill
-in application details for example.
+Template is the term used for the concept and actual __template__ file. Any
+folder containing a **manifest*** and one or more files that contain
+[Go template Actions] markup count as a template. Typically, you can point to
+a Git repository or a local folder will suffice.
 
-The idea is to quickly setup things you need on a regular basis.
+* The manifest is a configuration file, in JSON format, who's properties provide
+details to help __**"press"**__ (or render) the template. The term press as in
+newspaper press.
 
 **Hint:** Templates are invaluable for quickly setting up apps/projects layouts
 (even a small parts) that you commonly use. This is especially true when using
@@ -74,9 +77,6 @@ export PATH="${HOME}/bin:${PATH}"
 
 ## Using a Template
 
-You'll need to download this tool in order to use a template. See [Installation]
-if you have not done so.
-
 NOTE: There are command line flags should you need to place the arguments
 out of order. Run the program with `-h` or `--help` for options.
 
@@ -109,3 +109,4 @@ Run this application with 3 parameters:
 ---
 
 [Golang text/template]: https://golang.org/pkg/text/template/
+[Go template Actions]: https://pkg.go.dev/text/template#hdr-Actions
