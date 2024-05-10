@@ -83,8 +83,10 @@ func parseInput(ca []string) error {
 	return nil
 }
 
+// Run This he subcommand with input
 func Run(ca []string) error {
-	if e := parseInput(ca); e != nil {
+	e := parseInput(ca)
+	if e != nil || help {
 		return e
 	}
 
