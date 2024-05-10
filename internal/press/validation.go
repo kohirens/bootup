@@ -117,7 +117,7 @@ func checkValidationRules(placeholders map[string]string, validators []*validato
 
 		if vldtr.Rule == "regExp" {
 			if vldtr.Expression == "" {
-				return fmt.Errorf(msg.Stderr.EmptyRegExp, vldtr.Expression)
+				return fmt.Errorf(msg.Stderr.EmptyRegExp, vldtr)
 			}
 
 			_, e := regexp.Compile(vldtr.Expression)
