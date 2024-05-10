@@ -10,6 +10,7 @@ import (
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmplpress/internal/msg"
 	"github.com/ryanuber/go-glob"
+	"golang.org/x/text/cases"
 	"io"
 	"os"
 	"path/filepath"
@@ -241,7 +242,7 @@ func hasParentDir(parent, dir string) bool {
 func parse(tplFile, dstDir string, vars map[string]string) error {
 	log.Infof(msg.Stdout.Parsing, tplFile)
 	funcMap := template.FuncMap{
-		"title":   strings.Title,
+		"title":   cases.Title,
 		"toLower": strings.ToLower,
 		"toUpper": strings.ToUpper,
 	}
