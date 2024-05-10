@@ -8,11 +8,6 @@
     "type": "object",
     "required": [ "version", "placeholders" ],
     "properties": {
-        "version": {
-            "description": "The semantic version of the template.json schema used",
-            "type": "string",
-            "pattern": "\\d\\.\\d(\\.\\d)?"
-        },
         "placeholders": {
             "description": "A map where the keys are the placeholder names and the values are strings to present as a question to ask for the value in a CLI prompt",
             "type": "object"

@@ -151,7 +151,6 @@ func TestSkipping(tester *testing.T) {
 		},
 		map[string]string{"appName": "Repo 09"},
 		&TmplManifest{
-			Version: "1.2",
 			Placeholders: map[string]string{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
@@ -217,7 +216,6 @@ func TestSubstitute(tester *testing.T) {
 		},
 		map[string]string{"appName": "Repo 11"},
 		&TmplManifest{
-			Version: "2.2.0",
 			Placeholders: map[string]string{
 				"appName": "Application name, the formal name with capitalization and spaces",
 			},
