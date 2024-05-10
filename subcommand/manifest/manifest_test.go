@@ -115,3 +115,43 @@ func TestRunValidate(t *testing.T) {
 		})
 	}
 }
+
+func Test_getCleanPathEmpty(t *testing.T) {
+	tests := []struct {
+		name  string
+		aPath string
+		repo  string
+	}{
+		{"empty-string", "", "repo-15"},
+	}
+	for _, tt := range tests {
+		repoPath := git.CloneFromBundle(tt.repo, tmpDir, fixtureDir, ps)
+
+		t.Run(tt.name, func(t *testing.T) {
+			_ = os.Chdir(repoPath)
+			want := repoPath + ps + press.TmplManifestFile
+			if got := getCleanPath(tt.aPath); got != want {
+				t.Errorf("getCleanPath() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func Test_getCleanPath(t *testing.T) {
+	tests := []struct {
+		name string
+		repo string
+	}{
+		{"sample1", "repo-16"},
+	}
+	for _, tt := range tests {
+		repoPath := git.CloneFromBundle(tt.repo, tmpDir, fixtureDir, ps)
+		want := repoPath + ps + press.TmplManifestFile
+
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getCleanPath(repoPath); got != want {
+				t.Errorf("getCleanPath() = %v, want %v", got, want)
+			}
+		})
+	}
+}

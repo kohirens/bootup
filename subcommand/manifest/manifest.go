@@ -100,7 +100,16 @@ func Run(ca []string) error {
 
 		log.Logf(msg.Stdout.GeneratedManifest, filename)
 	case "validate":
-		return press.ValidateManifest(input.Path)
+		ip := getCleanPath(input.Path)
+
+		e := press.ValidateManifest(ip)
+		if e != nil {
+			log.Logf("invalid manifest %v", ip)
+		} else {
+			log.Logf("manifest is valid: %v", ip)
+		}
+
+		return e
 	}
 
 	return nil
@@ -161,6 +170,37 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 	}
 
 	return filename, nil
+}
+
+func getCleanPath(aPath string) string {
+	var wf string
+
+	if aPath == "" { // transform to current directory
+		clean, e := os.Getwd()
+		if e != nil {
+			m := fmt.Sprintf("could not access the current working dirctory %q: %v", wf, e.Error())
+			panic(m)
+		}
+		wf = clean
+	}
+
+	if fsio.Exist(aPath) {
+		clean, e := filepath.Abs(aPath)
+		if e != nil {
+			m := fmt.Sprintf("there is an issue with the path %q: %v", aPath, e.Error())
+			panic(m)
+		}
+		wf = clean
+	}
+
+	if !strings.Contains(wf, ".json") {
+		wf = wf + ps + press.TmplManifestFile
+	}
+	if !fsio.Exist(wf) {
+		panic(fmt.Sprintf("inavlid path %v", aPath))
+	}
+
+	return wf
 }
 
 // listTemplateFields list actions in Go templates. See SO answer: https://stackoverflow.com/a/40584967/419097
