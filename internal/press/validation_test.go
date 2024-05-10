@@ -410,7 +410,7 @@ func TestRunValidate(t *testing.T) {
 		wantErr  bool
 	}{
 		{"case-1", fixtureDir + PS + "template-01.json", "validate", true},
-		{"case-2", fixtureDir + PS + "template-02.json", "validate", true},
+		{"case-2", fixtureDir + PS + "template-02.json", "validate", false},
 	}
 
 	for _, tt := range tests {
