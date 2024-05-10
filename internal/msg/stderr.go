@@ -74,7 +74,7 @@ var Stderr = struct {
 	CouldNotWriteFile:      "could not write file %v, reason: %v",
 	EmptyDirFilename:       "bad filename %q was set for property emptyDirFile",
 	EmptyPlaceholderName:   "empty placeholder %q, %q",
-	EmptyRegExp:            "regExp validation rule cannot have their expression left empty",
+	EmptyRegExp:            "regular expression validation rule was left empty, see rule:  %v ",
 	FatalHeader:            "\nfatal error detected: ",
 	Filename:               "invalid filename/pattern %q",
 	FileTooBig:             "template file too big to parse, must be less thatn %v bytes",
