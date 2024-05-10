@@ -11,20 +11,24 @@ shutd () {
     printf "%s" "Shutting down the container gracefully..."
 
     # You can run clean commands here!
-
-    echo "done"
+    last_signal="15"
 }
 
 trap 'shutd' TERM
 
-echo "Starting up"
+echo "Starting up..."
 
 # Run non-blocking commands here
 go mod tidy
 go mod vendor
 
-echo "Ready."
+echo "Ready!"
 
-# This will keep the container running, it has very low CPU usage.
-# When this process receives a signal to be stopped, shutd function will run.
-while :; do :; done & kill -STOP $! && wait $!
+last_signal=""
+
+# Run until the TERM signal to stop is received.
+while [ "${last_signal}" = "15" ]; do
+    sleep 1
+done
+
+echo "done"
