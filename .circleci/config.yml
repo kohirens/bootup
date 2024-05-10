@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-    vr: kohirens/version-release@3.1.0
+    vr: kohirens/version-release@4.0.2
 
 parameters:
     app_name:
