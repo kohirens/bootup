@@ -58,6 +58,38 @@ func FindTemplates(dir string) ([]string, error) {
 	return files, nil
 }
 
+// GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
+func GetPlaceholderInput(placeholders *TmplManifest, tmplValues map[string]string, r *os.File, defaultVal string) error {
+	tVals := tmplValues
+	nPut := bufio.NewScanner(r)
+
+	for placeholder, desc := range placeholders.Placeholders {
+		a, answered := tVals[placeholder]
+		// skip placeholder that have been supplied with an answer from an answer file.
+
+		if answered {
+			log.Infof(msg.Stdout.PlaceholderHasAnswer, desc, a)
+			continue
+		}
+
+		// Just use the default value for all un-set placeholders.
+		if defaultVal != " " {
+			tVals[placeholder] = defaultVal
+			log.Infof(msg.Stdout.VarDefaultValue, placeholder)
+			continue
+		}
+
+		// Ask client for input.
+		fmt.Printf("\n%v - %v: ", placeholder, desc)
+		nPut.Scan()
+		tVals[placeholder] = nPut.Text()
+		log.Infof(msg.Stdout.Assignment, desc, tVals[placeholder])
+		log.Infof(msg.Stdout.Assignment, placeholder, tVals[placeholder])
+	}
+
+	return nil
+}
+
 // Print templates to the output directory.
 func Print(tplDir, outDir string, vars map[string]string, tmplJson *TmplManifest) error {
 	if !fsio.Exist(tplDir) {
@@ -145,6 +177,18 @@ func Print(tplDir, outDir string, vars map[string]string, tmplJson *TmplManifest
 	})
 }
 
+func ShowAllPlaceholderValues(tm *TmplManifest, tmplValues map[string]string) {
+	if tm.Placeholders == nil {
+		log.Logf(msg.Stdout.NoPlaceholders)
+		return
+	}
+
+	log.Logf(msg.Stdout.ValuesProvided)
+	for placeholder := range tm.Placeholders {
+		log.Logf(msg.Stdout.Assignment, placeholder, tmplValues[placeholder])
+	}
+}
+
 // copyAsIs Check a file matches a glob pattern, if so, then copy it to the
 // output as-is (without template parsing).
 func copyAsIs(files []string, relativePath, sourcePath, saveDir string) (bool, error) {
@@ -162,50 +206,6 @@ func copyAsIs(files []string, relativePath, sourcePath, saveDir string) (bool, e
 	}
 
 	return false, nil
-}
-
-// GetPlaceholderInput Checks for any missing placeholder values waits for their input from the CLI.
-func GetPlaceholderInput(placeholders *TmplManifest, tmplValues map[string]string, r *os.File, defaultVal string) error {
-	tVals := tmplValues
-	nPut := bufio.NewScanner(r)
-
-	for placeholder, desc := range placeholders.Placeholders {
-		a, answered := tVals[placeholder]
-		// skip placeholder that have been supplied with an answer from an answer file.
-
-		if answered {
-			log.Infof(msg.Stdout.PlaceholderHasAnswer, desc, a)
-			continue
-		}
-
-		// Just use the default value for all un-set placeholders.
-		if defaultVal != " " {
-			tVals[placeholder] = defaultVal
-			log.Infof(msg.Stdout.VarDefaultValue, placeholder)
-			continue
-		}
-
-		// Ask client for input.
-		fmt.Printf("\n%v - %v: ", placeholder, desc)
-		nPut.Scan()
-		tVals[placeholder] = nPut.Text()
-		log.Infof(msg.Stdout.Assignment, desc, tVals[placeholder])
-		log.Infof(msg.Stdout.Assignment, placeholder, tVals[placeholder])
-	}
-
-	return nil
-}
-
-func ShowAllPlaceholderValues(tm *TmplManifest, tmplValues map[string]string) {
-	if tm.Placeholders == nil {
-		log.Logf(msg.Stdout.NoPlaceholders)
-		return
-	}
-
-	log.Logf(msg.Stdout.ValuesProvided)
-	for placeholder := range tm.Placeholders {
-		log.Logf(msg.Stdout.Assignment, placeholder, tmplValues[placeholder])
-	}
 }
 
 // copyToDir Copy a file to a directory.
