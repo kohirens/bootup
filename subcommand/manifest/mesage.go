@@ -17,15 +17,27 @@ var UsageMessages = map[string]string{
 
 // UsageTmpl Usage information template of this command.
 const UsageTmpl = `
-Generate a template manifest in the {{.AppName}} schema format containing any
-placeholders found in the directory. This is a quality-of-life tool to help
-build new or update an existing template manifest file as changes to the
-template are made. Reducing human error of syncing placeholders as they are
-added, removed, or updated.
+Usage: {{.AppName}} {{.Command}} <command> [path/to/template.json]
 
-Usage: {{.AppName}} {{.Command}} generate <template-path>
+The current directory will be searched for a "template.json" if no path is
+given.
 
-example: {{.AppName}} {{.Command}} generate ./
+generate
+	Generate a template manifest in the {{.AppName}} schema format containing any
+	placeholders found in the directory. This is a quality-of-life tool to help
+	build new or update an existing template manifest file as changes to the
+	template are made. Reducing human error of syncing placeholders as they are
+	added, removed, or updated.
+
+validate
+	Validate a template.json conforms to the template.schema.json specification.
+
+examples:
+
+	$ {{.AppName}} {{.Command}} generate ./template.json
+
+	$ {{.AppName}} {{.Command}} validate ./template.json
+
 `
 
 var UsageVars = map[string]string{}
