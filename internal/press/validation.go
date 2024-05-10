@@ -27,10 +27,6 @@ func ValidateManifest(aFile string) error {
 		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e1.Error())
 	}
 
-	if e := checkVersion(tm.Version); e != nil {
-		return e
-	}
-
 	if e := checkCopyAsIs(tm.CopyAsIs); e != nil {
 		return e
 	}

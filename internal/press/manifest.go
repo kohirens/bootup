@@ -42,10 +42,6 @@ type TmplManifest struct {
 
 	// Optional validation to use when entering placeholder values from the CLI.
 	Validation []*validator `json:"validation,omitempty"`
-
-	// The version of the schema to use, which serves only as an indicator of
-	// the template engines features.
-	Version string `json:"version"`
 }
 
 // LoadAnswers Load key/value pairs from a JSON file to fill in placeholders (provides that data for the Go templates).
@@ -85,11 +81,6 @@ func ReadTemplateJson(filePath string) (*TmplManifest, error) {
 	q, e2 := NewTmplManifest(content)
 	if e2 != nil {
 		return nil, e2
-	}
-
-	log.Dbugf(msg.Stdout.TemplateVersion, q.Version)
-	if q.Version == "" {
-		return nil, fmt.Errorf(msg.Stderr.MissingTmplJsonVersion)
 	}
 
 	// It is possible to have a template with no placeholders.
