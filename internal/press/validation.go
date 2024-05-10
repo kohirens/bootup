@@ -87,11 +87,15 @@ func checkFilePatterns(files []string) error {
 }
 
 func checkSubstitute(filename, dir string) error {
+	if dir == "" {
+		return nil
+	}
+
 	substituteDir := filepath.Dir(filename) + PS + dir
 
 	log.Infof("checking for substiture dir %v", substituteDir)
 
-	if dir != "" && !fsio.Exist(substituteDir) {
+	if !fsio.Exist(substituteDir) {
 		return fmt.Errorf(msg.Stderr.NoDir, substituteDir)
 	}
 
