@@ -12,10 +12,10 @@ import (
 )
 
 type validator struct {
-	Expression string   `json:"Expression,omitempty"`
-	Fields     []string `json:"Fields"`
-	Rule       string   `json:"Rule"`
-	Message    string   `json:"Message"`
+	Expression string   `json:"expression,omitempty"`
+	Fields     []string `json:"fields"`
+	Rule       string   `json:"rule"`
+	Message    string   `json:"message"`
 }
 
 // ValidateManifest Read a template manifest and report any errors. This is a
