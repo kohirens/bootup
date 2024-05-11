@@ -119,6 +119,7 @@ func Run(ca []string) error {
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
 func generateATemplateManifest(tmplPath string) (string, error) {
+	log.Logf("generating manifest")
 	if !fsio.Exist(tmplPath) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
@@ -157,7 +158,8 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 	for _, tmpl := range templates {
 		fmt.Printf("checking %v\n", tmpl)
 
-		t, e := template.ParseFiles(tmpl)
+		bName := filepath.Base(tmpl)
+		t, e := template.New(bName).Funcs(press.FuncMap).ParseFiles(tmpl)
 		if e != nil {
 			return "", fmt.Errorf(msg.Stderr.ParsingFile, tmpl, e.Error())
 		}

@@ -25,6 +25,12 @@ const (
 	PS           = string(os.PathSeparator)
 )
 
+var FuncMap = template.FuncMap{
+	"title":   cases.Title,
+	"toLower": strings.ToLower,
+	"toUpper": strings.ToUpper,
+}
+
 // FindTemplates Recursively walk a directory looking for files along the way.
 func FindTemplates(dir string) ([]string, error) {
 	// Normalize the path separator in these 2 variables before comparing them.
@@ -241,11 +247,7 @@ func hasParentDir(parent, dir string) bool {
 // parse a file as a Go template.
 func parse(tplFile, dstDir string, vars map[string]string) error {
 	log.Infof(msg.Stdout.Parsing, tplFile)
-	funcMap := template.FuncMap{
-		"title":   cases.Title,
-		"toLower": strings.ToLower,
-		"toUpper": strings.ToUpper,
-	}
+	funcMap := FuncMap
 
 	tmplName := filepath.Base(tplFile)
 	parser, err1 := template.New(tmplName).Funcs(funcMap).ParseFiles(tplFile)
