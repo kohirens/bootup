@@ -45,6 +45,7 @@ var Stderr = struct {
 	NoPlaceholder          string
 	NoSetting              string
 	ParseBool              string
+	ParseGenerateInput     string
 	ParseInt               string
 	ParseUInt              string
 	ParsingConfigArgs      string
@@ -99,6 +100,7 @@ var Stderr = struct {
 	NoPlaceholder:          "there is no placeholder %v",
 	NoSetting:              "no setting named %q found",
 	ParseBool:              "%v is not a valid boolean value",
+	ParseGenerateInput:     "could not parse generate input: %v",
 	ParseInt:               "could not parse %v as a integer, %v",
 	ParseUInt:              "could not parse %v as a natural number, %v",
 	ParsingConfigArgs:      "error parsing config command args: %v",

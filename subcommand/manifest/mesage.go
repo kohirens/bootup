@@ -13,6 +13,7 @@ var stderr = struct {
 var UsageMessages = map[string]string{
 	"manifest": "Perform operations on the template manifest file.",
 	"help":     "Display this usage information.",
+	"Skip":     "skip files when generating the manifest.",
 }
 
 // UsageTmpl Usage information template of this command.

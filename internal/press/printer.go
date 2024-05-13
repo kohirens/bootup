@@ -154,7 +154,7 @@ func Print(tplDir, outDir string, vars map[string]string, tmplJson *TmplManifest
 		}
 
 		// Don't do anything with the files in this list.
-		if inSkipArray(relativePath, tmplJson.Skip) {
+		if InSkipArray(relativePath, tmplJson.Skip) {
 			log.Infof(msg.Stdout.Skipping, sourcePath)
 			return nil
 		}
