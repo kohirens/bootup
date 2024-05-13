@@ -40,8 +40,8 @@ func Test_inSkipArray(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := inSkipArray(tt.f, tt.patterns); got != tt.want {
-				t.Errorf("inSkipArray() = %v, want %v", got, tt.want)
+			if got := InSkipArray(tt.f, tt.patterns); got != tt.want {
+				t.Errorf("InSkipArray() = %v, want %v", got, tt.want)
 			}
 		})
 	}

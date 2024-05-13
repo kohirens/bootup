@@ -26,12 +26,14 @@ const (
 type Arguments struct {
 	Cmd  string // command to run.
 	Path string // path to generate a manifest for.
+	Skip string // files to exclude when generating a template manifest
 }
 
 var (
-	input Arguments
-	flags *flag.FlagSet
-	help  bool
+	input           Arguments
+	flags           *flag.FlagSet
+	help            bool
+	generateFlagSet *flag.FlagSet
 )
 
 func Init() *flag.FlagSet {
@@ -39,10 +41,14 @@ func Init() *flag.FlagSet {
 
 	flags.BoolVar(&help, "help", false, UsageMessages["help"])
 
+	generateFlagSet = flag.NewFlagSet("generate", flag.ExitOnError)
+
+	generateFlagSet.StringVar(&input.Skip, "skip", "", UsageMessages["Skip"])
+
 	return flags
 }
 
-func parseInput(ca []string) error {
+func parseCmd(ca []string) error {
 	if e := flags.Parse(ca); e != nil {
 		return fmt.Errorf(msg.Stderr.ParsingConfigArgs, e.Error())
 	}
@@ -70,8 +76,13 @@ func parseInput(ca []string) error {
 	}
 
 	input.Cmd = ca[0]
+
+	return nil
+}
+
+func parseInputPath(path string) error {
 	// clean up the path.
-	p, e1 := filepath.Abs(ca[1])
+	p, e1 := filepath.Abs(path)
 	if e1 != nil {
 		return fmt.Errorf(msg.Stderr.NoPath, e1.Error())
 	}
@@ -85,8 +96,7 @@ func parseInput(ca []string) error {
 
 // Run This he subcommand with input
 func Run(ca []string) error {
-	e := parseInput(ca)
-	if e != nil || help {
+	if e := parseCmd(ca); e != nil || help {
 		return e
 	}
 
@@ -95,13 +105,29 @@ func Run(ca []string) error {
 		flags.Usage()
 		return fmt.Errorf(msg.Stderr.InvalidCmd, input.Cmd)
 	case "generate":
-		filename, e1 := generateATemplateManifest(input.Path)
+		if e := generateFlagSet.Parse(flags.Args()[1:]); e != nil {
+			return fmt.Errorf(msg.Stderr.ParseGenerateInput, e.Error())
+		}
+
+		aPath := "."
+		if len(generateFlagSet.Args()) > 0 {
+			aPath = generateFlagSet.Args()[0]
+		}
+		if e := parseInputPath(aPath); e != nil || help {
+			return e
+		}
+
+		filename, e1 := generateATemplateManifest(input)
 		if e1 != nil {
 			return e1
 		}
 
 		log.Logf(msg.Stdout.GeneratedManifest, filename)
 	case "validate":
+		if e := parseInputPath(ca[1]); e != nil || help {
+			return e
+		}
+
 		ip := getCleanPath(input.Path)
 
 		e := press.ValidateManifest(ip)
@@ -118,8 +144,9 @@ func Run(ca []string) error {
 }
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
-func generateATemplateManifest(tmplPath string) (string, error) {
+func generateATemplateManifest(input Arguments) (string, error) {
 	log.Logf("generating manifest")
+	tmplPath := input.Path
 	if !fsio.Exist(tmplPath) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
@@ -146,6 +173,13 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 		tm.Validation = existing.Validation
 	}
 
+	if input.Skip != "" {
+		skips := strings.Split(input.Skip, ",")
+		tm.Skip = append(tm.Skip, skips...)
+	}
+
+	log.Infof("skip = %v\n", tm.Skip)
+
 	// Traverse the path recursively, filtering out files that should be excluded
 	templates, e3 := parseDir(tmplPath, tm)
 	if e3 != nil {
@@ -156,6 +190,16 @@ func generateATemplateManifest(tmplPath string) (string, error) {
 
 	// Parse the file as a template and extract all actions from each file.
 	for _, tmpl := range templates {
+		relativePath := strings.TrimLeft(strings.ReplaceAll(tmpl, tmplPath, ""), "\\/")
+		//fmt.Printf("relativePath = %v\n", relativePath)
+
+		// Don't do anything with the files in this list.
+		if press.InSkipArray(relativePath, tm.Skip) {
+			log.Infof(msg.Stdout.Skipping, tmpl)
+			fmt.Printf("skipping %v\n", tmpl)
+			continue
+		}
+
 		fmt.Printf("checking %v\n", tmpl)
 
 		bName := filepath.Base(tmpl)
