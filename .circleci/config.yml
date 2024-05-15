@@ -1,5 +1,16 @@
 version: 2.1
 
+# anchors:
+default-env-vars: &default-env-vars
+    DH_IMG_REPO: "kohirens/tmplpress"
+    DH_CONTAINER: "tmplpress-node-1"
+
+filter-semantic-tag: &filter-semantic-tag
+    tags:
+        only: /^v?\d+\.\d+\.\d+$/
+    branches:
+        ignore: /.*/
+
 orbs:
     vr: kohirens/version-release@4.0.2
 
@@ -23,16 +34,6 @@ parameters:
         default: "workflow-selector"
         description: Workflow to be executed.
         type: string
-
-default-env-vars: &default-env-vars
-    DH_IMG_REPO: "kohirens/tmplpress"
-    DH_CONTAINER: "tmplpress-node-1"
-
-filter-semantic-tag: &filter-semantic-tag
-    tags:
-        only: /^v?\d+\.\d+\.\d+$/
-    branches:
-        ignore: /.*/
 
 jobs:
     co:
@@ -88,7 +89,7 @@ jobs:
                   username: ${DH_USER}
                   password: ${DH_PASS}
         steps:
-            - checkout
+            - attach_workspace: { at: . }
             - run:
                   name: Build
                   command: |
@@ -139,11 +140,16 @@ workflows:
 
     on-tag-release:
         jobs:
+            - co:
+                  context: << pipeline.parameters.ctx_ci_cd >>
+                  filters:
+                      <<: *filter-semantic-tag
             - publish-execs:
                   context: << pipeline.parameters.ctx_ci_cd >>
                   filters:
                       <<: *filter-semantic-tag
                   app_name: <<pipeline.parameters.app_name>>
+                  requires: [ co ]
             - vr/publish-docker-hub:
                   context: << pipeline.parameters.ctx_docker_hub >>
                   filters:
@@ -151,6 +157,9 @@ workflows:
                   dockerfile: ".docker/Dockerfile"
                   image_tag: "<< pipeline.git.tag >>"
                   repository: "kohirens/<< pipeline.parameters.app_name >>"
+                  do_attach_workspace: true
+                  do_checkout: false
+                  requires: [ co ]
             - vr/publish-docker-hub:
                   context: << pipeline.parameters.ctx_docker_hub >>
                   filters:
@@ -158,3 +167,6 @@ workflows:
                   dockerfile: ".docker/Dockerfile"
                   image_tag: "latest"
                   repository: "kohirens/<< pipeline.parameters.app_name >>"
+                  do_attach_workspace: true
+                  do_checkout: false
+                  requires: [ co ]
