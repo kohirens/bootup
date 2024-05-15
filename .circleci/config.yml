@@ -38,7 +38,7 @@ parameters:
 jobs:
     co:
         docker:
-            - image: cimg/go:1.21
+            - image: cimg/go:1.22
         steps:
             - checkout
             - restore_cache:
@@ -56,7 +56,7 @@ jobs:
                   paths: [ . ]
     run-test:
         docker:
-            - image: cimg/go:1.21
+            - image: cimg/go:1.22
         steps:
             - attach_workspace:
                   at: .
@@ -84,7 +84,7 @@ jobs:
                 default: << pipeline.git.tag >>
                 type: string
         docker:
-            - image: kohirens/go-release:0.2.7
+            - image: kohirens/go-release:1.22.3
               auth:
                   username: ${DH_USER}
                   password: ${DH_PASS}
