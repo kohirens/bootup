@@ -29,12 +29,12 @@ var Stderr = struct {
 	GetRemoteTags          string
 	InvalidCmd             string
 	InvalidManifest        string
-	InvalidManifestVersion string
 	InvalidNoArgs          string
 	InvalidNoSubCmdArgs    string
 	InvalidPlaceholderName string
 	InvalidRegExp          string
 	InvalidTmplDir         string
+	ManifestValidation     string
 	MissingTmplJson        string
 	MissingTmplJsonVersion string
 	NewManifest            string
@@ -48,6 +48,7 @@ var Stderr = struct {
 	ParseGenerateInput     string
 	ParseInt               string
 	ParseUInt              string
+	ParseValidateInput     string
 	ParsingConfigArgs      string
 	PathNotAllowed         string
 	PlaceholdersProperty   string
@@ -84,12 +85,12 @@ var Stderr = struct {
 	GetLatestTag:           "failed to get latest tag from %v: %v",
 	InvalidCmd:             "invalid command %v",
 	InvalidManifest:        "invalid manifest found at %v, will replace it with the default",
-	InvalidManifestVersion: "bad manifest version %v, current version is %v",
 	InvalidNoArgs:          "invalid number of arguments passed to the config command, please see config -help for usage",
 	InvalidNoSubCmdArgs:    "subcommand %v takes at least %v arguments, run \"%[1]s -h\" for usage details",
 	InvalidPlaceholderName: "invalid placeholder name %v",
 	InvalidRegExp:          "invalid regular expression %q, %v",
 	InvalidTmplDir:         "invalid template directory %q",
+	ManifestValidation:     "problem with manifest %v, %v",
 	MissingTmplJson:        "%s is a file that is required to be in the template, there was a problem reading %q; error %q",
 	MissingTmplJsonVersion: "missing the Version property in template.json",
 	NewManifest:            "could not initialize a new manifest, %v",
@@ -103,6 +104,7 @@ var Stderr = struct {
 	ParseGenerateInput:     "could not parse generate input: %v",
 	ParseInt:               "could not parse %v as a integer, %v",
 	ParseUInt:              "could not parse %v as a natural number, %v",
+	ParseValidateInput:     "could not parse validate input: %v",
 	ParsingConfigArgs:      "error parsing config command args: %v",
 	PathNotAllowed:         "path/URL to template is not in the allow-list",
 	PlaceholdersProperty:   "bad placeholders variables %v, %v",

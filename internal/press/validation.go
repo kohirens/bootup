@@ -5,7 +5,6 @@ import (
 	"github.com/kohirens/stdlib/fsio"
 	"github.com/kohirens/stdlib/log"
 	"github.com/kohirens/tmplpress/internal/msg"
-	"golang.org/x/mod/semver"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -50,7 +49,7 @@ func ValidateManifest(aFile string) error {
 	}
 
 	if e := checkValidationRules(tm.Placeholders, tm.Validation); e != nil {
-		return fmt.Errorf(msg.Stderr.CannotReadFile, aFile, e.Error())
+		return fmt.Errorf(msg.Stderr.ManifestValidation, aFile, e.Error())
 	}
 
 	return nil
@@ -141,20 +140,6 @@ func checkVarName(vars map[string]string) error {
 			return fmt.Errorf(msg.Stderr.InvalidPlaceholderName, name)
 		}
 	}
-	return nil
-}
-
-func checkVersion(semantic string) error {
-	ver := "v" + semantic
-	if !semver.IsValid(ver) {
-		return fmt.Errorf(msg.Stderr.MissingTmplJsonVersion)
-	}
-
-	c := semver.Compare(ver, "v"+schemaVersion)
-	if c == 1 {
-		return fmt.Errorf(msg.Stderr.InvalidManifestVersion, semantic)
-	}
-
 	return nil
 }
 

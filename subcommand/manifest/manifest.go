@@ -34,6 +34,7 @@ var (
 	flags           *flag.FlagSet
 	help            bool
 	generateFlagSet *flag.FlagSet
+	validateFlagSet *flag.FlagSet
 )
 
 func Init() *flag.FlagSet {
@@ -44,6 +45,8 @@ func Init() *flag.FlagSet {
 	generateFlagSet = flag.NewFlagSet("generate", flag.ExitOnError)
 
 	generateFlagSet.StringVar(&input.Skip, "skip", "", UsageMessages["Skip"])
+
+	validateFlagSet = flag.NewFlagSet("validate", flag.ExitOnError)
 
 	return flags
 }
@@ -63,35 +66,44 @@ func parseCmd(ca []string) error {
 		return fmt.Errorf(msg.Stderr.InvalidNoSubCmdArgs, Name, 1)
 	}
 
-	if len(ca) < 2 {
+	input.Cmd = ca[0]
+
+	var subArgs []string
+	if len(ca) > 1 {
+		subArgs = ca[1:]
+	} else {
 		// Fall back to the current working directory when no path is specified.
 		cwd, e1 := os.Getwd()
 		if e1 != nil {
 			return fmt.Errorf(stderr.ListWorkingDirectory, e1.Error())
 		}
-
-		log.Dbugf(msg.Stdout.Cwd, cwd)
-
-		ca = append(ca, cwd)
+		subArgs = []string{cwd}
 	}
 
-	input.Cmd = ca[0]
+	switch input.Cmd {
+	case "generate":
+		if e := generateFlagSet.Parse(subArgs); e != nil {
+			return fmt.Errorf(msg.Stderr.ParseGenerateInput, e.Error())
+		}
+	case "validate":
+		if e := validateFlagSet.Parse(subArgs); e != nil {
+			return fmt.Errorf(msg.Stderr.ParseValidateInput, e.Error())
+		}
+	}
 
 	return nil
 }
 
-func parseInputPath(path string) error {
+func parseInputPath(path string) (string, error) {
 	// clean up the path.
 	p, e1 := filepath.Abs(path)
 	if e1 != nil {
-		return fmt.Errorf(msg.Stderr.NoPath, e1.Error())
+		return "", fmt.Errorf(msg.Stderr.NoPath, e1.Error())
 	}
 
-	input.Path = p
+	log.Dbugf(msg.Stdout.TemplatePath, p)
 
-	log.Dbugf(msg.Stdout.TemplatePath, input.Path)
-
-	return nil
+	return p, nil
 }
 
 // Run This he subcommand with input
@@ -105,48 +117,41 @@ func Run(ca []string) error {
 		flags.Usage()
 		return fmt.Errorf(msg.Stderr.InvalidCmd, input.Cmd)
 	case "generate":
-		if e := generateFlagSet.Parse(flags.Args()[1:]); e != nil {
-			return fmt.Errorf(msg.Stderr.ParseGenerateInput, e.Error())
-		}
-
-		aPath := "."
-		if len(generateFlagSet.Args()) > 0 {
-			aPath = generateFlagSet.Args()[0]
-		}
-		if e := parseInputPath(aPath); e != nil || help {
+		aPath, e := parseInputPath(generateFlagSet.Args()[0])
+		if e != nil || help {
 			return e
 		}
 
-		filename, e1 := generateATemplateManifest(input)
+		filename, e1 := generateATemplateManifest(aPath, input.Skip)
 		if e1 != nil {
 			return e1
 		}
 
 		log.Logf(msg.Stdout.GeneratedManifest, filename)
 	case "validate":
-		if e := parseInputPath(ca[1]); e != nil || help {
-			return e
+		aPath, e1 := parseInputPath(validateFlagSet.Args()[0])
+		if e1 != nil || help {
+			return e1
 		}
 
-		ip := getCleanPath(input.Path)
+		ip := getCleanPath(aPath)
 
-		e := press.ValidateManifest(ip)
-		if e != nil {
+		e2 := press.ValidateManifest(ip)
+		if e2 != nil {
 			log.Logf("invalid manifest %v", ip)
 		} else {
 			log.Logf("manifest is valid: %v", ip)
 		}
 
-		return e
+		return e2
 	}
 
 	return nil
 }
 
 // generateATemplateManifest Make a JSON file with your templates placeholders.
-func generateATemplateManifest(input Arguments) (string, error) {
+func generateATemplateManifest(tmplPath, skip string) (string, error) {
 	log.Logf("generating manifest")
-	tmplPath := input.Path
 	if !fsio.Exist(tmplPath) {
 		return "", fmt.Errorf(msg.Stderr.PathNotExist, tmplPath)
 	}
@@ -173,8 +178,8 @@ func generateATemplateManifest(input Arguments) (string, error) {
 		tm.Validation = existing.Validation
 	}
 
-	if input.Skip != "" {
-		skips := strings.Split(input.Skip, ",")
+	if skip != "" {
+		skips := strings.Split(skip, ",")
 		tm.Skip = append(tm.Skip, skips...)
 	}
 
