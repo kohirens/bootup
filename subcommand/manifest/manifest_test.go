@@ -39,7 +39,7 @@ func TestGenerateATemplateJson(runner *testing.T) {
 	for _, tc := range testCases {
 		runner.Run(tc.name, func(t *testing.T) {
 			repoPath := git.CloneFromBundle(tc.repo, tmpDir, fixtureDir, ps)
-			got, err := generateATemplateManifest(Arguments{Path: repoPath})
+			got, err := generateATemplateManifest(repoPath, "")
 			if err != nil {
 				t.Errorf("want nil, got: %q", err.Error())
 			}
