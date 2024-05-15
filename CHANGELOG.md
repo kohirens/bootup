@@ -1,3 +1,95 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [4.0.0] - 2024-05-15
+
+### Added
+
+- Skip File When Generating A Manifest
+- Manifest Validation Default Working Dir
+- Handle Unicode In Templates
+- Manifest Validation
+- Template Manifest Validation
+- Template Manifest Validation
+- Template Manifest Validation.
+- Glob Support To Skip List
+- Validateion for Template Input
+- Substitution Feature
+- Substitution
+- ReplaceWith Feature
+- Skip Files/Directories Feature
+
+### Changed
+
+- Load Existing Manifest On Generate
+- Upgraded Kohirens Stdlib
+- Allow Template With No Placeholders
+- Consolidate Application Runtime Feedback
+- Precheck Template Path
+- Upgraded stdlib
+- Add App Name To Cache Path
+- Export Private Git Functions
+- Default Log Level
+- Major Refactoring
+- Switch to Kohirens Stdlib kstring.InArray
+- Make Template Parse Function Private
+
+### Documentation
+
+- Updated With Recent Changes
+- Minor Update
+- Template Desining
+- Updated Documentation
+- Updated README
+- Fixed Exclude Extension Format
+- Misc Changes.
+
+### Fixed
+
+- Generating Manifest with Function Map
+- Error When Printing Help
+- Decoding Validation Rule
+- Substitute Failed To Replace Files
+- Fatal Error
+- Copy Excluded Files To Output
+- No Ouput When Substitute Provided
+- Private Type Returned From Exported Function
+- Logging Logic Error
+- Manfest Error
+- Treating URL As Local Path
+- Setting Verbosity
+- Throwing Error When Answer File Does Not Exist
+- Can Only Run Subcommands
+- RepalceWith Feature
+- Skipping Relative Paths
+
+### Regular Maintenance
+
+- Upgrade CI Tool
+- Try To Optimize Automation
+- Add New Changelog Auto Configuration
+- Change JSON Annotation To Lower Case
+- Adjust Validation Error Message
+- Substitution Logic
+- Refactored Development Environment Script
+- Upgraded Version Release Orb To 4.0.2
+
+### Removed
+
+- Version Property From Template Schema
+- References To Zip Usage
+- File Extension Checker Leftovers
+- Zip/7zip Archive Support
+- Unfinished 7-zip Integration
+
+### Testing
+
+- Fixed Test Chaning Directories
+
 <a name="unreleased"></a>
 ## [Unreleased]
 
