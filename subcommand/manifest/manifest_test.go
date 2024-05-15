@@ -127,7 +127,10 @@ func Test_getCleanPathEmpty(t *testing.T) {
 		repoPath := git.CloneFromBundle(tt.repo, tmpDir, fixtureDir, ps)
 
 		t.Run(tt.name, func(t *testing.T) {
+			wd, _ := os.Getwd()
 			_ = os.Chdir(repoPath)
+			defer os.Chdir(wd)
+
 			want := repoPath + ps + press.TmplManifestFile
 			if got := getCleanPath(tt.aPath); got != want {
 				t.Errorf("getCleanPath() = %v, want %v", got, want)
