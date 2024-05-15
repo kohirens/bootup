@@ -84,7 +84,7 @@ jobs:
                 default: << pipeline.git.tag >>
                 type: string
         docker:
-            - image: kohirens/go-release:1.22.3
+            - image: kohirens/go-release:1.22
               auth:
                   username: ${DH_USER}
                   password: ${DH_PASS}
