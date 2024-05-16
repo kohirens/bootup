@@ -155,17 +155,7 @@ workflows:
                   filters:
                       <<: *filter-semantic-tag
                   dockerfile: ".docker/Dockerfile"
-                  image_tag: "<< pipeline.git.tag >>"
-                  repository: "kohirens/<< pipeline.parameters.app_name >>"
-                  do_attach_workspace: true
-                  do_checkout: false
-                  requires: [ co ]
-            - vr/publish-docker-hub:
-                  context: << pipeline.parameters.ctx_docker_hub >>
-                  filters:
-                      <<: *filter-semantic-tag
-                  dockerfile: ".docker/Dockerfile"
-                  image_tag: "latest"
+                  image_tag: "<< pipeline.git.tag >> latest"
                   repository: "kohirens/<< pipeline.parameters.app_name >>"
                   do_attach_workspace: true
                   do_checkout: false
