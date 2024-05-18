@@ -1,10 +1,6 @@
 version: 2.1
 
 # anchors:
-default-env-vars: &default-env-vars
-    DH_IMG_REPO: "kohirens/tmplpress"
-    DH_CONTAINER: "tmplpress-node-1"
-
 filter-semantic-tag: &filter-semantic-tag
     tags:
         only: /^v?\d+\.\d+\.\d+$/
@@ -12,7 +8,7 @@ filter-semantic-tag: &filter-semantic-tag
         ignore: /.*/
 
 orbs:
-    vr: kohirens/version-release@4.0.2
+    vr: kohirens/version-release@4.0.3
 
 parameters:
     app_name:
@@ -155,7 +151,7 @@ workflows:
                   filters:
                       <<: *filter-semantic-tag
                   dockerfile: ".docker/Dockerfile"
-                  image_tag: "<< pipeline.git.tag >> latest"
+                  tags: "<< pipeline.git.tag >> latest"
                   repository: "kohirens/<< pipeline.parameters.app_name >>"
                   do_attach_workspace: true
                   do_checkout: false
