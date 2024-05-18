@@ -27,7 +27,7 @@ echo "Ready!"
 last_signal=""
 
 # Run until the TERM signal to stop is received.
-while [ "${last_signal}" = "15" ]; do
+while [ "${last_signal}" != "15" ]; do
     sleep 1
 done
 

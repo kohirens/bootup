@@ -4,7 +4,7 @@ ARG USER_GID='1000'
 ARG USER_GROUP='app_users'
 ARG REPO='github.com/kohirens/tmplpress'
 
-FROM kohirens/go:1.21.0 AS dev
+FROM kohirens/go:1.22.3 AS dev
 
 ARG USER_NAME
 ARG USER_UID
@@ -19,14 +19,16 @@ ENV SHELL /bin/bash
 
 COPY .docker/start.sh /usr/local/bin/start.sh
 
-# VS Code Requirements: openssh, musl, libgcc, libstdc++, git
+# VS Code Requirements: bash, openssh, musl, libgcc, libstdc++, git
 RUN apk --no-progress --purge --no-cache upgrade \
  && apk --no-progress --purge --no-cache add --upgrade \
+    bash \
     curl \
     git \
     gnupg \
     libgcc \
     libstdc++ \
+    musl \
     openssh \
  && apk --no-progress --purge --no-cache upgrade \
  && rm -vrf /var/cache/apk/* \
@@ -57,12 +59,13 @@ RUN go install golang.org/x/tools/gopls@latest
 #  && go install honnef.co/go/tools/cmd/staticcheck@latest \
 #  && go install github.com/cweill/gotests/...@latest
 
-COPY --chown=${USER_NAME}:${USER_GROUP} .devcontainer/download-vs-code-server.sh .
+ADD --chown=${USER_NAME}:${USER_GROUP} \
+    --chmod=777 \
+    https://raw.githubusercontent.com/b01/dl-vscode-server/updates-2024-05-16-01/download-vs-code.sh \
+    .
 
 # Install VS Code Server and Requirements for pre-installing extensions
-RUN chmod +x ./download-vs-code-server.sh && ./download-vs-code-server.sh \
- && mkdir -p /home/${USER_NAME}/.vscode-server/extensions \
- && rm ./download-vs-code-server.sh
+RUN ./download-vs-code.sh "linux" "x64" --alpine
 
 ENV PATH="/home/${USER_NAME}/bin:${PATH}"
 
@@ -84,7 +87,7 @@ COPY --chown=${USER_NAME}:${USER_GROUP} . .
 
 RUN go mod tidy && go build && go install
 
-FROM alpine:3.18 AS release
+FROM alpine:3.19 AS release
 
 ARG USER_NAME
 ARG USER_UID
